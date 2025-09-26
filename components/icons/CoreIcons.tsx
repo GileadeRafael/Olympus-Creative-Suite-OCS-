@@ -115,3 +115,9 @@ export const MailIcon: React.FC<IconProps> = ({ className }) => (
         <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
     </svg>
 );
+
+export const DiamondIcon: React.FC<IconProps> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+        <path fillRule="evenodd" d="M12.963 2.286a.75.75 0 00-1.927 0l-7.5 4.5A.75.75 0 003 7.5v9a.75.75 0 00.537.714l7.5 4.5a.75.75 0 00.927 0l7.5-4.5a.75.75 0 00.537-.714v-9a.75.75 0 00-.537-.714l-7.5-4.5zM12 6.19L6.75 9.19v5.62L12 17.81v-11.62zM17.25 9.19L12 12.19v5.62l5.25-3v-5.62z" clipRule="evenodd" />
+    </svg>
+);

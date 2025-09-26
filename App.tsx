@@ -4,6 +4,7 @@ import { ASSISTANTS } from './constants';
 import Sidebar from './components/Sidebar';
 import ChatView from './components/ChatView';
 import AuthPage from './components/AuthPage';
+import PurchaseModal from './components/PurchaseModal';
 import { startChatSession } from './services/geminiService';
 import type { Chat } from '@google/genai';
 import { LanguageProvider } from './contexts/LanguageContext';
@@ -16,20 +17,74 @@ const App: React.FC = () => {
   const { session, user } = useAuth();
   const [activeAssistant, setActiveAssistant] = useState<Assistant | null>(null);
   
-  // New state for chat history management
+  // State for chat history management
   const [chatHistory, setChatHistory] = useState<ChatHistoryItem[]>([]);
   const [activeChatId, setActiveChatId] = useState<string | 'new' | null>(null);
   const [currentMessages, setCurrentMessages] = useState<Message[]>([]);
   const [chatSession, setChatSession] = useState<Chat | null>(null);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
 
-  // Recreate chat session when assistant or the active chat (and its history) changes
+  // State for assistant purchase/unlocking
+  const [unlockedAssistants, setUnlockedAssistants] = useState<Set<string>>(new Set());
+  const [isUnlockStatusLoading, setIsUnlockStatusLoading] = useState(true);
+  const [assistantToPurchase, setAssistantToPurchase] = useState<Assistant | null>(null);
+
+  // Effect to fetch and subscribe to unlocked assistants
+  useEffect(() => {
+    if (!user) {
+        setUnlockedAssistants(new Set());
+        setIsUnlockStatusLoading(false);
+        return;
+    }
+
+    const fetchUnlocked = async () => {
+        setIsUnlockStatusLoading(true);
+        const { data, error } = await supabase
+            .from('user_assistants')
+            .select('assistant_id')
+            .eq('user_id', user.id);
+        
+        if (error) {
+            console.error("Error fetching unlocked assistants:", error.message);
+        } else {
+            setUnlockedAssistants(new Set(data.map(item => item.assistant_id)));
+        }
+        setIsUnlockStatusLoading(false);
+    };
+
+    fetchUnlocked();
+
+    const channel = supabase
+        .channel(`user_assistants:${user.id}`)
+        .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'user_assistants',
+            filter: `user_id=eq.${user.id}`
+        }, (payload) => {
+            const newAssistantId = (payload.new as { assistant_id: string }).assistant_id;
+            setUnlockedAssistants(prev => new Set(prev).add(newAssistantId));
+            
+            // If the user just purchased the assistant they were trying to view, close the modal.
+            if (assistantToPurchase?.id === newAssistantId) {
+                setAssistantToPurchase(null);
+            }
+        })
+        .subscribe();
+
+    return () => {
+        supabase.removeChannel(channel);
+    };
+  }, [user, assistantToPurchase]);
+
+
+  // Recreate chat session when assistant or the active chat changes
   useEffect(() => {
     if (activeAssistant) {
       const newSession = startChatSession(activeAssistant.systemInstruction, currentMessages);
       setChatSession(newSession);
     }
-  }, [activeAssistant, activeChatId]); // Reruns when we switch assistants or chats
+  }, [activeAssistant, activeChatId]);
 
   const fetchChatHistory = async (assistantId: string) => {
     if (!user) return null;
@@ -51,19 +106,27 @@ const App: React.FC = () => {
     return data;
   };
 
-  const handleSelectAssistant = async (assistant: Assistant) => {
+  const handleSelectUnlockedAssistant = async (assistant: Assistant) => {
     if (activeAssistant?.id === assistant.id) return;
     
     setActiveAssistant(assistant);
-    setCurrentMessages([]); // Clear messages immediately
-    setActiveChatId(null); // Reset active chat
+    setCurrentMessages([]); 
+    setActiveChatId(null); 
 
     const history = await fetchChatHistory(assistant.id);
 
     if (history && history.length > 0) {
-      handleSelectChat(history[0].id); // Load the most recent chat
+      handleSelectChat(history[0].id);
     } else {
-      handleNewChat(); // Or start a new one if no history exists
+      handleNewChat(); 
+    }
+  };
+
+  const handleAssistantClick = (assistant: Assistant) => {
+    if (unlockedAssistants.has(assistant.id)) {
+        handleSelectUnlockedAssistant(assistant);
+    } else {
+        setAssistantToPurchase(assistant);
     }
   };
 
@@ -91,19 +154,15 @@ const App: React.FC = () => {
   };
 
   const handleDeleteChat = (chatId: string) => {
-    // Optimistically update the UI by removing the chat from the list
     const originalHistory = chatHistory;
     setChatHistory(prev => prev.filter(c => c.id !== chatId));
 
-    // If the deleted chat was the active one, switch to a new chat view
     if (activeChatId === chatId) {
         handleNewChat();
     }
 
-    // Perform the deletion from the database
     supabase.from('chats').delete().eq('id', chatId)
       .then(({ error }) => {
-        // If there was an error, log it and revert the optimistic UI update
         if (error) {
             console.error("Error deleting chat:", error.message);
             setChatHistory(originalHistory);
@@ -112,13 +171,11 @@ const App: React.FC = () => {
   };
 
   const handleUpdateChatTitle = async (chatId: string, newTitle: string) => {
-    // Optimistically update the UI
     const originalHistory = [...chatHistory];
     setChatHistory(prev => prev.map(chat => 
         chat.id === chatId ? { ...chat, title: newTitle } : chat
     ));
 
-    // Update the database
     const { error } = await supabase
         .from('chats')
         .update({ title: newTitle })
@@ -126,7 +183,6 @@ const App: React.FC = () => {
 
     if (error) {
         console.error("Error updating chat title:", error.message);
-        // Revert UI on error
         setChatHistory(originalHistory);
     }
   };
@@ -194,9 +250,11 @@ const App: React.FC = () => {
       <div className="flex h-screen w-screen text-gray-800 dark:text-gray-200 bg-white dark:bg-ocs-dark-chat font-sans overflow-hidden">
         <Sidebar 
           assistants={ASSISTANTS} 
-          onSelectAssistant={handleSelectAssistant} 
+          onAssistantClick={handleAssistantClick} 
           activeAssistantId={activeAssistant?.id}
           onResetToHome={handleResetToHome}
+          unlockedAssistants={unlockedAssistants}
+          isLoading={isUnlockStatusLoading}
         />
         <main className="flex-1 flex flex-col h-full relative">
           <header className="absolute top-4 right-6 z-10">
@@ -226,6 +284,10 @@ const App: React.FC = () => {
               onUpdateChat={handleUpdateChat}
           />
         </main>
+        <PurchaseModal 
+          assistant={assistantToPurchase} 
+          onClose={() => setAssistantToPurchase(null)}
+        />
       </div>
     </LanguageProvider>
   );

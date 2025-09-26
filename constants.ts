@@ -197,9 +197,9 @@ Sempre responda em formato Markdown para organização visual. Mantenha um tom l
 
 
 export const ASSISTANTS: Assistant[] = [
-  { id: 'zora', name: 'ZORA', iconUrl: 'https://i.imgur.com/dDCJf6w.jpeg', ringColor: 'border-orange-500', descriptionKey: 'zora_description', systemInstruction: ZORA_PROMPT },
-  { id: 'wizi', name: 'WIZI', iconUrl: 'https://i.imgur.com/DLGf2bW.jpeg', ringColor: 'border-blue-600', descriptionKey: 'wizi_description', systemInstruction: WIZI_PROMPT },
-  { id: 'luma', name: 'LUMA', iconUrl: 'https://i.imgur.com/a1Rz61T.jpeg', ringColor: 'border-teal-400', descriptionKey: 'luma_description', systemInstruction: LUMA_PROMPT },
-  { id: 'loki', name: 'LOKI', iconUrl: 'https://i.imgur.com/eELvqjc.jpeg', ringColor: 'border-lime-400', descriptionKey: 'loki_description', systemInstruction: LOKI_PROMPT },
-  { id: 'iris', name: 'ÍRIS', iconUrl: 'https://i.imgur.com/rztcdE1.jpeg', ringColor: 'border-pink-500', descriptionKey: 'iris_description', systemInstruction: IRIS_PROMPT },
+  { id: 'zora', name: 'ZORA', iconUrl: 'https://i.imgur.com/dDCJf6w.jpeg', ringColor: 'border-orange-500', descriptionKey: 'zora_description', systemInstruction: ZORA_PROMPT, price: 97, purchaseUrl: 'https://pay.cakto.com.br/ixeawdp_585985' },
+  { id: 'wizi', name: 'WIZI', iconUrl: 'https://i.imgur.com/DLGf2bW.jpeg', ringColor: 'border-blue-600', descriptionKey: 'wizi_description', systemInstruction: WIZI_PROMPT, price: 97, purchaseUrl: 'https://pay.cakto.com.br/8m7wamw_585997' },
+  { id: 'luma', name: 'LUMA', iconUrl: 'https://i.imgur.com/a1Rz61T.jpeg', ringColor: 'border-teal-400', descriptionKey: 'luma_description', systemInstruction: LUMA_PROMPT, price: 87, purchaseUrl: 'https://pay.cakto.com.br/3bdnyhd_586003' },
+  { id: 'loki', name: 'LOKI', iconUrl: 'https://i.imgur.com/eELvqjc.jpeg', ringColor: 'border-lime-400', descriptionKey: 'loki_description', systemInstruction: LOKI_PROMPT, price: 127, purchaseUrl: 'https://pay.cakto.com.br/44zjs9q_586007' },
+  { id: 'iris', name: 'ÍRIS', iconUrl: 'https://i.imgur.com/rztcdE1.jpeg', ringColor: 'border-pink-500', descriptionKey: 'iris_description', systemInstruction: IRIS_PROMPT, price: 127, purchaseUrl: 'https://pay.cakto.com.br/zyruzzx_586010' },
 ];

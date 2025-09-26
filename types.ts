@@ -7,6 +7,8 @@ export interface Assistant {
   ringColor: string;
   descriptionKey: string;
   systemInstruction: string;
+  price: number;
+  purchaseUrl: string;
 }
 
 export interface Message {

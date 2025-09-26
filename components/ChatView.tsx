@@ -183,8 +183,6 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
         let modelResponse = '';
         const modelMessageId = `model-${Date.now()}`;
         
-        // FIX: Explicitly type `updatedMessages` as `Message[]` to prevent type widening on the `role` property of the new message object.
-        // This resolves type errors in subsequent calls to setMessages, onCreateChat, and onUpdateChat.
         let updatedMessages: Message[] = [...newMessages, { id: modelMessageId, role: 'model', content: '' }];
         setMessages(updatedMessages);
 
@@ -208,7 +206,6 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
         if (lastMessage && lastMessage.role === 'model' && lastMessage.content === '') {
            return prev.slice(0, -1).concat({ ...lastMessage, id: errorId, content: t('send_error') });
         }
-        // FIX: Explicitly type the new error message object to `Message` to ensure the returned array is of type `Message[]`.
         const errorMessage: Message = {id: errorId, role: 'model', content: t('send_error') };
         return [...prev, errorMessage];
       });
