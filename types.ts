@@ -13,4 +13,5 @@ export interface Message {
   id: string;
   role: 'user' | 'model';
   content: string;
+  images?: { mimeType: string; data: string }[];
 }
