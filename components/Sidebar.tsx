@@ -7,14 +7,17 @@ interface SidebarProps {
   assistants: Assistant[];
   onSelectAssistant: (assistant: Assistant) => void;
   activeAssistantId?: string;
+  onResetToHome: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ assistants, onSelectAssistant, activeAssistantId }) => {
+const Sidebar: React.FC<SidebarProps> = ({ assistants, onSelectAssistant, activeAssistantId, onResetToHome }) => {
   return (
     <aside className="bg-gray-100 dark:bg-ocs-dark-sidebar w-20 flex flex-col items-center py-6">
       <div className="mb-6">
-         <img src="https://i.imgur.com/QAy8ULl.png" alt="Olympus Logo" className="h-10 w-auto block dark:hidden" />
-         <img src="https://i.imgur.com/0vBQm1M.png" alt="Olympus Logo" className="h-10 w-auto hidden dark:block" />
+        <button onClick={onResetToHome} className="transition-transform duration-200 hover:scale-110 focus:outline-none" aria-label="Go to homepage">
+          <img src="https://i.imgur.com/QAy8ULl.png" alt="Olympus Logo" className="h-10 w-auto block dark:hidden" />
+          <img src="https://i.imgur.com/0vBQm1M.png" alt="Olympus Logo" className="h-10 w-auto hidden dark:block" />
+        </button>
       </div>
       <nav className="flex-1 flex flex-col items-center justify-center space-y-3">
         {assistants.map((assistant) => (

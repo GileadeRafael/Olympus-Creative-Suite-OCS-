@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
 import { translations, LanguageCode } from '../lib/i18n';
 
 interface LanguageContextType {
@@ -12,13 +12,13 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [language, setLanguage] = useState<LanguageCode>('en');
 
-    const t = (key: string, replacements: Record<string, string | number> = {}) => {
+    const t = useCallback((key: string, replacements: Record<string, string | number> = {}) => {
         let translation = translations[language][key] || translations['en'][key] || key;
         Object.keys(replacements).forEach(placeholder => {
             translation = translation.replace(`{${placeholder}}`, String(replacements[placeholder]));
         });
         return translation;
-    };
+    }, [language]);
 
     return (
         <LanguageContext.Provider value={{ language, setLanguage, t }}>

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import type { Assistant, Message } from '../types';
 import { sendMessageStream } from '../services/geminiService';
 import type { Chat } from '@google/genai';
-import { XIcon, PlusIcon, PaperclipIcon, ChevronDownIcon } from './icons/CoreIcons';
+import { XIcon, PlusIcon, ChevronDownIcon } from './icons/CoreIcons';
 import WelcomeScreen from './WelcomeScreen';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Remarkable } from 'remarkable';
@@ -33,15 +33,16 @@ const getCopyButtonColors = (ringColor: string): string => {
 
 interface ChatViewProps {
   assistant: Assistant | null;
-  assistants: Assistant[];
-  onSelectAssistant: (assistant: Assistant) => void;
   chatSession: Chat | null;
   messages: Message[];
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
   user: User | null;
+  activeChatId: string | 'new' | null;
+  onCreateChat: (firstUserMessage: Message, fullConversation: Message[]) => Promise<string | null>;
+  onUpdateChat: (chatId: string, fullConversation: Message[]) => Promise<void>;
 }
 
-const ChatView: React.FC<ChatViewProps> = ({ assistant, assistants, onSelectAssistant, chatSession, messages, setMessages, user }) => {
+const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, setMessages, user, activeChatId, onCreateChat, onUpdateChat }) => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedImages, setSelectedImages] = useState<{ mimeType: string; data: string }[]>([]);
@@ -168,23 +169,37 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, assistants, onSelectAssi
       content: input, 
       images: selectedImages 
     };
-    setMessages(prev => [...prev, userMessage]);
+    
+    // Optimistically update UI
+    const newMessages: Message[] = [...messages, userMessage];
+    setMessages(newMessages);
+    
     setInput('');
     setSelectedImages([]);
     setIsLoading(true);
 
     try {
-      const stream = await sendMessageStream(chatSession, input, selectedImages);
-      let modelResponse = '';
-      const modelMessageId = `model-${Date.now()}`;
-      
-      // Add a placeholder message for the model's response
-      setMessages(prev => [...prev, { id: modelMessageId, role: 'model', content: '' }]);
+        const stream = await sendMessageStream(chatSession, input, selectedImages);
+        let modelResponse = '';
+        const modelMessageId = `model-${Date.now()}`;
+        
+        // FIX: Explicitly type `updatedMessages` as `Message[]` to prevent type widening on the `role` property of the new message object.
+        // This resolves type errors in subsequent calls to setMessages, onCreateChat, and onUpdateChat.
+        let updatedMessages: Message[] = [...newMessages, { id: modelMessageId, role: 'model', content: '' }];
+        setMessages(updatedMessages);
 
-      for await (const chunk of stream) {
-        modelResponse += chunk.text;
-        setMessages(prev => prev.map(m => m.id === modelMessageId ? { ...m, content: modelResponse } : m));
-      }
+        for await (const chunk of stream) {
+            modelResponse += chunk.text;
+            updatedMessages = updatedMessages.map(m => m.id === modelMessageId ? { ...m, content: modelResponse } : m);
+            setMessages(updatedMessages);
+        }
+
+        if (activeChatId === 'new') {
+            await onCreateChat(userMessage, updatedMessages);
+        } else if (activeChatId) {
+            await onUpdateChat(activeChatId, updatedMessages);
+        }
+
     } catch (error) {
       console.error('Error sending message:', error);
       const errorId = `error-${Date.now()}`;
@@ -193,7 +208,9 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, assistants, onSelectAssi
         if (lastMessage && lastMessage.role === 'model' && lastMessage.content === '') {
            return prev.slice(0, -1).concat({ ...lastMessage, id: errorId, content: t('send_error') });
         }
-        return [...prev, {id: errorId, role: 'model', content: t('send_error') }];
+        // FIX: Explicitly type the new error message object to `Message` to ensure the returned array is of type `Message[]`.
+        const errorMessage: Message = {id: errorId, role: 'model', content: t('send_error') };
+        return [...prev, errorMessage];
       });
     } finally {
       setIsLoading(false);
@@ -208,13 +225,13 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, assistants, onSelectAssi
   };
   
   if (!assistant) {
-    return <WelcomeScreen />;
+    return <WelcomeScreen user={user} />;
   }
 
   const isSendDisabled = isLoading || (!input.trim() && selectedImages.length === 0);
 
   return (
-    <div className="flex flex-col h-full w-full">
+    <div className="flex flex-col h-full w-full relative">
       <div ref={chatContainerRef} className="flex-1 overflow-y-auto custom-scrollbar">
         <div className="max-w-4xl mx-auto px-4 pt-6 h-full">
           {messages.length === 0 ? (
@@ -234,8 +251,10 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, assistants, onSelectAssi
               <div key={msg.id} id={`message-${msg.id}`} className={`my-6 flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className="relative group">
                   <div
-                    className={`p-4 rounded-2xl max-w-2xl prose dark:prose-invert prose-p:my-2 prose-p:leading-relaxed prose-headings:my-4 prose-pre:bg-black prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-code:text-white ${
-                      msg.role === 'user' ? 'bg-ocs-accent text-white' : 'bg-gray-50 dark:bg-ocs-dark-input text-gray-800 dark:text-gray-200'
+                    className={`p-4 rounded-2xl max-w-2xl prose-p:my-2 prose-p:leading-relaxed prose-headings:my-4 prose-pre:bg-black prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-code:text-white ${
+                      msg.role === 'user' 
+                        ? 'bg-gray-200 dark:bg-ocs-dark-hover prose dark:prose-invert'
+                        : 'bg-gray-50 dark:bg-ocs-dark-input text-gray-800 dark:text-gray-200 prose dark:prose-invert'
                     }`}
                   >
                     {msg.content ? <div dangerouslySetInnerHTML={{ __html: md.render(msg.content) }} /> : null}
