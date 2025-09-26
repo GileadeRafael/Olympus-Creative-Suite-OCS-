@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabaseClient';
+import { MailIcon } from './icons/CoreIcons';
 
 const AuthPage: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(true);
@@ -8,6 +9,7 @@ const AuthPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   useEffect(() => {
     if (toast) {
@@ -35,7 +37,7 @@ const AuthPage: React.FC = () => {
 
         if (signUpError) throw signUpError;
 
-        setToast({ message: 'Check your email for the confirmation link!', type: 'success' });
+        setShowConfirmationModal(true);
 
       } else {
         // Sign In Flow
@@ -53,6 +55,13 @@ const AuthPage: React.FC = () => {
     }
   };
 
+  const handleCloseConfirmationModal = () => {
+    setShowConfirmationModal(false);
+    setIsSignUp(false);
+    setPassword('');
+    setUsername('');
+  };
+
   const backgroundStyle = {
     backgroundImage: `url('https://i.imgur.com/SDbDZkl.png')`,
     backgroundSize: 'cover',
@@ -66,6 +75,35 @@ const AuthPage: React.FC = () => {
           {toast.message}
         </div>
       )}
+
+      {showConfirmationModal && (
+        <div 
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            onClick={handleCloseConfirmationModal}
+        >
+            <div 
+                className="w-full max-w-sm bg-black/30 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/10 flex flex-col items-center text-center"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div className="mb-4 text-white bg-white/10 p-3 rounded-full">
+                    <MailIcon className="w-8 h-8" />
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-4">Confirm your email</h3>
+                <p className="text-white/80 mb-6">
+                    We've sent a confirmation link to <br/>
+                    <span className="font-semibold text-white">{email}</span>. 
+                    Please check your inbox to complete your registration.
+                </p>
+                <button
+                    onClick={handleCloseConfirmationModal}
+                    className="w-full bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                    OK
+                </button>
+            </div>
+        </div>
+      )}
+
       <div className="w-full max-w-md bg-black/30 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/10">
         <div className="flex justify-between items-center mb-6">
             <div className="flex bg-black/20 rounded-full p-1 border border-white/10">
@@ -74,7 +112,7 @@ const AuthPage: React.FC = () => {
             </div>
         </div>
 
-        <h2 className="text-3xl font-bold text-white mb-6">Create an account</h2>
+        <h2 className="text-3xl font-bold text-white mb-6">{isSignUp ? 'Create an account' : 'Welcome back'}</h2>
 
         <form onSubmit={handleAuth} className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
