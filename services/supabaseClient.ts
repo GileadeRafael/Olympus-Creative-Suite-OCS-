@@ -12,16 +12,17 @@ declare global {
 }
 
 import { createClient } from '@supabase/supabase-js';
-import { LOCAL_SUPABASE_URL, LOCAL_SUPABASE_ANON_KEY } from '../config';
+// Importa as chaves do arquivo local 'secrets.ts', que está ignorado pelo Git.
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../secrets';
 
-// This logic makes the app work seamlessly in both local and production (Vercel) environments.
-// It prioritizes Vercel's environment variables but falls back to your local config file.
-const supabaseUrl = import.meta.env?.VITE_SUPABASE_URL || LOCAL_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env?.VITE_SUPABASE_ANON_KEY || LOCAL_SUPABASE_ANON_KEY;
+// Esta lógica permite que o app funcione tanto localmente (usando secrets.ts)
+// quanto em produção na Vercel (usando as Environment Variables).
+const supabaseUrl = import.meta.env?.VITE_SUPABASE_URL || SUPABASE_URL;
+const supabaseAnonKey = import.meta.env?.VITE_SUPABASE_ANON_KEY || SUPABASE_ANON_KEY;
 
 
-if (!supabaseUrl || supabaseUrl === "COLE_SUA_URL_SUPABASE_AQUI" || !supabaseAnonKey || supabaseAnonKey === "COLE_SUA_CHAVE_ANON_SUPABASE_AQUI") {
-  throw new Error('As credenciais do Supabase não foram encontradas. Por favor, adicione-as ao arquivo "config.ts".');
+if (!supabaseUrl || supabaseUrl.startsWith("SUA_URL_SUPABASE_AQUI") || !supabaseAnonKey || supabaseAnonKey.startsWith("SUA_CHAVE_ANON_SUPABASE_AQUI")) {
+  throw new Error("As credenciais do Supabase não foram encontradas. Por favor, renomeie o arquivo 'secrets.template.ts' para 'secrets.ts' e adicione suas credenciais.");
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);

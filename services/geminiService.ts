@@ -12,15 +12,16 @@ declare global {
 
 import { GoogleGenAI, Chat, Part } from "@google/genai";
 import type { Message } from '../types';
-import { LOCAL_API_KEY } from "../config";
+// Importa as chaves do arquivo local 'secrets.ts', que está ignorado pelo Git.
+import { API_KEY } from "../secrets";
 
-// This logic makes the app work seamlessly in both local and production (Vercel) environments.
-// It prioritizes Vercel's environment variables but falls back to your local config file.
-const apiKey = import.meta.env?.VITE_API_KEY || LOCAL_API_KEY;
+// Esta lógica permite que o app funcione tanto localmente (usando secrets.ts)
+// quanto em produção na Vercel (usando as Environment Variables).
+const apiKey = import.meta.env?.VITE_API_KEY || API_KEY;
 
-if (!apiKey || apiKey === "COLE_SUA_CHAVE_GEMINI_AQUI") {
-    // Updated error message to point to the new config file for local development.
-    throw new Error("A chave de API do Gemini não foi encontrada. Por favor, adicione-a ao arquivo 'config.ts'.");
+if (!apiKey || apiKey.startsWith("SUA_CHAVE_GEMINI_AQUI")) {
+    // Mensagem de erro atualizada para o novo método.
+    throw new Error("A chave de API do Gemini não foi encontrada. Por favor, renomeie o arquivo 'secrets.template.ts' para 'secrets.ts' e adicione sua chave de API.");
 }
 
 const ai = new GoogleGenAI({ apiKey });

@@ -1,18 +1,25 @@
 /**
- * IMPORTANTE: COLE SUAS CHAVES AQUI
- * ====================================
+ * ARQUIVO DE CONFIGURAÇÃO - NÃO COMETA SUAS CHAVES AQUI!
+ * =======================================================
  * 
- * Este arquivo é a solução definitiva para o desenvolvimento local.
+ * Este arquivo serve como um fallback, mas a maneira CORRETA e SEGURA
+ * de gerenciar suas chaves para desenvolvimento local é usando um arquivo .env.local.
  * 
- * Como usar:
- * 1. Cole sua chave de API do Google AI no lugar de "AIzaSy...".
- * 2. Cole a URL do seu projeto Supabase no lugar de "https://qrwobo...".
- * 3. Cole sua chave Anon do Supabase no lugar de "eyJhbGci...".
+ * INSTRUÇÕES URGENTES:
+ * 1. Crie um novo arquivo na raiz do seu projeto chamado `.env.local`
+ * 2. Adicione suas chaves a este arquivo no seguinte formato:
  * 
- * ATENÇÃO: Este arquivo é APENAS para fazer o app funcionar no seu computador.
- * A Vercel usará as chaves que você configurou no painel dela.
+ *    VITE_API_KEY="SUA_CHAVE_GEMINI_AQUI"
+ *    VITE_SUPABASE_URL="SUA_URL_SUPABASE_AQUI"
+ *    VITE_SUPABASE_ANON_KEY="SUA_CHAVE_ANON_SUPABASE_AQUI"
+ * 
+ * 3. Certifique-se de que o arquivo `.env.local` esteja no seu `.gitignore` para
+ *    que ele nunca seja enviado para o GitHub.
+ *
+ * O aplicativo irá ler automaticamente as variáveis do seu arquivo .env.local.
+ * As chaves abaixo são apenas placeholders e farão o aplicativo falhar se usadas.
  */
 
-export const LOCAL_API_KEY = "AIzaSyDE2gM_c3uqH7B7d1nhircQQZ2RIPhdx3c";
-export const LOCAL_SUPABASE_URL = "https://qrwoboahachmnrfmgnrm.supabase.co";
-export const LOCAL_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyd29ib2FoYWNobW5yZm1nbnJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0Nzc1NzYsImV4cCI6MjA3MzA1MzU3Nn0.t91DYh5gePmNTsJV64Pzlq8YYAwp1ZJzqaHZuHu6cjA";
+export const LOCAL_API_KEY = "COLE_SUA_CHAVE_GEMINI_NO_ARQUIVO_ENV_LOCAL";
+export const LOCAL_SUPABASE_URL = "COLE_SUA_URL_SUPABASE_NO_ARQUIVO_ENV_LOCAL";
+export const LOCAL_SUPABASE_ANON_KEY = "COLE_SUA_CHAVE_ANON_SUPABASE_NO_ARQUIVO_ENV_LOCAL";
