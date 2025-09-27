@@ -12,14 +12,15 @@ declare global {
 
 import { GoogleGenAI, Chat, Part } from "@google/genai";
 import type { Message } from '../types';
+import { LOCAL_API_KEY } from "../config";
 
-// This is a Vite project. The correct way to access environment variables on the client-side
-// is via `import.meta.env`. They must be prefixed with `VITE_`.
-const apiKey = import.meta.env.VITE_API_KEY;
+// This logic makes the app work seamlessly in both local and production (Vercel) environments.
+// It prioritizes Vercel's environment variables but falls back to your local config file.
+const apiKey = import.meta.env?.VITE_API_KEY || LOCAL_API_KEY;
 
-if (!apiKey) {
-    // Updated error message to reflect the correct environment variable name for Vite.
-    throw new Error("VITE_API_KEY environment variable not set. Please ensure it's defined in your Vercel project settings.");
+if (!apiKey || apiKey === "COLE_SUA_CHAVE_GEMINI_AQUI") {
+    // Updated error message to point to the new config file for local development.
+    throw new Error("A chave de API do Gemini não foi encontrada. Por favor, adicione-a ao arquivo 'config.ts'.");
 }
 
 const ai = new GoogleGenAI({ apiKey });
