@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import type { Assistant, Message, ChatHistoryItem } from './types';
 import { ASSISTANTS } from './constants';
@@ -25,58 +26,11 @@ const App: React.FC = () => {
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
 
   // State for assistant purchase/unlocking
-  const [unlockedAssistants, setUnlockedAssistants] = useState<Set<string>>(new Set());
-  const [isUnlockStatusLoading, setIsUnlockStatusLoading] = useState(true);
+  // The logic for fetching unlocked assistants has been removed.
+  // All assistants will appear locked by default, directing users to the purchase modal.
+  const [unlockedAssistants] = useState<Set<string>>(new Set());
+  const [isUnlockStatusLoading] = useState(false);
   const [assistantToPurchase, setAssistantToPurchase] = useState<Assistant | null>(null);
-
-  // Effect to fetch and subscribe to unlocked assistants
-  useEffect(() => {
-    if (!user) {
-        setUnlockedAssistants(new Set());
-        setIsUnlockStatusLoading(false);
-        return;
-    }
-
-    const fetchUnlocked = async () => {
-        setIsUnlockStatusLoading(true);
-        const { data, error } = await supabase
-            .from('user_assistants')
-            .select('assistant_id')
-            .eq('user_id', user.id);
-        
-        if (error) {
-            console.error("Error fetching unlocked assistants:", error.message);
-        } else {
-            setUnlockedAssistants(new Set(data.map(item => item.assistant_id)));
-        }
-        setIsUnlockStatusLoading(false);
-    };
-
-    fetchUnlocked();
-
-    const channel = supabase
-        .channel(`user_assistants:${user.id}`)
-        .on('postgres_changes', {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'user_assistants',
-            filter: `user_id=eq.${user.id}`
-        }, (payload) => {
-            const newAssistantId = (payload.new as { assistant_id: string }).assistant_id;
-            setUnlockedAssistants(prev => new Set(prev).add(newAssistantId));
-            
-            // If the user just purchased the assistant they were trying to view, close the modal.
-            if (assistantToPurchase?.id === newAssistantId) {
-                setAssistantToPurchase(null);
-            }
-        })
-        .subscribe();
-
-    return () => {
-        supabase.removeChannel(channel);
-    };
-  }, [user, assistantToPurchase]);
-
 
   // Recreate chat session when assistant or the active chat changes
   useEffect(() => {

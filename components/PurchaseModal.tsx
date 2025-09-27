@@ -1,3 +1,4 @@
+
 import React from 'react';
 import type { Assistant } from '../types';
 import { XIcon } from './icons/CoreIcons';
@@ -17,12 +18,8 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({ assistant, onClose, user 
         currency: 'BRL',
     }).format(assistant.price);
 
-    // Append the user ID to the purchase URL. The webhook will receive this.
-    // Cakto's documentation/support will confirm the exact parameter name,
-    // but `custom_fields[user_id]` is a common and robust pattern.
-    const purchaseUrlWithUser = user
-        ? `${assistant.purchaseUrl}?custom_fields[user_id]=${user.id}`
-        : assistant.purchaseUrl;
+    // The user ID logic has been removed as it's not needed for the WhatsApp link.
+    const purchaseUrlWithUser = assistant.purchaseUrl;
 
     return (
         <div
@@ -33,7 +30,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({ assistant, onClose, user 
             aria-labelledby="purchase-modal-title"
         >
             <div
-                className="w-full max-w-sm bg-ocs-dark-sidebar rounded-2xl shadow-2xl p-8 border border-white/10 flex flex-col items-center text-center transform scale-95 hover:scale-100 transition-transform duration-300 relative"
+                className="w-full max-w-sm bg-ocs-dark-sidebar rounded-2xl shadow-2xl p-8 border border-white/10 flex flex-col items-center text-center relative"
                 onClick={(e) => e.stopPropagation()}
             >
                 <button
@@ -59,7 +56,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({ assistant, onClose, user 
                     href={purchaseUrlWithUser}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`w-full block text-center font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg ${getButtonColors(assistant.ringColor)}`}
+                    className={`w-full block text-center font-bold py-4 px-6 rounded-xl ${getButtonColors(assistant.ringColor)}`}
                 >
                     Buy Now for <span className="font-extrabold">{formattedPrice}</span>
                 </a>
