@@ -1,20 +1,19 @@
-// FIX: Standardized environment variable access to use `process.env.VITE_...`,
-// matching the user's Vercel configuration and ensuring build-time injection.
-declare const process: {
-  env: {
-    VITE_API_KEY?: string;
-  };
-};
+// Per @google/genai guidelines, we must use process.env for the API key.
+// This change also resolves TypeScript errors related to missing Vite client types.
 
 import { GoogleGenAI, Chat, Part } from "@google/genai";
 import type { Message } from '../types';
 
-// FIX: Use the VITE_ prefixed variable as configured by the user in Vercel.
-if (!process.env.VITE_API_KEY) {
-    throw new Error("VITE_API_KEY environment variable not set in Vercel.");
+// FIX: Per @google/genai guidelines, the API key MUST be obtained from process.env.API_KEY.
+// This also resolves the TypeScript errors related to `import.meta.env`.
+const apiKey = process.env.API_KEY;
+
+if (!apiKey) {
+    // FIX: Updated error message to reflect the correct environment variable.
+    throw new Error("API_KEY environment variable not set. Please ensure it's defined in your Vercel project settings.");
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.VITE_API_KEY });
+const ai = new GoogleGenAI({ apiKey });
 
 // Helper to convert our Message array to Gemini's history format
 const messagesToHistory = (messages: Message[]) => {
