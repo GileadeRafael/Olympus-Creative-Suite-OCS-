@@ -1,19 +1,28 @@
 import React from 'react';
 import type { Assistant } from '../types';
 import { XIcon } from './icons/CoreIcons';
+import type { User } from '@supabase/supabase-js';
 
 interface PurchaseModalProps {
     assistant: Assistant | null;
     onClose: () => void;
+    user: User | null;
 }
 
-const PurchaseModal: React.FC<PurchaseModalProps> = ({ assistant, onClose }) => {
+const PurchaseModal: React.FC<PurchaseModalProps> = ({ assistant, onClose, user }) => {
     if (!assistant) return null;
 
     const formattedPrice = new Intl.NumberFormat('pt-BR', {
         style: 'currency',
         currency: 'BRL',
     }).format(assistant.price);
+
+    // Append the user ID to the purchase URL. The webhook will receive this.
+    // Cakto's documentation/support will confirm the exact parameter name,
+    // but `custom_fields[user_id]` is a common and robust pattern.
+    const purchaseUrlWithUser = user
+        ? `${assistant.purchaseUrl}?custom_fields[user_id]=${user.id}`
+        : assistant.purchaseUrl;
 
     return (
         <div
@@ -47,7 +56,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({ assistant, onClose }) => 
                 </p>
 
                 <a
-                    href={assistant.purchaseUrl}
+                    href={purchaseUrlWithUser}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`w-full block text-center font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg ${getButtonColors(assistant.ringColor)}`}

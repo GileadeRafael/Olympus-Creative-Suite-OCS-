@@ -287,6 +287,7 @@ const App: React.FC = () => {
         <PurchaseModal 
           assistant={assistantToPurchase} 
           onClose={() => setAssistantToPurchase(null)}
+          user={user}
         />
       </div>
     </LanguageProvider>
