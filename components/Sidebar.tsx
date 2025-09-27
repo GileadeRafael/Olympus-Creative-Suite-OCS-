@@ -2,7 +2,7 @@ import React from 'react';
 import type { Assistant } from '../types';
 import ThemeToggle from './ThemeToggle';
 import LanguageSelector from './LanguageSelector';
-import { DiamondIcon } from './icons/CoreIcons';
+import { DiamondIcon, HistoryIcon } from './icons/CoreIcons';
 
 interface SidebarProps {
   assistants: Assistant[];
@@ -11,9 +11,10 @@ interface SidebarProps {
   onResetToHome: () => void;
   unlockedAssistants: Set<string>;
   isLoading: boolean;
+  onToggleHistory: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ assistants, onAssistantClick, activeAssistantId, onResetToHome, unlockedAssistants, isLoading }) => {
+const Sidebar: React.FC<SidebarProps> = ({ assistants, onAssistantClick, activeAssistantId, onResetToHome, unlockedAssistants, isLoading, onToggleHistory }) => {
   return (
     <aside className="bg-gray-100 dark:bg-ocs-dark-sidebar w-20 flex flex-col items-center py-6">
       <div className="mb-6">
@@ -53,6 +54,15 @@ const Sidebar: React.FC<SidebarProps> = ({ assistants, onAssistantClick, activeA
         })}
       </nav>
       <div className="flex flex-col items-center space-y-2">
+        {activeAssistantId && (
+            <button
+                onClick={onToggleHistory}
+                className="md:hidden w-12 h-12 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-ocs-dark-hover transition-colors duration-200 ease-in-out focus:outline-none"
+                aria-label="Toggle chat history"
+            >
+                <HistoryIcon className="w-6 h-6" />
+            </button>
+        )}
         <LanguageSelector />
         <ThemeToggle />
       </div>

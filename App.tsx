@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import type { Assistant, Message, ChatHistoryItem } from './types';
 import { ASSISTANTS } from './constants';
@@ -24,6 +25,7 @@ const App: React.FC = () => {
   const [currentMessages, setCurrentMessages] = useState<Message[]>([]);
   const [chatSession, setChatSession] = useState<Chat | null>(null);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
 
   // State for assistant purchase/unlocking
   const [unlockedAssistants, setUnlockedAssistants] = useState<Set<string>>(new Set());
@@ -152,11 +154,13 @@ const App: React.FC = () => {
         setActiveChatId(chatId);
         setCurrentMessages(data.messages || []);
     }
+    setIsHistoryModalOpen(false); // Close modal on selection
   };
   
   const handleNewChat = () => {
     setActiveChatId('new');
     setCurrentMessages([]);
+    setIsHistoryModalOpen(false); // Close modal on new chat
   };
 
   const handleDeleteChat = (chatId: string) => {
@@ -261,6 +265,7 @@ const App: React.FC = () => {
           onResetToHome={handleResetToHome}
           unlockedAssistants={unlockedAssistants}
           isLoading={isUnlockStatusLoading}
+          onToggleHistory={() => setIsHistoryModalOpen(p => !p)}
         />
         <main className="flex-1 flex flex-col h-full relative">
           <header className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
@@ -276,6 +281,8 @@ const App: React.FC = () => {
               onDeleteChat={handleDeleteChat}
               onUpdateChatTitle={handleUpdateChatTitle}
               isLoading={isHistoryLoading}
+              isOpen={isHistoryModalOpen}
+              onClose={() => setIsHistoryModalOpen(false)}
             />
           )}
           <ChatView 

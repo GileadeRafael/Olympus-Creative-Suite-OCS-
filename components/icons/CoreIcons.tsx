@@ -121,3 +121,9 @@ export const DiamondIcon: React.FC<IconProps> = ({ className }) => (
         <path fillRule="evenodd" d="M12.963 2.286a.75.75 0 00-1.927 0l-7.5 4.5A.75.75 0 003 7.5v9a.75.75 0 00.537.714l7.5 4.5a.75.75 0 00.927 0l7.5-4.5a.75.75 0 00.537-.714v-9a.75.75 0 00-.537-.714l-7.5-4.5zM12 6.19L6.75 9.19v5.62L12 17.81v-11.62zM17.25 9.19L12 12.19v5.62l5.25-3v-5.62z" clipRule="evenodd" />
     </svg>
 );
+
+export const HistoryIcon: React.FC<IconProps> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+);
