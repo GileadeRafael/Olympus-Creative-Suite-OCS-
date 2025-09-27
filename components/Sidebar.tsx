@@ -2,7 +2,7 @@ import React from 'react';
 import type { Assistant } from '../types';
 import ThemeToggle from './ThemeToggle';
 import LanguageSelector from './LanguageSelector';
-import { DiamondIcon, HistoryIcon } from './icons/CoreIcons';
+import { DiamondIcon, HistoryIcon, BellIcon } from './icons/CoreIcons';
 
 interface SidebarProps {
   assistants: Assistant[];
@@ -12,16 +12,40 @@ interface SidebarProps {
   unlockedAssistants: Set<string>;
   isLoading: boolean;
   onToggleHistory: () => void;
+  hasUnreadNotifications: boolean;
+  onToggleNotifications: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ assistants, onAssistantClick, activeAssistantId, onResetToHome, unlockedAssistants, isLoading, onToggleHistory }) => {
+const Sidebar: React.FC<SidebarProps> = ({ 
+    assistants, 
+    onAssistantClick, 
+    activeAssistantId, 
+    onResetToHome, 
+    unlockedAssistants, 
+    isLoading, 
+    onToggleHistory,
+    hasUnreadNotifications,
+    onToggleNotifications,
+}) => {
   return (
     <aside className="bg-gray-100 dark:bg-ocs-dark-sidebar w-20 flex flex-col items-center py-6">
-      <div className="mb-6">
+      <div className="flex flex-col items-center space-y-4 mb-6">
         <button onClick={onResetToHome} className="transition-transform duration-200 hover:scale-110 focus:outline-none" aria-label="Go to homepage">
           <img src="https://i.imgur.com/QAy8ULl.png" alt="Olympus Logo" className="h-10 w-auto block dark:hidden" />
           <img src="https://i.imgur.com/0vBQm1M.png" alt="Olympus Logo" className="h-10 w-auto hidden dark:block" />
         </button>
+        <div className="relative">
+             <button
+                onClick={onToggleNotifications}
+                className="w-12 h-12 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-ocs-dark-hover transition-colors duration-200 ease-in-out focus:outline-none"
+                aria-label="View notifications"
+            >
+                <BellIcon className="w-6 h-6" />
+            </button>
+            {hasUnreadNotifications && (
+                <span className="absolute top-2 right-2 block h-3 w-3 rounded-full bg-red-500 border-2 border-gray-100 dark:border-ocs-dark-sidebar pointer-events-none" />
+            )}
+        </div>
       </div>
       <nav className="flex-1 flex flex-col items-center justify-center space-y-3">
         {assistants.map((assistant) => {

@@ -14,6 +14,7 @@ import { useAuth } from './hooks/useAuth';
 import Avatar from './components/Avatar';
 import { supabase } from './services/supabaseClient';
 import HistoryModal from './components/HistoryModal';
+import NotificationsModal from './components/NotificationsModal';
 
 const App: React.FC = () => {
   const { session, user } = useAuth();
@@ -31,6 +32,29 @@ const App: React.FC = () => {
   const [unlockedAssistants, setUnlockedAssistants] = useState<Set<string>>(new Set());
   const [isUnlockStatusLoading, setIsUnlockStatusLoading] = useState(true);
   const [assistantToPurchase, setAssistantToPurchase] = useState<Assistant | null>(null);
+
+  // State for notifications
+  const [notifications, setNotifications] = useState<string[]>([]);
+  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false); // Default to false
+  const [isNotificationsModalOpen, setIsNotificationsModalOpen] = useState(false);
+  
+  // Set initial notification on app load
+  useEffect(() => {
+    setNotifications(["Welcome to Olympus Creative Suite! Select an assistant to get started."]);
+  }, []);
+
+  // Check notification read status from localStorage when user is available
+  useEffect(() => {
+    if (user) {
+        const hasBeenRead = localStorage.getItem(`welcomeNotificationRead_${user.id}`);
+        if (!hasBeenRead) {
+            setHasUnreadNotifications(true);
+        }
+    } else {
+        // Reset notification status on logout
+        setHasUnreadNotifications(false);
+    }
+  }, [user]);
 
   // Fetch unlocked assistants when the user is available and listen for real-time changes
   useEffect(() => {
@@ -246,6 +270,15 @@ const App: React.FC = () => {
     setChatHistory([]);
     setChatSession(null);
   };
+  
+  const handleCloseNotifications = () => {
+    setIsNotificationsModalOpen(false);
+    setHasUnreadNotifications(false); // Mark as read for the UI
+    if (user) {
+        // Persist the "read" status in localStorage for the specific user
+        localStorage.setItem(`welcomeNotificationRead_${user.id}`, 'true');
+    }
+  };
 
   if (!session) {
     return (
@@ -266,6 +299,8 @@ const App: React.FC = () => {
           unlockedAssistants={unlockedAssistants}
           isLoading={isUnlockStatusLoading}
           onToggleHistory={() => setIsHistoryModalOpen(p => !p)}
+          hasUnreadNotifications={hasUnreadNotifications}
+          onToggleNotifications={() => setIsNotificationsModalOpen(p => !p)}
         />
         <main className="flex-1 flex flex-col h-full relative">
           <header className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
@@ -301,6 +336,11 @@ const App: React.FC = () => {
           assistant={assistantToPurchase} 
           onClose={() => setAssistantToPurchase(null)}
           user={user}
+        />
+        <NotificationsModal
+          isOpen={isNotificationsModalOpen}
+          onClose={handleCloseNotifications}
+          notifications={notifications}
         />
       </div>
     </LanguageProvider>
