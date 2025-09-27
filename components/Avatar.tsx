@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../services/supabaseClient';
@@ -38,7 +39,7 @@ const Avatar: React.FC<AvatarProps> = ({ user }) => {
         <span className="font-semibold text-base">{username}</span>
       </button>
       {dropdownOpen && (
-         <div className="absolute top-full right-0 mt-3 w-64 bg-white/50 dark:bg-ocs-dark-input/50 backdrop-blur-2xl border border-white/30 dark:border-zinc-700/60 rounded-2xl shadow-2xl z-20 overflow-hidden">
+         <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-64 bg-white/50 dark:bg-ocs-dark-input/50 backdrop-blur-2xl border border-white/30 dark:border-zinc-700/60 rounded-2xl shadow-2xl z-20 overflow-hidden">
           <div className="p-4 border-b border-black/10 dark:border-white/10">
             <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{username}</p>
             <p className="text-xs text-gray-500 dark:text-ocs-text-muted truncate">{user.email}</p>

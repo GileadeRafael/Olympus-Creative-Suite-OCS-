@@ -26,11 +26,63 @@ const App: React.FC = () => {
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
 
   // State for assistant purchase/unlocking
-  // The logic for fetching unlocked assistants has been removed.
-  // All assistants will appear locked by default, directing users to the purchase modal.
-  const [unlockedAssistants] = useState<Set<string>>(new Set());
-  const [isUnlockStatusLoading] = useState(false);
+  const [unlockedAssistants, setUnlockedAssistants] = useState<Set<string>>(new Set());
+  const [isUnlockStatusLoading, setIsUnlockStatusLoading] = useState(true);
   const [assistantToPurchase, setAssistantToPurchase] = useState<Assistant | null>(null);
+
+  // Fetch unlocked assistants when the user is available and listen for real-time changes
+  useEffect(() => {
+    // If there's no user, reset the state and do nothing further.
+    if (!user) {
+        setUnlockedAssistants(new Set());
+        setIsUnlockStatusLoading(false);
+        return;
+    }
+
+    const fetchUnlocked = async () => {
+        setIsUnlockStatusLoading(true);
+        const { data, error } = await supabase
+            .from('user_assistants')
+            .select('assistant_id')
+            .eq('user_id', user.id);
+
+        if (error) {
+            console.error("Error fetching unlocked assistants:", error.message);
+            setUnlockedAssistants(new Set());
+        } else {
+            const unlockedIds = new Set(data.map(item => item.assistant_id));
+            setUnlockedAssistants(unlockedIds);
+        }
+        setIsUnlockStatusLoading(false);
+    };
+
+    fetchUnlocked();
+
+    // Set up a real-time subscription to the user_assistants table.
+    // This will automatically update the UI when a user's permissions change.
+    const channel = supabase
+        .channel(`user_assistants_changes_for_${user.id}`)
+        .on(
+            'postgres_changes',
+            {
+                event: '*',
+                schema: 'public',
+                table: 'user_assistants',
+                filter: `user_id=eq.${user.id}`,
+            },
+            (payload) => {
+                console.log('Permission change detected, refetching unlocked assistants.', payload);
+                // Refetch all data to ensure the UI is perfectly in sync.
+                fetchUnlocked();
+            }
+        )
+        .subscribe();
+
+    // Clean up the subscription when the component unmounts or the user changes.
+    return () => {
+        supabase.removeChannel(channel);
+    };
+  }, [user]);
 
   // Recreate chat session when assistant or the active chat changes
   useEffect(() => {
@@ -211,7 +263,7 @@ const App: React.FC = () => {
           isLoading={isUnlockStatusLoading}
         />
         <main className="flex-1 flex flex-col h-full relative">
-          <header className="absolute top-4 right-6 z-10">
+          <header className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
             {user && <Avatar user={user} />}
           </header>
            {activeAssistant && user && (
