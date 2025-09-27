@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import type { Assistant } from '../types';
 import { XIcon } from './icons/CoreIcons';
@@ -62,7 +63,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({ assistant, onClose, user 
                 </a>
 
                 <p className="text-xs text-ocs-text-muted/70 mt-4">
-                    You will be redirected to our secure payment partner, Cakto. Access is granted automatically after payment.
+                    You will be redirected to support. Access is granted automatically after payment.
                 </p>
             </div>
         </div>
