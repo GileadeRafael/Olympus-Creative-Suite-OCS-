@@ -1,6 +1,7 @@
 
 
 
+
 import React, { useState, useEffect } from 'react';
 import type { Assistant, Message, ChatHistoryItem } from './types';
 import { ASSISTANTS } from './constants';
@@ -24,7 +25,7 @@ import { ToastProvider } from './contexts/ToastContext';
 import ToastContainer from './components/ToastContainer';
 
 const AppContent: React.FC = () => {
-  const { session, user, authEvent } = useAuth();
+  const { session, user, isPasswordRecovery } = useAuth();
   const { t } = useLanguage();
   const { trackAction, resetSessionCounters } = useGamification();
   const [activeAssistant, setActiveAssistant] = useState<Assistant | null>(null);
@@ -337,7 +338,10 @@ const AppContent: React.FC = () => {
     }
   };
   
-  if (authEvent === 'PASSWORD_RECOVERY') {
+  // By checking for isPasswordRecovery before checking for a session,
+  // we ensure the user is directed to the password reset page even when
+  // Supabase has created a temporary session for them.
+  if (isPasswordRecovery) {
     return (
       <LanguageProvider>
         <ResetPasswordPage />

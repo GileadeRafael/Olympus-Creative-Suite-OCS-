@@ -6,8 +6,15 @@ export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [authEvent, setAuthEvent] = useState<AuthChangeEvent | null>(null);
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
 
   useEffect(() => {
+    // On initial load, check URL hash for recovery token. This makes the
+    // recovery state persistent even if the user reloads the page.
+    if (window.location.hash.includes('type=recovery')) {
+      setIsPasswordRecovery(true);
+    }
+    
     // This function atomically updates both user and session state
     // to prevent race conditions where the session is updated before the user object.
     const updateUserAndSession = async (currentSession: Session | null) => {
@@ -33,6 +40,15 @@ export function useAuth() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
         setAuthEvent(event);
+        // When a recovery event is detected, set the recovery state to true.
+        // This state will persist until the user signs out or reloads the page
+        // after a successful password update.
+        if (event === 'PASSWORD_RECOVERY') {
+          setIsPasswordRecovery(true);
+        } else if (event === 'SIGNED_OUT') {
+          // Explicitly reset the state on sign out.
+          setIsPasswordRecovery(false);
+        }
         updateUserAndSession(currentSession);
       }
     );
@@ -40,5 +56,5 @@ export function useAuth() {
     return () => subscription.unsubscribe();
   }, []);
 
-  return { session, user, authEvent };
+  return { session, user, authEvent, isPasswordRecovery };
 }
