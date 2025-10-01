@@ -9,7 +9,7 @@ import AuthPage from './components/AuthPage';
 import PurchaseModal from './components/PurchaseModal';
 import { startChatSession } from './services/geminiService';
 import type { Chat } from '@google/genai';
-import { LanguageProvider } from './contexts/LanguageContext';
+import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import { GamificationProvider, useGamification } from './contexts/GamificationContext';
 import { useAuth } from './hooks/useAuth';
 import Avatar from './components/Avatar';
@@ -23,6 +23,7 @@ import ToastContainer from './components/ToastContainer';
 
 const AppContent: React.FC = () => {
   const { session, user } = useAuth();
+  const { t } = useLanguage();
   const { trackAction, resetSessionCounters } = useGamification();
   const [activeAssistant, setActiveAssistant] = useState<Assistant | null>(null);
   
@@ -51,13 +52,14 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     const today = new Date();
     const formattedDate = today.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
-    const gamificationNotification = `New Gamification System! 🎮 Unlock badges for completing challenges. Check your progress by clicking on your avatar. (Implemented on ${formattedDate})`;
+    const gamificationNotification = t('notification_gamification', { date: formattedDate });
+    const welcomeNotification = t('notification_welcome');
 
     setNotifications([
         gamificationNotification,
-        "Welcome to Olympus Creative Suite! Select an assistant to get started.",
+        welcomeNotification,
     ]);
-  }, []);
+  }, [t]);
 
   // Check notification read status from localStorage when user is available
   useEffect(() => {

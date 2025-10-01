@@ -1,5 +1,6 @@
 import React from 'react';
 import { XIcon, SparklesIcon } from './icons/CoreIcons';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface NotificationsModalProps {
     isOpen: boolean;
@@ -9,6 +10,7 @@ interface NotificationsModalProps {
 
 const NotificationsModal: React.FC<NotificationsModalProps> = ({ isOpen, onClose, notifications }) => {
     if (!isOpen) return null;
+    const { t } = useLanguage();
 
     return (
         <div
@@ -24,12 +26,12 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ isOpen, onClose
             >
                 <header className="flex items-center justify-between p-4 border-b border-black/10 dark:border-white/10">
                     <h2 id="notifications-modal-title" className="font-bold text-lg text-gray-800 dark:text-white">
-                        Notifications
+                        {t('notifications_title')}
                     </h2>
                     <button
                         onClick={onClose}
                         className="p-1.5 text-gray-500 dark:text-gray-400 rounded-full hover:bg-gray-500/10 dark:hover:bg-white/10"
-                        aria-label="Close notifications"
+                        aria-label={t('notifications_close')}
                     >
                         <XIcon className="w-5 h-5" />
                     </button>
@@ -49,7 +51,7 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ isOpen, onClose
                         ))
                     ) : (
                         <div className="flex justify-center items-center h-24">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">You're all caught up!</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{t('notifications_empty')}</p>
                         </div>
                     )}
                 </div>

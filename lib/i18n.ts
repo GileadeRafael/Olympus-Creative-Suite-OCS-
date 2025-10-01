@@ -28,6 +28,11 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'new_chat': 'New Chat',
     'search_chats_placeholder': 'Search chats...',
     'no_search_results': 'No results found',
+    'notifications_title': 'Notifications',
+    'notifications_close': 'Close notifications',
+    'notifications_empty': "You're all caught up!",
+    'notification_gamification': 'New Gamification System! 🎮 Unlock badges for completing challenges. Check your progress by clicking on your avatar. (Implemented on {date})',
+    'notification_welcome': 'Welcome to Olympus Creative Suite! Select an assistant to get started.',
   },
   pt: {
     'greeting_morning': 'bom dia',
@@ -56,6 +61,11 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'new_chat': 'Nova Conversa',
     'search_chats_placeholder': 'Pesquisar conversas...',
     'no_search_results': 'Nenhum resultado encontrado',
+    'notifications_title': 'Notificações',
+    'notifications_close': 'Fechar notificações',
+    'notifications_empty': 'Você está em dia!',
+    'notification_gamification': 'Novo Sistema de Gamificação! 🎮 Desbloqueie emblemas ao completar desafios. Verifique seu progresso clicando no seu avatar. (Implementado em {date})',
+    'notification_welcome': 'Bem-vindo ao Olympus Creative Suite! Selecione um assistente para começar.',
   },
   es: {
     'greeting_morning': 'buenos días',
@@ -84,6 +94,11 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'new_chat': 'Nuevo Chat',
     'search_chats_placeholder': 'Buscar chats...',
     'no_search_results': 'No se encontraron resultados',
+    'notifications_title': 'Notificaciones',
+    'notifications_close': 'Cerrar notificaciones',
+    'notifications_empty': '¡Estás al día!',
+    'notification_gamification': '¡Nuevo sistema de gamificación! 🎮 Desbloquea insignias por completar desafíos. Revisa tu progreso haciendo clic en tu avatar. (Implementado el {date})',
+    'notification_welcome': '¡Bienvenido a Olympus Creative Suite! Selecciona un asistente para empezar.',
   },
   zh: {
     'greeting_morning': '早上好',
@@ -112,6 +127,11 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'new_chat': '新聊天',
     'search_chats_placeholder': '搜索聊天...',
     'no_search_results': '未找到结果',
+    'notifications_title': '通知',
+    'notifications_close': '关闭通知',
+    'notifications_empty': '您已了解所有最新信息！',
+    'notification_gamification': '全新游戏化系统！🎮 完成挑战即可解锁徽章。点击您的头像查看进度。(实施于 {date})',
+    'notification_welcome': '欢迎来到 Olympus Creative Suite！请选择一位助手开始。',
   },
   fr: {
     'greeting_morning': 'bonjour',
@@ -140,5 +160,10 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'new_chat': 'Nouvelle Discussion',
     'search_chats_placeholder': 'Rechercher des discussions...',
     'no_search_results': 'Aucun résultat trouvé',
+    'notifications_title': 'Notifications',
+    'notifications_close': 'Fermer les notifications',
+    'notifications_empty': 'Vous êtes à jour !',
+    'notification_gamification': 'Nouveau système de gamification ! 🎮 Débloquez des badges en relevant des défis. Vérifiez votre progression en cliquant sur votre avatar. (Implémenté le {date})',
+    'notification_welcome': 'Bienvenue dans la Olympus Creative Suite ! Sélectionnez un assistant pour commencer.',
   }
 };
