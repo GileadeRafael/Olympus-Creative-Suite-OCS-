@@ -4,6 +4,7 @@ import React from 'react';
 import type { Assistant } from '../types';
 import { XIcon } from './icons/CoreIcons';
 import type { User } from '@supabase/supabase-js';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface PurchaseModalProps {
     assistant: Assistant | null;
@@ -12,6 +13,7 @@ interface PurchaseModalProps {
 }
 
 const PurchaseModal: React.FC<PurchaseModalProps> = ({ assistant, onClose, user }) => {
+    const { t } = useLanguage();
     if (!assistant) return null;
 
     const formattedPrice = new Intl.NumberFormat('pt-BR', {
@@ -47,10 +49,10 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({ assistant, onClose, user 
                 </div>
 
                 <h2 id="purchase-modal-title" className="text-3xl font-bold text-white mb-2">
-                    Unlock {assistant.name}
+                    {t('unlock_assistant_title', { assistantName: assistant.name })}
                 </h2>
                 <p className="text-ocs-text-muted max-w-xs mb-6">
-                    Gain full access to {assistant.name}'s creative capabilities and unlock your potential.
+                    {t('unlock_assistant_description', { assistantName: assistant.name })}
                 </p>
 
                 <a
@@ -59,11 +61,11 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({ assistant, onClose, user 
                     rel="noopener noreferrer"
                     className={`w-full block text-center font-bold py-4 px-6 rounded-xl ${getButtonColors(assistant.ringColor)}`}
                 >
-                    Buy Now for <span className="font-extrabold">{formattedPrice}</span>
+                    {t('buy_now_button', { price: formattedPrice })}
                 </a>
 
                 <p className="text-xs text-ocs-text-muted/70 mt-4">
-                    You will be redirected to support. Access is granted automatically after payment.
+                    {t('redirect_notice')}
                 </p>
             </div>
         </div>

@@ -33,6 +33,11 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'notifications_empty': "You're all caught up!",
     'notification_gamification': 'New Gamification System! 🎮 Unlock badges for completing challenges. Check your progress by clicking on your avatar. (Implemented on {date})',
     'notification_welcome': 'Welcome to Olympus Creative Suite! Select an assistant to get started.',
+    'unlock_assistant_title': 'Unlock {assistantName}',
+    'unlock_assistant_description': "Gain full access to {assistantName}'s creative capabilities and unlock your potential.",
+    'buy_now_button': 'Buy Now for {price}',
+    'redirect_notice': 'You will be redirected to support. Access is granted automatically after payment.',
+    'locked_tooltip': '(Locked)',
   },
   pt: {
     'greeting_morning': 'bom dia',
@@ -66,6 +71,11 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'notifications_empty': 'Você está em dia!',
     'notification_gamification': 'Novo Sistema de Gamificação! 🎮 Desbloqueie emblemas ao completar desafios. Verifique seu progresso clicando no seu avatar. (Implementado em {date})',
     'notification_welcome': 'Bem-vindo ao Olympus Creative Suite! Selecione um assistente para começar.',
+    'unlock_assistant_title': 'Desbloquear {assistantName}',
+    'unlock_assistant_description': 'Obtenha acesso total às capacidades criativas de {assistantName} e desbloqueie seu potencial.',
+    'buy_now_button': 'Comprar Agora por {price}',
+    'redirect_notice': 'Você será redirecionado para o suporte. O acesso é concedido automaticamente após o pagamento.',
+    'locked_tooltip': '(Bloqueado)',
   },
   es: {
     'greeting_morning': 'buenos días',
@@ -99,6 +109,11 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'notifications_empty': '¡Estás al día!',
     'notification_gamification': '¡Nuevo sistema de gamificación! 🎮 Desbloquea insignias por completar desafíos. Revisa tu progreso haciendo clic en tu avatar. (Implementado el {date})',
     'notification_welcome': '¡Bienvenido a Olympus Creative Suite! Selecciona un asistente para empezar.',
+    'unlock_assistant_title': 'Desbloquear {assistantName}',
+    'unlock_assistant_description': 'Obtén acceso completo a las capacidades creativas de {assistantName} y libera tu potencial.',
+    'buy_now_button': 'Comprar Ahora por {price}',
+    'redirect_notice': 'Serás redirigido al soporte. El acceso se concede automáticamente después del pago.',
+    'locked_tooltip': '(Bloqueado)',
   },
   zh: {
     'greeting_morning': '早上好',
@@ -132,6 +147,11 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'notifications_empty': '您已了解所有最新信息！',
     'notification_gamification': '全新游戏化系统！🎮 完成挑战即可解锁徽章。点击您的头像查看进度。(实施于 {date})',
     'notification_welcome': '欢迎来到 Olympus Creative Suite！请选择一位助手开始。',
+    'unlock_assistant_title': '解锁 {assistantName}',
+    'unlock_assistant_description': '完全访问 {assistantName} 的创作能力，释放您的潜力。',
+    'buy_now_button': '立即购买，价格 {price}',
+    'redirect_notice': '您将被重定向到支持页面。付款后将自动授予访问权限。',
+    'locked_tooltip': '（已锁定）',
   },
   fr: {
     'greeting_morning': 'bonjour',
@@ -165,5 +185,10 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'notifications_empty': 'Vous êtes à jour !',
     'notification_gamification': 'Nouveau système de gamification ! 🎮 Débloquez des badges en relevant des défis. Vérifiez votre progression en cliquant sur votre avatar. (Implémenté le {date})',
     'notification_welcome': 'Bienvenue dans la Olympus Creative Suite ! Sélectionnez un assistant pour commencer.',
+    'unlock_assistant_title': 'Déverrouiller {assistantName}',
+    'unlock_assistant_description': "Obtenez un accès complet aux capacités créatives de {assistantName} et libérez votre potentiel.",
+    'buy_now_button': 'Acheter maintenant pour {price}',
+    'redirect_notice': "Vous serez redirigé vers le support. L'accès est accordé automatiquement après le paiement.",
+    'locked_tooltip': '(Verrouillé)',
   }
 };
