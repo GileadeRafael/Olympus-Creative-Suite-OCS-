@@ -1,8 +1,6 @@
 
 
-
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import type { Assistant, Message, ChatHistoryItem } from './types';
 import { ASSISTANTS } from './constants';
 import Sidebar from './components/Sidebar';
@@ -27,7 +25,7 @@ import ToastContainer from './components/ToastContainer';
 const AppContent: React.FC = () => {
   const { session, user, isPasswordRecovery } = useAuth();
   const { t } = useLanguage();
-  const { trackAction, resetSessionCounters } = useGamification();
+  const { trackAction, resetSessionCounters, setNotificationCallback } = useGamification();
   const [activeAssistant, setActiveAssistant] = useState<Assistant | null>(null);
   
   // State for chat history management
@@ -64,6 +62,22 @@ const AppContent: React.FC = () => {
     ]);
   }, [t]);
 
+    const addNotification = useCallback((message: string) => {
+        setNotifications(prev => [message, ...prev]);
+    }, []);
+
+    useEffect(() => {
+        if (setNotificationCallback) {
+            setNotificationCallback(addNotification);
+        }
+        return () => {
+            if (setNotificationCallback) {
+                // Clean up by setting a no-op function
+                setNotificationCallback(() => {});
+            }
+        };
+    }, [addNotification, setNotificationCallback]);
+
   // Check notification read status from localStorage when user is available
   useEffect(() => {
     if (user && notifications.length > 0) {
@@ -98,7 +112,7 @@ const AppContent: React.FC = () => {
       
       localStorage.setItem(lastSeenKey, today.toISOString());
     }
-  }, [user]);
+  }, [user, trackAction]);
 
 
   // Fetch unlocked assistants when the user is available and listen for real-time changes
@@ -163,7 +177,7 @@ const AppContent: React.FC = () => {
       const newSession = startChatSession(activeAssistant.systemInstruction, currentMessages);
       setChatSession(newSession);
     }
-  }, [activeAssistant, activeChatId]);
+  }, [activeAssistant, activeChatId, currentMessages]);
 
   const fetchChatHistory = async (assistantId: string) => {
     if (!user) return null;
@@ -338,6 +352,16 @@ const AppContent: React.FC = () => {
     }
   };
   
+  const handleClearNotifications = () => {
+    if (user) {
+        // When clearing, reset the seen counter to 0 relative to the new empty list.
+        localStorage.setItem(`notificationsSeenCount_${user.id}`, '0');
+    }
+    setNotifications([]);
+    setHasUnreadNotifications(false);
+    setIsNotificationsModalOpen(false); // Close the modal
+  };
+
   // By checking for isPasswordRecovery before checking for a session,
   // we ensure the user is directed to the password reset page even when
   // Supabase has created a temporary session for them.
@@ -411,6 +435,7 @@ const AppContent: React.FC = () => {
           isOpen={isNotificationsModalOpen}
           onClose={handleCloseNotifications}
           notifications={notifications}
+          onClearAll={handleClearNotifications}
         />
         <BadgesModal
             isOpen={isBadgesModalOpen}

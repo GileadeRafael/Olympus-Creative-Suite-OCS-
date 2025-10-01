@@ -38,6 +38,8 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'buy_now_button': 'Buy Now for {price}',
     'redirect_notice': 'You will be redirected to support. Access is granted automatically after payment.',
     'locked_tooltip': '(Locked)',
+    'clear_notifications': 'Clear all',
+    'notification_badge_unlocked': 'New Badge! You unlocked "{badgeName}" on {date}.',
   },
   pt: {
     'greeting_morning': 'bom dia',
@@ -76,6 +78,8 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'buy_now_button': 'Comprar Agora por {price}',
     'redirect_notice': 'Você será redirecionado para o suporte. O acesso é concedido automaticamente após o pagamento.',
     'locked_tooltip': '(Bloqueado)',
+    'clear_notifications': 'Limpar tudo',
+    'notification_badge_unlocked': 'Novo Emblema! Você desbloqueou "{badgeName}" em {date}.',
   },
   es: {
     'greeting_morning': 'buenos días',
@@ -114,6 +118,8 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'buy_now_button': 'Comprar Ahora por {price}',
     'redirect_notice': 'Serás redirigido al soporte. El acceso se concede automáticamente después del pago.',
     'locked_tooltip': '(Bloqueado)',
+    'clear_notifications': 'Limpiar todo',
+    'notification_badge_unlocked': '¡Nueva insignia! Desbloqueaste "{badgeName}" el {date}.',
   },
   zh: {
     'greeting_morning': '早上好',
@@ -152,6 +158,8 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'buy_now_button': '立即购买，价格 {price}',
     'redirect_notice': '您将被重定向到支持页面。付款后将自动授予访问权限。',
     'locked_tooltip': '（已锁定）',
+    'clear_notifications': '全部清除',
+    'notification_badge_unlocked': '新徽章！您于 {date} 解锁了“{badgeName}”。',
   },
   fr: {
     'greeting_morning': 'bonjour',
@@ -190,5 +198,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'buy_now_button': 'Acheter maintenant pour {price}',
     'redirect_notice': "Vous serez redirigé vers le support. L'accès est accordé automatiquement après le paiement.",
     'locked_tooltip': '(Verrouillé)',
+    'clear_notifications': 'Tout effacer',
+    'notification_badge_unlocked': 'Nouveau badge ! Vous avez débloqué "{badgeName}" le {date}.',
   }
 };

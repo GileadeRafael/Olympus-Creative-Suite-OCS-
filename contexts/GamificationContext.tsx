@@ -5,6 +5,7 @@ import { supabase } from '../services/supabaseClient';
 import { useAuth } from '../hooks/useAuth';
 import { BADGES, GamificationEvent, Badge } from '../constants/badges';
 import { useToast } from './ToastContext';
+import { useLanguage } from './LanguageContext';
 
 export interface UserProgress {
     [badgeId: string]: {
@@ -19,6 +20,7 @@ interface GamificationContextType {
     badges: Badge[];
     trackAction: (event: GamificationEvent, value?: Record<string, any>) => void;
     resetSessionCounters: () => void;
+    setNotificationCallback: (callback: (message: string) => void) => void;
 }
 
 const GamificationContext = createContext<GamificationContextType | undefined>(undefined);
@@ -26,7 +28,9 @@ const GamificationContext = createContext<GamificationContextType | undefined>(u
 export const GamificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const { user } = useAuth();
     const { addToast } = useToast();
+    const { t, language } = useLanguage();
     const [userProgress, setUserProgress] = useState<UserProgress>({});
+    const notificationCallbackRef = useRef<((message: string) => void) | null>(null);
     
     // Using refs for counters that don't need to trigger re-renders
     const sessionCounters = useRef({ marathon: 0, fileShooter: 0 }).current;
@@ -40,6 +44,10 @@ export const GamificationProvider: React.FC<{ children: ReactNode }> = ({ childr
     const resetSessionCounters = useCallback(() => {
         sessionCounters.marathon = 0;
     }, [sessionCounters]);
+    
+    const setNotificationCallback = useCallback((callback: (message: string) => void) => {
+        notificationCallbackRef.current = callback;
+    }, []);
 
     // Fetch initial progress when user logs in
     useEffect(() => {
@@ -255,7 +263,14 @@ export const GamificationProvider: React.FC<{ children: ReactNode }> = ({ childr
                 Promise.resolve().then(async () => {
                     const uniqueUnlocked = [...new Map(newlyUnlockedBadges.map(item => [item.id, item])).values()];
                     uniqueUnlocked.forEach(b => {
-                        if (!b.hidden) addToast({ name: b.name, icon: b.icon, colorClass: b.colorClass });
+                        if (!b.hidden) {
+                            addToast({ name: b.name, icon: b.icon, colorClass: b.colorClass });
+                            const formattedDate = new Date().toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' });
+                            const notificationMessage = t('notification_badge_unlocked', { badgeName: b.name, date: formattedDate });
+                            if (notificationCallbackRef.current) {
+                                notificationCallbackRef.current(notificationMessage);
+                            }
+                        }
                     });
                     
                     const updates = Object.keys(newProgress)
@@ -282,10 +297,10 @@ export const GamificationProvider: React.FC<{ children: ReactNode }> = ({ childr
             
             return currentProgress;
         });
-    }, [user, addToast, sessionCounters, dailyCounters, chatSpecificTrackers, crossoverState]);
+    }, [user, addToast, sessionCounters, dailyCounters, chatSpecificTrackers, crossoverState, t, language]);
 
     return (
-        <GamificationContext.Provider value={{ userProgress, badges: BADGES, trackAction, resetSessionCounters }}>
+        <GamificationContext.Provider value={{ userProgress, badges: BADGES, trackAction, resetSessionCounters, setNotificationCallback }}>
             {children}
         </GamificationContext.Provider>
     );

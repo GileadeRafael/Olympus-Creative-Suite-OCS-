@@ -6,9 +6,10 @@ interface NotificationsModalProps {
     isOpen: boolean;
     onClose: () => void;
     notifications: string[];
+    onClearAll: () => void;
 }
 
-const NotificationsModal: React.FC<NotificationsModalProps> = ({ isOpen, onClose, notifications }) => {
+const NotificationsModal: React.FC<NotificationsModalProps> = ({ isOpen, onClose, notifications, onClearAll }) => {
     if (!isOpen) return null;
     const { t } = useLanguage();
 
@@ -55,6 +56,17 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ isOpen, onClose
                         </div>
                     )}
                 </div>
+                
+                {notifications.length > 0 && (
+                    <footer className="p-2 border-t border-black/10 dark:border-white/10">
+                        <button
+                            onClick={onClearAll}
+                            className="w-full text-center text-sm font-semibold text-gray-500 dark:text-gray-400 py-2 rounded-lg hover:bg-gray-500/10 dark:hover:bg-white/10 transition-colors"
+                        >
+                            {t('clear_notifications')}
+                        </button>
+                    </footer>
+                )}
             </div>
         </div>
     );
