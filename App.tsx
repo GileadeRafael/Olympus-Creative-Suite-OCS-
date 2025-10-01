@@ -1,11 +1,13 @@
 
 
+
 import React, { useState, useEffect } from 'react';
 import type { Assistant, Message, ChatHistoryItem } from './types';
 import { ASSISTANTS } from './constants';
 import Sidebar from './components/Sidebar';
 import ChatView from './components/ChatView';
 import AuthPage from './components/AuthPage';
+import ResetPasswordPage from './components/ResetPasswordPage';
 import PurchaseModal from './components/PurchaseModal';
 import { startChatSession } from './services/geminiService';
 import type { Chat } from '@google/genai';
@@ -22,7 +24,7 @@ import { ToastProvider } from './contexts/ToastContext';
 import ToastContainer from './components/ToastContainer';
 
 const AppContent: React.FC = () => {
-  const { session, user } = useAuth();
+  const { session, user, authEvent } = useAuth();
   const { t } = useLanguage();
   const { trackAction, resetSessionCounters } = useGamification();
   const [activeAssistant, setActiveAssistant] = useState<Assistant | null>(null);
@@ -334,6 +336,14 @@ const AppContent: React.FC = () => {
         localStorage.setItem(`notificationsSeenCount_${user.id}`, notifications.length.toString());
     }
   };
+  
+  if (authEvent === 'PASSWORD_RECOVERY') {
+    return (
+      <LanguageProvider>
+        <ResetPasswordPage />
+      </LanguageProvider>
+    );
+  }
   
   if (!session) {
     return (

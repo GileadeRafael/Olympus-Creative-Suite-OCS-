@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../services/supabaseClient';
-import type { Session, User } from '@supabase/supabase-js';
+import type { Session, User, AuthChangeEvent } from '@supabase/supabase-js';
 
 export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [authEvent, setAuthEvent] = useState<AuthChangeEvent | null>(null);
 
   useEffect(() => {
     // This function atomically updates both user and session state
@@ -30,7 +31,8 @@ export function useAuth() {
 
     // Listen for auth state changes (SIGN_IN, SIGN_OUT, USER_UPDATED).
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, currentSession) => {
+      (event, currentSession) => {
+        setAuthEvent(event);
         updateUserAndSession(currentSession);
       }
     );
@@ -38,5 +40,5 @@ export function useAuth() {
     return () => subscription.unsubscribe();
   }, []);
 
-  return { session, user };
+  return { session, user, authEvent };
 }
