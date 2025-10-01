@@ -209,6 +209,10 @@ const AuthPage: React.FC = () => {
           </>
         )}
       </div>
+      <div className="fixed bottom-6 right-6 flex items-center space-x-3 opacity-50 hover:opacity-100 transition-opacity duration-300">
+        <img src="https://i.imgur.com/0vBQm1M.png" alt="Olympus Logo" className="h-8 w-auto" />
+        <span className="text-white font-semibold">Olympus Creative Suite</span>
+      </div>
     </div>
   );
 };
