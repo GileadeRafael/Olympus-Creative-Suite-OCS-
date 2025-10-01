@@ -1,23 +1,18 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import type { User } from '@supabase/supabase-js';
-import { supabase } from '../services/supabaseClient';
 import { LogoutIcon, BadgeIcon } from './icons/ProfileIcons';
 
 interface AvatarProps {
   user: User;
   onOpenBadges: () => void;
+  onLogout: () => void;
 }
 
-const Avatar: React.FC<AvatarProps> = ({ user, onOpenBadges }) => {
+const Avatar: React.FC<AvatarProps> = ({ user, onOpenBadges, onLogout }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const username = user.user_metadata?.username || 'User';
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -54,7 +49,7 @@ const Avatar: React.FC<AvatarProps> = ({ user, onOpenBadges }) => {
               <span>Badges</span>
             </button>
             <button
-              onClick={handleLogout}
+              onClick={onLogout}
               className="w-full flex items-center space-x-3 text-left px-4 py-2.5 text-sm text-red-600 dark:text-red-500 hover:bg-red-500/5 dark:hover:bg-red-500/10 rounded-lg transition-colors"
             >
               <LogoutIcon className="w-5 h-5" />

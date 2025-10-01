@@ -1,7 +1,3 @@
-
-
-
-
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Assistant, Message, ChatHistoryItem, Notification } from './types';
 import { ASSISTANTS } from './constants';
@@ -23,6 +19,7 @@ import BadgesModal from './components/BadgesModal';
 import { GamificationEvent } from './constants/badges';
 import { ToastProvider } from './contexts/ToastContext';
 import ToastContainer from './components/ToastContainer';
+import LogoutAnimation from './components/LogoutAnimation';
 
 const AppContent: React.FC = () => {
   const { session, user, isPasswordRecovery } = useAuth();
@@ -51,6 +48,9 @@ const AppContent: React.FC = () => {
   
   // State for Badges Modal
   const [isBadgesModalOpen, setIsBadgesModalOpen] = useState(false);
+
+  // State for Logout Animation
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   // Load notifications from localStorage or set defaults
   useEffect(() => {
@@ -387,6 +387,14 @@ const AppContent: React.FC = () => {
     }
   };
 
+  const handleLogout = () => {
+    setIsLoggingOut(true);
+    setTimeout(async () => {
+      await supabase.auth.signOut();
+      setIsLoggingOut(false);
+    }, 1500); // Wait for animation
+  };
+
   // By checking for isPasswordRecovery before checking for a session,
   // we ensure the user is directed to the password reset page even when
   // Supabase has created a temporary session for them.
@@ -423,7 +431,7 @@ const AppContent: React.FC = () => {
         />
         <main className="flex-1 flex flex-col h-full relative">
           <header className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
-            {user && <Avatar user={user} onOpenBadges={() => setIsBadgesModalOpen(true)} />}
+            {user && <Avatar user={user} onOpenBadges={() => setIsBadgesModalOpen(true)} onLogout={handleLogout} />}
           </header>
            {activeAssistant && user && (
             <HistoryModal
@@ -468,6 +476,7 @@ const AppContent: React.FC = () => {
         />
         <ToastContainer />
       </div>
+      {isLoggingOut && <LogoutAnimation username={user?.user_metadata?.username || 'User'} />}
     </>
   );
 };
