@@ -40,6 +40,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'locked_tooltip': '(Locked)',
     'clear_notifications': 'Clear all',
     'notification_badge_unlocked': 'New Badge! You unlocked "{badgeName}" on {date}.',
+    'drop_files_here': 'Drop your files here',
   },
   pt: {
     'greeting_morning': 'bom dia',
@@ -80,6 +81,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'locked_tooltip': '(Bloqueado)',
     'clear_notifications': 'Limpar tudo',
     'notification_badge_unlocked': 'Novo Emblema! Você desbloqueou "{badgeName}" em {date}.',
+    'drop_files_here': 'Arraste seus arquivos aqui',
   },
   es: {
     'greeting_morning': 'buenos días',
@@ -120,6 +122,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'locked_tooltip': '(Bloqueado)',
     'clear_notifications': 'Limpiar todo',
     'notification_badge_unlocked': '¡Nueva insignia! Desbloqueaste "{badgeName}" el {date}.',
+    'drop_files_here': 'Suelta tus archivos aquí',
   },
   zh: {
     'greeting_morning': '早上好',
@@ -160,6 +163,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'locked_tooltip': '（已锁定）',
     'clear_notifications': '全部清除',
     'notification_badge_unlocked': '新徽章！您于 {date} 解锁了“{badgeName}”。',
+    'drop_files_here': '将文件拖放到此处',
   },
   fr: {
     'greeting_morning': 'bonjour',
@@ -200,5 +204,6 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'locked_tooltip': '(Verrouillé)',
     'clear_notifications': 'Tout effacer',
     'notification_badge_unlocked': 'Nouveau badge ! Vous avez débloqué "{badgeName}" le {date}.',
+    'drop_files_here': 'Déposez vos fichiers ici',
   }
 };

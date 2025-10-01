@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import type { Assistant, Message } from '../types';
 import { sendMessageStream } from '../services/geminiService';
 import type { Chat } from '@google/genai';
-import { XIcon, PlusIcon, ChevronDownIcon } from './icons/CoreIcons';
+import { XIcon, PlusIcon, ChevronDownIcon, ImageIcon } from './icons/CoreIcons';
 import WelcomeScreen from './WelcomeScreen';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Remarkable } from 'remarkable';
@@ -51,6 +51,7 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
   const [isLoading, setIsLoading] = useState(false);
   const [selectedImages, setSelectedImages] = useState<{ mimeType: string; data: string }[]>([]);
   const [modalImage, setModalImage] = useState<string | null>(null);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -135,99 +136,105 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
 
     return () => clearTimeout(timer);
   }, [messages, assistant]);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      trackAction(GamificationEvent.FILE_UPLOADED, { count: e.target.files.length });
-      const files = Array.from(e.target.files);
-      // FIX: Explicitly type 'file' as File to resolve TypeScript inference issues where it was treated as 'unknown'.
-      const imagePromises = files.map((file: File) => {
-        return new Promise<{ mimeType: string; data: string }>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            if (typeof reader.result !== 'string') {
-              return reject('FileReader result is not a string');
-            }
-            const base64String = reader.result.split(',')[1];
-            resolve({ mimeType: file.type, data: base64String });
-          };
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-      });
-
-      Promise.all(imagePromises).then(newImages => {
-        setSelectedImages(prev => [...prev, ...newImages]);
-      });
-      e.target.value = ''; // Allow re-selecting the same file
-    }
-  };
-
-  const removeSelectedImage = (index: number) => {
-    setSelectedImages(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const handleSend = async () => {
-    if ((!input.trim() && selectedImages.length === 0) || !chatSession || !assistant) return;
-
-    // Easter Egg Check
-    if (input.trim().toLowerCase() === 'olympus') {
-        trackAction(GamificationEvent.EASTER_EGG_FOUND);
-    }
-    
-    // For general message tracking and Crossover badge
-    trackAction(GamificationEvent.MESSAGE_SENT, { text: input, assistantId: assistant.id, chatId: activeChatId });
-
-    const userMessage: Message = { 
-      id: `user-${Date.now()}`, 
-      role: 'user', 
-      content: input, 
-      images: selectedImages 
-    };
-    
-    // Optimistically update UI
-    const newMessages: Message[] = [...messages, userMessage];
-    setMessages(newMessages);
-    
-    setInput('');
-    setSelectedImages([]);
-    setIsLoading(true);
-
-    try {
-        const stream = await sendMessageStream(chatSession, input, selectedImages);
-        let modelResponse = '';
-        const modelMessageId = `model-${Date.now()}`;
+  
+    const processFiles = (files: FileList) => {
+        if (!files) return;
         
-        let updatedMessages: Message[] = [...newMessages, { id: modelMessageId, role: 'model', content: '' }];
-        setMessages(updatedMessages);
+        trackAction(GamificationEvent.FILE_UPLOADED, { count: files.length });
+        const fileArray = Array.from(files);
+        // FIX: Explicitly type 'file' as File to resolve TypeScript inference issues.
+        const imagePromises = fileArray.map((file: File) => {
+            return new Promise<{ mimeType: string; data: string }>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                if (typeof reader.result !== 'string') {
+                return reject('FileReader result is not a string');
+                }
+                const base64String = reader.result.split(',')[1];
+                resolve({ mimeType: file.type, data: base64String });
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+            });
+        });
 
-        for await (const chunk of stream) {
-            modelResponse += chunk.text;
-            updatedMessages = updatedMessages.map(m => m.id === modelMessageId ? { ...m, content: modelResponse } : m);
+        Promise.all(imagePromises).then(newImages => {
+            setSelectedImages(prev => [...prev, ...newImages]);
+        });
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            processFiles(e.target.files);
+            e.target.value = ''; // Allow re-selecting the same file
+        }
+    };
+
+    const removeSelectedImage = (index: number) => {
+        setSelectedImages(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const handleSend = async () => {
+        if ((!input.trim() && selectedImages.length === 0) || !chatSession || !assistant) return;
+
+        // Easter Egg Check
+        if (input.trim().toLowerCase() === 'olympus') {
+            trackAction(GamificationEvent.EASTER_EGG_FOUND);
+        }
+        
+        // For general message tracking and Crossover badge
+        trackAction(GamificationEvent.MESSAGE_SENT, { text: input, assistantId: assistant.id, chatId: activeChatId });
+
+        const userMessage: Message = { 
+        id: `user-${Date.now()}`, 
+        role: 'user', 
+        content: input, 
+        images: selectedImages 
+        };
+        
+        // Optimistically update UI
+        const newMessages: Message[] = [...messages, userMessage];
+        setMessages(newMessages);
+        
+        setInput('');
+        setSelectedImages([]);
+        setIsLoading(true);
+
+        try {
+            const stream = await sendMessageStream(chatSession, input, selectedImages);
+            let modelResponse = '';
+            const modelMessageId = `model-${Date.now()}`;
+            
+            let updatedMessages: Message[] = [...newMessages, { id: modelMessageId, role: 'model', content: '' }];
             setMessages(updatedMessages);
-        }
 
-        if (activeChatId === 'new') {
-            await onCreateChat(userMessage, updatedMessages);
-        } else if (activeChatId) {
-            await onUpdateChat(activeChatId, updatedMessages);
-        }
+            for await (const chunk of stream) {
+                modelResponse += chunk.text;
+                updatedMessages = updatedMessages.map(m => m.id === modelMessageId ? { ...m, content: modelResponse } : m);
+                setMessages(updatedMessages);
+            }
 
-    } catch (error) {
-      console.error('Error sending message:', error);
-      const errorId = `error-${Date.now()}`;
-      setMessages(prev => {
-        const lastMessage = prev[prev.length - 1];
-        if (lastMessage && lastMessage.role === 'model' && lastMessage.content === '') {
-           return prev.slice(0, -1).concat({ ...lastMessage, id: errorId, content: t('send_error') });
+            if (activeChatId === 'new') {
+                await onCreateChat(userMessage, updatedMessages);
+            } else if (activeChatId) {
+                await onUpdateChat(activeChatId, updatedMessages);
+            }
+
+        } catch (error) {
+        console.error('Error sending message:', error);
+        const errorId = `error-${Date.now()}`;
+        setMessages(prev => {
+            const lastMessage = prev[prev.length - 1];
+            if (lastMessage && lastMessage.role === 'model' && lastMessage.content === '') {
+            return prev.slice(0, -1).concat({ ...lastMessage, id: errorId, content: t('send_error') });
+            }
+            const errorMessage: Message = {id: errorId, role: 'model', content: t('send_error') };
+            return [...prev, errorMessage];
+        });
+        } finally {
+        setIsLoading(false);
         }
-        const errorMessage: Message = {id: errorId, role: 'model', content: t('send_error') };
-        return [...prev, errorMessage];
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
   
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -236,6 +243,38 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
     }
   };
   
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+          setIsDraggingOver(true);
+      }
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+          setIsDraggingOver(false);
+      }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDraggingOver(false);
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          processFiles(e.dataTransfer.files);
+          e.dataTransfer.clearData();
+      }
+  };
+
+
   if (!assistant) {
     return <WelcomeScreen user={user} />;
   }
@@ -249,7 +288,13 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
   const isSendDisabled = isLoading || (!input.trim() && selectedImages.length === 0);
 
   return (
-    <div className="flex flex-col h-full w-full relative">
+    <div
+        className="flex flex-col h-full w-full relative"
+        onDragEnter={handleDragEnter}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+    >
       <div ref={chatContainerRef} className="flex-1 overflow-y-auto custom-scrollbar">
         <div className="max-w-4xl mx-auto px-4 pt-6 h-full">
           {messages.length === 0 ? (
@@ -391,6 +436,14 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
             </button>
         </div>
       )}
+       {isDraggingOver && assistant && (
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-30 flex items-center justify-center p-4 transition-opacity duration-300">
+                <div className="w-full h-full border-4 border-dashed border-ocs-accent rounded-3xl flex flex-col items-center justify-center text-white pointer-events-none">
+                    <ImageIcon className="w-16 h-16 mb-4 text-ocs-accent" />
+                    <p className="text-2xl font-bold">{t('drop_files_here')}</p>
+                </div>
+            </div>
+        )}
     </div>
   );
 };
