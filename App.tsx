@@ -224,22 +224,23 @@ const AppContent: React.FC = () => {
   };
 
   const handleSelectUnlockedAssistant = async (assistant: Assistant) => {
-    if (activeAssistant?.id === assistant.id) return;
-    
-    trackAction(GamificationEvent.ASSISTANT_SWITCHED, { id: assistant.id });
-    resetSessionCounters(); // Reset for badges like "Marathon Runner"
+    // If the user clicks the same assistant icon while already on its "new chat" screen, do nothing.
+    // Otherwise, clicking the same assistant icon while in a conversation will reset the view to a "new chat" screen.
+    if (activeAssistant?.id === assistant.id && activeChatId === 'new') return;
+
+    // Only track the "switch" event if the assistant is actually different.
+    if (activeAssistant?.id !== assistant.id) {
+      trackAction(GamificationEvent.ASSISTANT_SWITCHED, { id: assistant.id });
+    }
 
     setActiveAssistant(assistant);
-    setCurrentMessages([]); 
-    setActiveChatId(null); 
+    
+    // Fetch chat history for the selected assistant so it's available in the history modal.
+    // We don't await this, allowing the UI to update immediately while history loads in the background.
+    fetchChatHistory(assistant.id);
 
-    const history = await fetchChatHistory(assistant.id);
-
-    if (history && history.length > 0) {
-      handleSelectChat(history[0].id);
-    } else {
-      handleNewChat(); 
-    }
+    // As requested, always start a new chat to show the assistant's presentation screen.
+    handleNewChat(); 
   };
 
   const handleAssistantClick = (assistant: Assistant) => {
