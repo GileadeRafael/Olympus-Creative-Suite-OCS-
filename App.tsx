@@ -10,14 +10,20 @@ import PurchaseModal from './components/PurchaseModal';
 import { startChatSession } from './services/geminiService';
 import type { Chat } from '@google/genai';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { GamificationProvider, useGamification } from './contexts/GamificationContext';
 import { useAuth } from './hooks/useAuth';
 import Avatar from './components/Avatar';
 import { supabase } from './services/supabaseClient';
 import HistoryModal from './components/HistoryModal';
 import NotificationsModal from './components/NotificationsModal';
+import BadgesModal from './components/BadgesModal';
+import { GamificationEvent } from './constants/badges';
+import { ToastProvider } from './contexts/ToastContext';
+import ToastContainer from './components/ToastContainer';
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
   const { session, user } = useAuth();
+  const { trackAction, resetSessionCounters } = useGamification();
   const [activeAssistant, setActiveAssistant] = useState<Assistant | null>(null);
   
   // State for chat history management
@@ -35,26 +41,60 @@ const App: React.FC = () => {
 
   // State for notifications
   const [notifications, setNotifications] = useState<string[]>([]);
-  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false); // Default to false
+  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const [isNotificationsModalOpen, setIsNotificationsModalOpen] = useState(false);
   
+  // State for Badges Modal
+  const [isBadgesModalOpen, setIsBadgesModalOpen] = useState(false);
+
   // Set initial notification on app load
   useEffect(() => {
-    setNotifications(["Welcome to Olympus Creative Suite! Select an assistant to get started."]);
+    const today = new Date();
+    const formattedDate = today.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    const gamificationNotification = `New Gamification System! 🎮 Unlock badges for completing challenges. Check your progress by clicking on your avatar. (Implemented on ${formattedDate})`;
+
+    setNotifications([
+        gamificationNotification,
+        "Welcome to Olympus Creative Suite! Select an assistant to get started.",
+    ]);
   }, []);
 
   // Check notification read status from localStorage when user is available
   useEffect(() => {
-    if (user) {
-        const hasBeenRead = localStorage.getItem(`welcomeNotificationRead_${user.id}`);
-        if (!hasBeenRead) {
+    if (user && notifications.length > 0) {
+        const seenCount = parseInt(localStorage.getItem(`notificationsSeenCount_${user.id}`) || '0', 10);
+        if (notifications.length > seenCount) {
             setHasUnreadNotifications(true);
+        } else {
+            setHasUnreadNotifications(false);
         }
     } else {
-        // Reset notification status on logout
+        // Reset notification status on logout or if there are no notifications
         setHasUnreadNotifications(false);
     }
+  }, [user, notifications]);
+
+  // Logic for the 'Silent One' badge - runs once when the user logs in.
+  useEffect(() => {
+    if (user) {
+      const lastSeenKey = `lastSeen_${user.id}`;
+      const lastSeenDate = localStorage.getItem(lastSeenKey);
+      const today = new Date();
+
+      if (lastSeenDate) {
+        const lastSeen = new Date(lastSeenDate);
+        const diffTime = Math.abs(today.getTime() - lastSeen.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays >= 30) {
+          trackAction(GamificationEvent.USER_RETURNED);
+        }
+      }
+      
+      localStorage.setItem(lastSeenKey, today.toISOString());
+    }
   }, [user]);
+
 
   // Fetch unlocked assistants when the user is available and listen for real-time changes
   useEffect(() => {
@@ -67,6 +107,8 @@ const App: React.FC = () => {
 
     const fetchUnlocked = async () => {
         setIsUnlockStatusLoading(true);
+        // Reverted to a direct table query to fix the "Failed to send a request to the Edge Function" error.
+        // This method was working previously and is more stable for this environment.
         const { data, error } = await supabase
             .from('user_assistants')
             .select('assistant_id')
@@ -76,7 +118,7 @@ const App: React.FC = () => {
             console.error("Error fetching unlocked assistants:", error.message);
             setUnlockedAssistants(new Set());
         } else {
-            const unlockedIds = new Set(data.map(item => item.assistant_id));
+            const unlockedIds = new Set(data.map((item: { assistant_id: string }) => item.assistant_id));
             setUnlockedAssistants(unlockedIds);
         }
         setIsUnlockStatusLoading(false);
@@ -141,6 +183,9 @@ const App: React.FC = () => {
   const handleSelectUnlockedAssistant = async (assistant: Assistant) => {
     if (activeAssistant?.id === assistant.id) return;
     
+    trackAction(GamificationEvent.ASSISTANT_SWITCHED, { id: assistant.id });
+    resetSessionCounters(); // Reset for badges like "Marathon Runner"
+
     setActiveAssistant(assistant);
     setCurrentMessages([]); 
     setActiveChatId(null); 
@@ -165,6 +210,9 @@ const App: React.FC = () => {
   const handleSelectChat = async (chatId: string) => {
     if (activeChatId === chatId) return;
     
+    trackAction(GamificationEvent.HISTORY_VIEWED);
+    resetSessionCounters(); // Reset for badges like "Marathon Runner"
+
     const { data, error } = await supabase
       .from('chats')
       .select('messages')
@@ -182,6 +230,7 @@ const App: React.FC = () => {
   };
   
   const handleNewChat = () => {
+    resetSessionCounters(); // Reset for badges like "Marathon Runner"
     setActiveChatId('new');
     setCurrentMessages([]);
     setIsHistoryModalOpen(false); // Close modal on new chat
@@ -228,6 +277,8 @@ const App: React.FC = () => {
   const handleCreateChat = async (firstUserMessage: Message, fullConversation: Message[]) => {
       if (!user || !activeAssistant) return null;
 
+      trackAction(GamificationEvent.CHAT_STARTED, { assistantId: activeAssistant.id });
+      
       const title = generateTitle(firstUserMessage.content);
       
       const { data, error } = await supabase
@@ -253,6 +304,7 @@ const App: React.FC = () => {
 
   const handleUpdateChat = async (chatId: string, fullConversation: Message[]) => {
       if (!user) return;
+      trackAction(GamificationEvent.MESSAGE_SENT, { conversationLength: fullConversation.length, chatId: chatId });
       const { error } = await supabase
           .from('chats')
           .update({ messages: fullConversation })
@@ -272,14 +324,15 @@ const App: React.FC = () => {
   };
   
   const handleCloseNotifications = () => {
+    trackAction(GamificationEvent.NOTIFICATION_INTERACTED);
     setIsNotificationsModalOpen(false);
     setHasUnreadNotifications(false); // Mark as read for the UI
     if (user) {
-        // Persist the "read" status in localStorage for the specific user
-        localStorage.setItem(`welcomeNotificationRead_${user.id}`, 'true');
+        // Persist the "read" status in localStorage for the specific user by storing the count of notifications they've seen
+        localStorage.setItem(`notificationsSeenCount_${user.id}`, notifications.length.toString());
     }
   };
-
+  
   if (!session) {
     return (
       <LanguageProvider>
@@ -289,7 +342,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <LanguageProvider>
+    <>
       <div className="flex h-screen w-screen text-gray-800 dark:text-gray-200 bg-white dark:bg-ocs-dark-chat font-sans overflow-hidden">
         <Sidebar 
           assistants={ASSISTANTS} 
@@ -301,10 +354,11 @@ const App: React.FC = () => {
           onToggleHistory={() => setIsHistoryModalOpen(p => !p)}
           hasUnreadNotifications={hasUnreadNotifications}
           onToggleNotifications={() => setIsNotificationsModalOpen(p => !p)}
+          activeChatId={activeChatId}
         />
         <main className="flex-1 flex flex-col h-full relative">
           <header className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
-            {user && <Avatar user={user} />}
+            {user && <Avatar user={user} onOpenBadges={() => setIsBadgesModalOpen(true)} />}
           </header>
            {activeAssistant && user && (
             <HistoryModal
@@ -342,9 +396,26 @@ const App: React.FC = () => {
           onClose={handleCloseNotifications}
           notifications={notifications}
         />
+        <BadgesModal
+            isOpen={isBadgesModalOpen}
+            onClose={() => setIsBadgesModalOpen(false)}
+        />
+        <ToastContainer />
       </div>
-    </LanguageProvider>
+    </>
   );
 };
+
+
+const App: React.FC = () => (
+  <LanguageProvider>
+    <ToastProvider>
+      <GamificationProvider>
+        <AppContent />
+      </GamificationProvider>
+    </ToastProvider>
+  </LanguageProvider>
+);
+
 
 export default App;

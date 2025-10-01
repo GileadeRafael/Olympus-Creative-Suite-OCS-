@@ -7,6 +7,31 @@
     <title>Olympus Creative Suite</title>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap');
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      @keyframes fadeOut {
+        from {
+          opacity: 1;
+        }
+        to {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+      }
+      .toast-enter {
+        animation: slideIn 0.5s forwards cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+      .toast-exit {
+        animation: fadeOut 0.5s forwards cubic-bezier(0.55, 0.085, 0.68, 0.53);
+      }
     </style>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script>

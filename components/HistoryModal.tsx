@@ -1,7 +1,10 @@
+
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import type { Assistant, ChatHistoryItem } from '../types';
 import { TrashIcon, PlusIcon, PencilIcon, SearchIcon } from './icons/CoreIcons';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useGamification } from '../contexts/GamificationContext';
+import { GamificationEvent } from '../constants/badges';
 
 interface HistoryModalProps {
     assistant: Assistant;
@@ -18,6 +21,7 @@ interface HistoryModalProps {
 
 const HistoryModal: React.FC<HistoryModalProps> = ({ assistant, history, activeChatId, onSelectChat, onNewChat, onDeleteChat, onUpdateChatTitle, isLoading, isOpen, onClose }) => {
     const { t } = useLanguage();
+    const { trackAction } = useGamification();
     const [editingChatId, setEditingChatId] = useState<string | null>(null);
     const [editingTitle, setEditingTitle] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
@@ -42,11 +46,13 @@ const HistoryModal: React.FC<HistoryModalProps> = ({ assistant, history, activeC
     const handleDelete = (e: React.MouseEvent, chatId: string) => {
         e.stopPropagation(); // Prevent onSelectChat from firing
         if (window.confirm(t('delete_chat_confirm'))) {
+            trackAction(GamificationEvent.CHAT_DELETED);
             onDeleteChat(chatId);
         }
     };
 
-    const handleStartEdit = (chat: ChatHistoryItem) => {
+    const handleStartEdit = (e: React.MouseEvent, chat: ChatHistoryItem) => {
+        e.stopPropagation();
         setEditingChatId(chat.id);
         setEditingTitle(chat.title);
     };
@@ -63,6 +69,7 @@ const HistoryModal: React.FC<HistoryModalProps> = ({ assistant, history, activeC
         }
         const originalChat = history.find(c => c.id === editingChatId);
         if (originalChat && originalChat.title !== editingTitle.trim()) {
+            trackAction(GamificationEvent.CHAT_RENAMED);
             onUpdateChatTitle(editingChatId, editingTitle.trim());
         }
         handleCancelEdit();
@@ -151,7 +158,7 @@ const HistoryModal: React.FC<HistoryModalProps> = ({ assistant, history, activeC
                                     <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate pr-16">{chat.title}</p>
                                     <div className="absolute top-1/2 right-2 -translate-y-1/2 flex items-center space-x-0.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
                                         <button
-                                            onClick={(e) => { e.stopPropagation(); handleStartEdit(chat); }}
+                                            onClick={(e) => handleStartEdit(e, chat)}
                                             className="p-1.5 text-gray-500 dark:text-gray-400 rounded-full hover:bg-gray-500/10 hover:text-gray-800 dark:hover:text-white dark:hover:bg-white/10"
                                             aria-label={t('edit_chat_title')}
                                         >

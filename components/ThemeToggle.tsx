@@ -1,11 +1,15 @@
+
 import React, { useState, useEffect } from 'react';
 import { SunIcon, MoonIcon } from './icons/CoreIcons';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useGamification } from '../contexts/GamificationContext';
+import { GamificationEvent } from '../constants/badges';
 
 type Theme = 'light' | 'dark';
 
 const ThemeToggle: React.FC = () => {
     const { t } = useLanguage();
+    const { trackAction } = useGamification();
     // Initialize theme from localStorage or system preference, default to dark.
     const [theme, setTheme] = useState<Theme>(() => {
         if (typeof window === 'undefined') return 'dark';
@@ -24,6 +28,7 @@ const ThemeToggle: React.FC = () => {
     }, [theme]);
 
     const toggleTheme = () => {
+        trackAction(GamificationEvent.THEME_CHANGED);
         setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
     };
 

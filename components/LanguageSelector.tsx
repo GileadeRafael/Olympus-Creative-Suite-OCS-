@@ -1,6 +1,10 @@
+
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { LanguageCode } from '../lib/i18n';
+import { useGamification } from '../contexts/GamificationContext';
+import { GamificationEvent } from '../constants/badges';
 
 interface Language {
   code: LanguageCode;
@@ -16,9 +20,15 @@ const languages: Language[] = [
   { code: 'fr', name: 'Français', flagUrl: 'https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg' },
 ];
 
-const LanguageSelector: React.FC = () => {
+interface LanguageSelectorProps {
+  activeChatId: string | 'new' | null;
+}
+
+
+const LanguageSelector: React.FC<LanguageSelectorProps> = ({ activeChatId }) => {
     const [isOpen, setIsOpen] = useState(false);
     const { language, setLanguage, t } = useLanguage();
+    const { trackAction } = useGamification();
     const [selectedLang, setSelectedLang] = useState<Language>(languages.find(l => l.code === language) || languages[0]);
     const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -39,6 +49,7 @@ const LanguageSelector: React.FC = () => {
     }, [wrapperRef]);
     
     const handleSelectLang = (lang: Language) => {
+        trackAction(GamificationEvent.LANGUAGE_CHANGED, { code: lang.code, chatId: activeChatId });
         setLanguage(lang.code);
         setIsOpen(false);
     };

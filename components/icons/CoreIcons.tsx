@@ -116,6 +116,13 @@ export const MailIcon: React.FC<IconProps> = ({ className }) => (
     </svg>
 );
 
+// FIX: Added the missing DownloadIcon component.
+export const DownloadIcon: React.FC<IconProps> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+    </svg>
+);
+
 export const DiamondIcon: React.FC<IconProps> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
         <path fillRule="evenodd" d="M12.963 2.286a.75.75 0 00-1.927 0l-7.5 4.5A.75.75 0 003 7.5v9a.75.75 0 00.537.714l7.5 4.5a.75.75 0 00.927 0l7.5-4.5a.75.75 0 00.537-.714v-9a.75.75 0 00-.537-.714l-7.5-4.5zM12 6.19L6.75 9.19v5.62L12 17.81v-11.62zM17.25 9.19L12 12.19v5.62l5.25-3v-5.62z" clipRule="evenodd" />

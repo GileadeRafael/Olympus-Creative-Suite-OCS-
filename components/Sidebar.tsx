@@ -14,6 +14,7 @@ interface SidebarProps {
   onToggleHistory: () => void;
   hasUnreadNotifications: boolean;
   onToggleNotifications: () => void;
+  activeChatId: string | 'new' | null;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ 
@@ -26,6 +27,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     onToggleHistory,
     hasUnreadNotifications,
     onToggleNotifications,
+    activeChatId,
 }) => {
   return (
     <aside className="bg-gray-100 dark:bg-ocs-dark-sidebar w-20 flex flex-col items-center py-6">
@@ -87,7 +89,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <HistoryIcon className="w-6 h-6" />
             </button>
         )}
-        <LanguageSelector />
+        <LanguageSelector activeChatId={activeChatId} />
         <ThemeToggle />
       </div>
     </aside>

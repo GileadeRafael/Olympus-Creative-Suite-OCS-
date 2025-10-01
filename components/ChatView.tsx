@@ -1,3 +1,5 @@
+
+
 import React, { useState, useRef, useEffect } from 'react';
 import type { Assistant, Message } from '../types';
 import { sendMessageStream } from '../services/geminiService';
@@ -7,6 +9,8 @@ import WelcomeScreen from './WelcomeScreen';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Remarkable } from 'remarkable';
 import type { User } from '@supabase/supabase-js';
+import { useGamification } from '../contexts/GamificationContext';
+import { GamificationEvent } from '../constants/badges';
 
 const md = new Remarkable({
   html: true,
@@ -53,7 +57,7 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-
+  const { trackAction } = useGamification();
   const { t } = useLanguage();
   
   const username = user?.user_metadata?.username || 'User';
@@ -120,7 +124,8 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
                 // If already wrapped, just update the button color
                 const button = wrapper.querySelector('button');
                 if (button) {
-                    const oldColorClasses = Array.from(button.classList).filter(c => c.startsWith('bg-') || c.startsWith('hover:bg-'));
+                    // FIX: Explicitly type 'c' as string to resolve TypeScript inference issue with 'startsWith'.
+                    const oldColorClasses = Array.from(button.classList).filter((c: string) => c.startsWith('bg-') || c.startsWith('hover:bg-'));
                     button.classList.remove(...oldColorClasses);
                     button.classList.add(bgColor, hoverBgColor);
                 }
@@ -133,8 +138,10 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
+      trackAction(GamificationEvent.FILE_UPLOADED, { count: e.target.files.length });
       const files = Array.from(e.target.files);
-      const imagePromises = files.map(file => {
+      // FIX: Explicitly type 'file' as File to resolve TypeScript inference issues where it was treated as 'unknown'.
+      const imagePromises = files.map((file: File) => {
         return new Promise<{ mimeType: string; data: string }>((resolve, reject) => {
           const reader = new FileReader();
           reader.onloadend = () => {
@@ -161,7 +168,15 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
   };
 
   const handleSend = async () => {
-    if ((!input.trim() && selectedImages.length === 0) || !chatSession) return;
+    if ((!input.trim() && selectedImages.length === 0) || !chatSession || !assistant) return;
+
+    // Easter Egg Check
+    if (input.trim().toLowerCase() === 'olympus') {
+        trackAction(GamificationEvent.EASTER_EGG_FOUND);
+    }
+    
+    // For general message tracking and Crossover badge
+    trackAction(GamificationEvent.MESSAGE_SENT, { text: input, assistantId: assistant.id, chatId: activeChatId });
 
     const userMessage: Message = { 
       id: `user-${Date.now()}`, 
@@ -224,6 +239,12 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
   if (!assistant) {
     return <WelcomeScreen user={user} />;
   }
+  
+  const handleCopy = (text: string) => {
+    if (assistant) {
+      trackAction(GamificationEvent.CLIPBOARD_COPY, { text, assistantId: assistant.id });
+    }
+  };
 
   const isSendDisabled = isLoading || (!input.trim() && selectedImages.length === 0);
 
@@ -245,12 +266,14 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
             </div>
           ) : (
             messages.map((msg) => (
-              <div key={msg.id} id={`message-${msg.id}`} className={`my-6 flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className="relative group">
+              <div key={msg.id} id={`message-${msg.id}`} className={`my-6 flex group ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className="relative">
                   <div
-                    className={`p-4 rounded-2xl max-w-2xl prose-p:my-2 prose-p:leading-relaxed prose-headings:my-4 prose-pre:bg-black prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-code:text-white ${
+                    onCopy={msg.role === 'model' ? () => handleCopy(msg.content) : undefined}
+                    className={`p-4 rounded-2xl max-w-2xl prose-p:my-2 prose-p:leading-relaxed prose-headings:my-4 prose-pre:bg-black prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-code:text-white transition-colors ${
                       msg.role === 'user' 
                         ? 'bg-gray-200 dark:bg-ocs-dark-hover prose dark:prose-invert'
+                        // biome-ignore lint/nursery/noConstantCondition: <explanation>
                         : 'bg-gray-50 dark:bg-ocs-dark-input text-gray-800 dark:text-gray-200 prose dark:prose-invert'
                     }`}
                   >

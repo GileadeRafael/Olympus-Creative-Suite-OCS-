@@ -2,13 +2,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../services/supabaseClient';
-import { LogoutIcon } from './icons/ProfileIcons';
+import { LogoutIcon, BadgeIcon } from './icons/ProfileIcons';
 
 interface AvatarProps {
   user: User;
+  onOpenBadges: () => void;
 }
 
-const Avatar: React.FC<AvatarProps> = ({ user }) => {
+const Avatar: React.FC<AvatarProps> = ({ user, onOpenBadges }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -45,6 +46,13 @@ const Avatar: React.FC<AvatarProps> = ({ user }) => {
             <p className="text-xs text-gray-500 dark:text-ocs-text-muted truncate">{user.email}</p>
           </div>
           <div className="p-2 space-y-1">
+            <button
+              onClick={() => { onOpenBadges(); setDropdownOpen(false); }}
+              className="w-full flex items-center space-x-3 text-left px-4 py-2.5 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-500/5 dark:hover:bg-white/10 rounded-lg transition-colors"
+            >
+              <BadgeIcon className="w-5 h-5" />
+              <span>Badges</span>
+            </button>
             <button
               onClick={handleLogout}
               className="w-full flex items-center space-x-3 text-left px-4 py-2.5 text-sm text-red-600 dark:text-red-500 hover:bg-red-500/5 dark:hover:bg-red-500/10 rounded-lg transition-colors"

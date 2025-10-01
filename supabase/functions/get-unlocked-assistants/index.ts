@@ -1,4 +1,5 @@
 
+
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 
@@ -15,7 +16,7 @@ const createResponse = (body: object | string, status: number, headers: Headers)
 serve(async (req: Request) => {
   const corsHeaders = new Headers({
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-user-id',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
   });
 
@@ -36,25 +37,26 @@ serve(async (req: Request) => {
   });
 
   try {
-    const user_id = req.headers.get('x-user-id');
-
-    if (!user_id) {
-      return createResponse({ error: 'x-user-id header is required.' }, 400, corsHeaders);
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+        return createResponse({ error: 'Authorization header is required.' }, 401, corsHeaders);
     }
-    
-    // Security check: In a real-world scenario, you would verify the JWT
-    // from the Authorization header to ensure the user making the request
-    // is authorized to query data for the given user_id.
-    // For this environment, we proceed assuming valid invocation.
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+
+    if (userError || !user) {
+        console.error('JWT validation error:', userError?.message);
+        return createResponse({ error: 'Invalid or expired token.' }, 401, corsHeaders);
+    }
 
     const { data, error } = await supabaseAdmin
       .from('user_assistants')
       .select('assistant_id')
-      .eq('user_id', user_id);
+      .eq('user_id', user.id);
 
     if (error) {
       console.error('Supabase query error:', error.message);
-      // Don't expose detailed DB errors to the client
       return createResponse({ error: 'Failed to retrieve data.' }, 500, corsHeaders);
     }
 
