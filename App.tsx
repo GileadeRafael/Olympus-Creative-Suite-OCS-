@@ -1,7 +1,8 @@
 
 
+
 import React, { useState, useEffect, useCallback } from 'react';
-import type { Assistant, Message, ChatHistoryItem } from './types';
+import type { Assistant, Message, ChatHistoryItem, Notification } from './types';
 import { ASSISTANTS } from './constants';
 import Sidebar from './components/Sidebar';
 import ChatView from './components/ChatView';
@@ -42,28 +43,50 @@ const AppContent: React.FC = () => {
   const [assistantToPurchase, setAssistantToPurchase] = useState<Assistant | null>(null);
 
   // State for notifications
-  const [notifications, setNotifications] = useState<string[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const [isNotificationsModalOpen, setIsNotificationsModalOpen] = useState(false);
   
   // State for Badges Modal
   const [isBadgesModalOpen, setIsBadgesModalOpen] = useState(false);
 
-  // Set initial notification on app load
+  // Load notifications from localStorage or set defaults
   useEffect(() => {
-    const today = new Date();
-    const formattedDate = today.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
-    const gamificationNotification = t('notification_gamification', { date: formattedDate });
-    const welcomeNotification = t('notification_welcome');
+    if (!user) {
+        setNotifications([]);
+        return;
+    }
 
-    setNotifications([
-        gamificationNotification,
-        welcomeNotification,
-    ]);
-  }, [t]);
+    const storedKey = `notifications_${user.id}`;
+    const stored = localStorage.getItem(storedKey);
 
-    const addNotification = useCallback((message: string) => {
-        setNotifications(prev => [message, ...prev]);
+    if (stored) {
+        setNotifications(JSON.parse(stored));
+    } else {
+        const today = new Date().toISOString();
+        const initialNotifications: Notification[] = [
+            { key: 'notification_gamification', date: today },
+            { key: 'notification_welcome', date: today }
+        ];
+        setNotifications(initialNotifications);
+        localStorage.setItem(storedKey, JSON.stringify(initialNotifications));
+    }
+  }, [user]);
+  
+  // Persist notifications to localStorage whenever they change
+  useEffect(() => {
+    if (!user) return;
+    
+    const storedKey = `notifications_${user.id}`;
+    // This check prevents overwriting stored notifications with an empty array during login flicker
+    if (notifications.length > 0 || localStorage.getItem(storedKey)) {
+         localStorage.setItem(storedKey, JSON.stringify(notifications));
+    }
+  }, [notifications, user]);
+
+
+    const addNotification = useCallback((notification: Notification) => {
+        setNotifications(prev => [notification, ...prev]);
     }, []);
 
     useEffect(() => {
@@ -353,13 +376,13 @@ const AppContent: React.FC = () => {
   };
   
   const handleClearNotifications = () => {
+    setNotifications([]); // This will trigger the persistence useEffect to save an empty array
+    setHasUnreadNotifications(false);
+    setIsNotificationsModalOpen(false);
     if (user) {
         // When clearing, reset the seen counter to 0 relative to the new empty list.
         localStorage.setItem(`notificationsSeenCount_${user.id}`, '0');
     }
-    setNotifications([]);
-    setHasUnreadNotifications(false);
-    setIsNotificationsModalOpen(false); // Close the modal
   };
 
   // By checking for isPasswordRecovery before checking for a session,

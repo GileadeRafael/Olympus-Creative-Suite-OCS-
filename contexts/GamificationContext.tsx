@@ -1,11 +1,13 @@
 
 
+
 import React, { createContext, useState, useContext, ReactNode, useCallback, useEffect, useRef } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { useAuth } from '../hooks/useAuth';
 import { BADGES, GamificationEvent, Badge } from '../constants/badges';
 import { useToast } from './ToastContext';
 import { useLanguage } from './LanguageContext';
+import type { Notification } from '../types';
 
 export interface UserProgress {
     [badgeId: string]: {
@@ -20,7 +22,7 @@ interface GamificationContextType {
     badges: Badge[];
     trackAction: (event: GamificationEvent, value?: Record<string, any>) => void;
     resetSessionCounters: () => void;
-    setNotificationCallback: (callback: (message: string) => void) => void;
+    setNotificationCallback: (callback: (notification: Notification) => void) => void;
 }
 
 const GamificationContext = createContext<GamificationContextType | undefined>(undefined);
@@ -30,7 +32,7 @@ export const GamificationProvider: React.FC<{ children: ReactNode }> = ({ childr
     const { addToast } = useToast();
     const { t, language } = useLanguage();
     const [userProgress, setUserProgress] = useState<UserProgress>({});
-    const notificationCallbackRef = useRef<((message: string) => void) | null>(null);
+    const notificationCallbackRef = useRef<((notification: Notification) => void) | null>(null);
     
     // Using refs for counters that don't need to trigger re-renders
     const sessionCounters = useRef({ marathon: 0, fileShooter: 0 }).current;
@@ -45,7 +47,7 @@ export const GamificationProvider: React.FC<{ children: ReactNode }> = ({ childr
         sessionCounters.marathon = 0;
     }, [sessionCounters]);
     
-    const setNotificationCallback = useCallback((callback: (message: string) => void) => {
+    const setNotificationCallback = useCallback((callback: (notification: Notification) => void) => {
         notificationCallbackRef.current = callback;
     }, []);
 
@@ -265,10 +267,13 @@ export const GamificationProvider: React.FC<{ children: ReactNode }> = ({ childr
                     uniqueUnlocked.forEach(b => {
                         if (!b.hidden) {
                             addToast({ name: b.name, icon: b.icon, colorClass: b.colorClass });
-                            const formattedDate = new Date().toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' });
-                            const notificationMessage = t('notification_badge_unlocked', { badgeName: b.name, date: formattedDate });
+                            const newNotification: Notification = {
+                                key: 'notification_badge_unlocked',
+                                date: new Date().toISOString(),
+                                params: { badgeName: b.name }
+                            };
                             if (notificationCallbackRef.current) {
-                                notificationCallbackRef.current(notificationMessage);
+                                notificationCallbackRef.current(newNotification);
                             }
                         }
                     });

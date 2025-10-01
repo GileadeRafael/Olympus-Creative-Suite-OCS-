@@ -28,3 +28,9 @@ export interface ChatHistoryItem {
 export interface ChatRecord extends ChatHistoryItem {
   messages: Message[];
 }
+
+export interface Notification {
+  key: string;
+  date: string; // ISO string for consistent storage
+  params?: Record<string, string | number>;
+}

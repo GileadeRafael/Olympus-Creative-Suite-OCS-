@@ -1,17 +1,18 @@
 import React from 'react';
 import { XIcon, SparklesIcon } from './icons/CoreIcons';
 import { useLanguage } from '../contexts/LanguageContext';
+import type { Notification } from '../types';
 
 interface NotificationsModalProps {
     isOpen: boolean;
     onClose: () => void;
-    notifications: string[];
+    notifications: Notification[];
     onClearAll: () => void;
 }
 
 const NotificationsModal: React.FC<NotificationsModalProps> = ({ isOpen, onClose, notifications, onClearAll }) => {
     if (!isOpen) return null;
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
 
     return (
         <div
@@ -40,16 +41,22 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ isOpen, onClose
 
                 <div className="flex-1 p-4 space-y-3 overflow-y-auto max-h-[60vh]">
                     {notifications.length > 0 ? (
-                        notifications.map((note, index) => (
-                            <div key={index} className="flex items-start space-x-3">
-                                <div className="mt-1 flex-shrink-0 text-ocs-accent">
-                                    <SparklesIcon className="w-5 h-5" />
+                        notifications.map((note, index) => {
+                            const formattedDate = new Date(note.date).toLocaleDateString(language, { year: 'numeric', month: 'long', day: 'numeric' });
+                            const params = { ...note.params, date: formattedDate };
+                            const content = t(note.key, params);
+
+                            return (
+                                <div key={`${note.key}-${index}`} className="flex items-start space-x-3">
+                                    <div className="mt-1 flex-shrink-0 text-ocs-accent">
+                                        <SparklesIcon className="w-5 h-5" />
+                                    </div>
+                                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                                        {content}
+                                    </p>
                                 </div>
-                                <p className="text-sm text-gray-700 dark:text-gray-300">
-                                    {note}
-                                </p>
-                            </div>
-                        ))
+                            );
+                        })
                     ) : (
                         <div className="flex justify-center items-center h-24">
                             <p className="text-sm text-gray-500 dark:text-gray-400">{t('notifications_empty')}</p>
