@@ -1,6 +1,7 @@
 
 
 
+
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Assistant, Message, ChatHistoryItem, Notification } from './types';
 import { ASSISTANTS } from './constants';
@@ -44,6 +45,7 @@ const AppContent: React.FC = () => {
 
   // State for notifications
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isNotificationsLoaded, setIsNotificationsLoaded] = useState(false);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const [isNotificationsModalOpen, setIsNotificationsModalOpen] = useState(false);
   
@@ -54,6 +56,7 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     if (!user) {
         setNotifications([]);
+        setIsNotificationsLoaded(false); // Reset on logout
         return;
     }
 
@@ -71,18 +74,16 @@ const AppContent: React.FC = () => {
         setNotifications(initialNotifications);
         localStorage.setItem(storedKey, JSON.stringify(initialNotifications));
     }
+    setIsNotificationsLoaded(true);
   }, [user]);
   
   // Persist notifications to localStorage whenever they change
   useEffect(() => {
-    if (!user) return;
+    if (!user || !isNotificationsLoaded) return;
     
     const storedKey = `notifications_${user.id}`;
-    // This check prevents overwriting stored notifications with an empty array during login flicker
-    if (notifications.length > 0 || localStorage.getItem(storedKey)) {
-         localStorage.setItem(storedKey, JSON.stringify(notifications));
-    }
-  }, [notifications, user]);
+    localStorage.setItem(storedKey, JSON.stringify(notifications));
+  }, [notifications, user, isNotificationsLoaded]);
 
 
     const addNotification = useCallback((notification: Notification) => {
