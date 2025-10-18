@@ -97,9 +97,9 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
 
       const confirmationOverlay = wrapper.querySelector('.confirmation-overlay') as HTMLElement;
       if (confirmationOverlay) {
-        confirmationOverlay.classList.remove('opacity-0', 'pointer-events-none');
+        confirmationOverlay.classList.add('copy-confirmation-visible');
         setTimeout(() => {
-          confirmationOverlay.classList.add('opacity-0', 'pointer-events-none');
+          confirmationOverlay.classList.remove('copy-confirmation-visible');
         }, 2000);
       }
     } catch (err) {
@@ -110,6 +110,8 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
   const renderMessageContent = useCallback((content: string) => {
     if (!assistant) return { __html: md.render(content) };
 
+    const copyButtonText = t('copy_button_text');
+    const copiedText = t('copied_confirmation_text');
     const rawHtml = md.render(content);
     const buttonColorClass = getCopyButtonColors(assistant.ringColor);
 
@@ -117,18 +119,18 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
         return `
             <div class="code-block-wrapper relative group cursor-pointer">
                 <pre${preAttributes}>${innerContent}</pre>
-                <button class="absolute top-2 right-2 z-10 px-2.5 py-1 text-xs font-semibold ${buttonColorClass} text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100" aria-label="Copiar prompt">
-                    Copiar
+                <button class="absolute top-2 right-2 z-10 px-2.5 py-1 text-xs font-semibold ${buttonColorClass} text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100" aria-label="${copyButtonText}">
+                    ${copyButtonText}
                 </button>
-                <div class="confirmation-overlay absolute inset-0 bg-black/70 flex items-center justify-center text-white font-bold rounded-lg opacity-0 pointer-events-none transition-opacity duration-300">
-                    Prompt copiado!
+                <div class="confirmation-overlay absolute inset-0 bg-black/70 flex items-center justify-center text-white font-bold rounded-lg">
+                    ${copiedText}
                 </div>
             </div>
         `;
     });
 
     return { __html: wrappedHtml };
-  }, [assistant]);
+  }, [assistant, t]);
   
     const processFiles = (files: FileList) => {
         if (!files) return;

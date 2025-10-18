@@ -41,6 +41,8 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'clear_notifications': 'Clear all',
     'notification_badge_unlocked': 'New Badge! You unlocked "{badgeName}" on {date}.',
     'drop_files_here': 'Drop your files here',
+    'copy_button_text': 'Copy',
+    'copied_confirmation_text': 'Prompt copied!',
   },
   pt: {
     'greeting_morning': 'bom dia',
@@ -82,6 +84,8 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'clear_notifications': 'Limpar tudo',
     'notification_badge_unlocked': 'Novo Emblema! Você desbloqueou "{badgeName}" em {date}.',
     'drop_files_here': 'Arraste seus arquivos aqui',
+    'copy_button_text': 'Copiar',
+    'copied_confirmation_text': 'Prompt copiado!',
   },
   es: {
     'greeting_morning': 'buenos días',
@@ -123,6 +127,8 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'clear_notifications': 'Limpiar todo',
     'notification_badge_unlocked': '¡Nueva insignia! Desbloqueaste "{badgeName}" el {date}.',
     'drop_files_here': 'Suelta tus archivos aquí',
+    'copy_button_text': 'Copiar',
+    'copied_confirmation_text': '¡Prompt copiado!',
   },
   zh: {
     'greeting_morning': '早上好',
@@ -164,6 +170,8 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'clear_notifications': '全部清除',
     'notification_badge_unlocked': '新徽章！您于 {date} 解锁了“{badgeName}”。',
     'drop_files_here': '将文件拖放到此处',
+    'copy_button_text': '复制',
+    'copied_confirmation_text': '提示已复制！',
   },
   fr: {
     'greeting_morning': 'bonjour',
@@ -205,5 +213,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'clear_notifications': 'Tout effacer',
     'notification_badge_unlocked': 'Nouveau badge ! Vous avez débloqué "{badgeName}" le {date}.',
     'drop_files_here': 'Déposez vos fichiers ici',
+    'copy_button_text': 'Copier',
+    'copied_confirmation_text': 'Prompt copié !',
   }
 };

@@ -64,6 +64,18 @@
       .dark .custom-scrollbar {
         scrollbar-color: #6b7280 transparent;
       }
+      
+      /* Styles for code copy confirmation */
+      .confirmation-overlay {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease-in-out;
+      }
+      .copy-confirmation-visible {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
     </style>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script>
