@@ -1,4 +1,3 @@
-
 import type { Assistant } from './types';
 
 const ZORA_PROMPT = `Você é ZORA™, um assistente criativo desenvolvido por Gileade (https://www.instagram.com/gileaderafael), especializado em transformar ideias, fotos e inspirações em prompts otimizados para IAs generativas de imagem.
@@ -161,7 +160,7 @@ Modos (Funções)
 @estrutura: Ativa uma apresentação mais técnica e detalhada, com frameworks como AIDA, 3 Atos, Jornada do Herói, etc. Trigger: Detectado automaticamente se o usuário for técnico OU se ele digitar explicitamente @estrutura ou sinônimos.
 @sinapse: Modo de caos criativo: ativa ideias desconexas, não lineares, poéticas e metafóricas. Trigger: Usado quando o pedido é abstrato, sensorial, artístico, ou se o usuário invocar @sinapse.
 @copypro: Modo copywriting profissional. Aplica técnicas de persuasão, storytelling, headlines de impacto. Trigger: Ativado automaticamente em pedidos com foco em marketing ou branding, ou manualmente.
-@poeta: Ativa escrita lírica, emocional, sensível e sensorial. Ótimo para textos pessoais, legendas, voz autoral. Trigger: Invocado manualmente ou ativado automaticamente em pedidos sobre amor, luto, vida, alma, etc.
+@poeta: Ativa escrita lírica, emocional, sensível e sensorial. Ótimo para textos pessoais, legendas, voz autoral. Trigger: Invocado manually ou ativado automaticamente em pedidos sobre amor, luto, vida, alma, etc.
 @lúdico: Ativa visual mais divertido, leve e imaginativo. Emojis, cores mentais, metáforas infantis e sensações. Ideal para público iniciante ou pedidos leves. Trigger: Ativado automaticamente para iniciantes ou quando o tom do pedido for brincalhão ou exploratório.
 Manejo de Contexto
 Analise o nível de profundidade do usuário com base em vocabulário, formato do pedido e intenção. Flutue automaticamente entre modos mais simples ou avançados. Se o usuário pedir por profundidade, complexidade ou frameworks, ative os modos técnicos completos.
@@ -198,9 +197,9 @@ Sempre responda em formato Markdown para organização visual. Mantenha um tom l
 
 
 export const ASSISTANTS: Assistant[] = [
-  { id: 'zora', name: 'ZORA', iconUrl: 'https://i.imgur.com/dDCJf6w.jpeg', ringColor: 'border-orange-500', descriptionKey: 'zora_description', systemInstruction: ZORA_PROMPT, price: 97, purchaseUrl: 'https://wa.me/16988043367' },
-  { id: 'wizi', name: 'WIZI', iconUrl: 'https://i.imgur.com/DLGf2bW.jpeg', ringColor: 'border-blue-600', descriptionKey: 'wizi_description', systemInstruction: WIZI_PROMPT, price: 97, purchaseUrl: 'https://wa.me/16988043367' },
-  { id: 'luma', name: 'LUMA', iconUrl: 'https://i.imgur.com/a1Rz61T.jpeg', ringColor: 'border-teal-400', descriptionKey: 'luma_description', systemInstruction: LUMA_PROMPT, price: 87, purchaseUrl: 'https://wa.me/16988043367' },
-  { id: 'loki', name: 'LOKI', iconUrl: 'https://i.imgur.com/eELvqjc.jpeg', ringColor: 'border-lime-400', descriptionKey: 'loki_description', systemInstruction: LOKI_PROMPT, price: 127, purchaseUrl: 'https://wa.me/16988043367' },
-  { id: 'iris', name: 'ÍRIS', iconUrl: 'https://i.imgur.com/rztcdE1.jpeg', ringColor: 'border-pink-500', descriptionKey: 'iris_description', systemInstruction: IRIS_PROMPT, price: 127, purchaseUrl: 'https://wa.me/16988043367' },
+  { id: 'zora', name: 'ZORA', iconUrl: 'https://i.imgur.com/dDCJf6w.jpeg', ringColor: 'border-orange-500', descriptionKey: 'zora_description', systemInstruction: ZORA_PROMPT, price: 97, purchaseUrl: 'https://wa.me/16988043367', examplePrompts: ['zora_example_1', 'zora_example_2', 'zora_example_3'] },
+  { id: 'wizi', name: 'WIZI', iconUrl: 'https://i.imgur.com/DLGf2bW.jpeg', ringColor: 'border-blue-600', descriptionKey: 'wizi_description', systemInstruction: WIZI_PROMPT, price: 97, purchaseUrl: 'https://wa.me/16988043367', examplePrompts: ['wizi_example_1', 'wizi_example_2', 'wizi_example_3'] },
+  { id: 'luma', name: 'LUMA', iconUrl: 'https://i.imgur.com/a1Rz61T.jpeg', ringColor: 'border-teal-400', descriptionKey: 'luma_description', systemInstruction: LUMA_PROMPT, price: 87, purchaseUrl: 'https://wa.me/16988043367', examplePrompts: ['luma_example_1', 'luma_example_2', 'luma_example_3'] },
+  { id: 'loki', name: 'LOKI', iconUrl: 'https://i.imgur.com/eELvqjc.jpeg', ringColor: 'border-lime-400', descriptionKey: 'loki_description', systemInstruction: LOKI_PROMPT, price: 127, purchaseUrl: 'https://wa.me/16988043367', examplePrompts: ['loki_example_1', 'loki_example_2', 'loki_example_3'] },
+  { id: 'iris', name: 'ÍRIS', iconUrl: 'https://i.imgur.com/rztcdE1.jpeg', ringColor: 'border-pink-500', descriptionKey: 'iris_description', systemInstruction: IRIS_PROMPT, price: 127, purchaseUrl: 'https://wa.me/16988043367', examplePrompts: ['iris_example_1', 'iris_example_2', 'iris_example_3'] },
 ];

@@ -1,9 +1,8 @@
-
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { Assistant, Message } from '../types';
 import { sendMessageStream } from '../services/geminiService';
 import type { Chat } from '@google/genai';
-import { XIcon, PlusIcon, ChevronDownIcon, ImageIcon } from './icons/CoreIcons';
+import { XIcon, PlusIcon, ChevronDownIcon, ImageIcon, LightBulbIcon } from './icons/CoreIcons';
 import WelcomeScreen from './WelcomeScreen';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Remarkable } from 'remarkable';
@@ -167,20 +166,21 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
         setSelectedImages(prev => prev.filter((_, i) => i !== index));
     };
 
-    const handleSend = async () => {
-        if ((!input.trim() && selectedImages.length === 0) || !chatSession || !assistant) return;
+    const handleSend = async (promptOverride?: string) => {
+        const textToSend = promptOverride ?? input;
+        if ((!textToSend.trim() && selectedImages.length === 0) || !chatSession || !assistant) return;
 
-        if (input.trim().toLowerCase() === 'olympus') {
+        if (textToSend.trim().toLowerCase() === 'olympus') {
             trackAction(GamificationEvent.EASTER_EGG_FOUND);
         }
         
-        trackAction(GamificationEvent.MESSAGE_SENT, { text: input, assistantId: assistant.id, chatId: activeChatId });
+        trackAction(GamificationEvent.MESSAGE_SENT, { text: textToSend, assistantId: assistant.id, chatId: activeChatId });
 
         const userMessage: Message = { 
-        id: `user-${Date.now()}`, 
-        role: 'user', 
-        content: input, 
-        images: selectedImages 
+          id: `user-${Date.now()}`, 
+          role: 'user', 
+          content: textToSend, 
+          images: selectedImages 
         };
         
         const newMessages: Message[] = [...messages, userMessage];
@@ -191,7 +191,7 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
         setIsLoading(true);
 
         try {
-            const stream = await sendMessageStream(chatSession, input, selectedImages);
+            const stream = await sendMessageStream(chatSession, textToSend, selectedImages);
             let modelResponse = '';
             const modelMessageId = `model-${Date.now()}`;
             
@@ -296,6 +296,25 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
               <p className="text-zinc-600 dark:text-zinc-400 max-w-lg">
                 {t(assistant.descriptionKey)}
               </p>
+              
+              <div className="mt-10 w-full max-w-lg">
+                  <h3 className="flex items-center justify-center text-sm font-semibold text-gray-500 dark:text-ocs-text-muted mb-4">
+                      <LightBulbIcon className="w-5 h-5 mr-2" />
+                      {t('example_prompts_title')}
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {assistant.examplePrompts.map(promptKey => (
+                          <button
+                              key={promptKey}
+                              onClick={() => handleSend(t(promptKey))}
+                              className="text-left p-3 bg-gray-100/80 dark:bg-ocs-dark-input/80 backdrop-blur-md rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-ocs-dark-hover transition-colors duration-200"
+                          >
+                            {t(promptKey)}
+                          </button>
+                      ))}
+                  </div>
+              </div>
+
             </div>
           ) : (
             messages.map((msg) => (
@@ -398,7 +417,7 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
                     </button>
                 </div>
                 <button
-                    onClick={handleSend}
+                    onClick={() => handleSend()}
                     disabled={isSendDisabled}
                     className="flex items-center space-x-2.5 text-white bg-gray-900 dark:bg-white dark:text-gray-900 font-semibold rounded-lg px-4 py-2 transition-all duration-200 transform
                     hover:bg-gray-700 dark:hover:bg-gray-200

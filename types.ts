@@ -9,6 +9,7 @@ export interface Assistant {
   systemInstruction: string;
   price: number;
   purchaseUrl: string;
+  examplePrompts: string[];
 }
 
 export interface Message {
