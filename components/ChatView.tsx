@@ -51,6 +51,8 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
   const [selectedImages, setSelectedImages] = useState<{ mimeType: string; data: string }[]>([]);
   const [modalImage, setModalImage] = useState<string | null>(null);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const [copyFeedback, setCopyFeedback] = useState<{ top: number; left: number; width: number; height: number; key: number } | null>(null);
+
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -77,31 +79,32 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
   
   const handleContainerClick = async (e: React.MouseEvent<HTMLDivElement>) => {
     const wrapper = (e.target as HTMLElement).closest('.code-block-wrapper');
-
-    if (!wrapper) {
-      return; // Clicked outside a code block
-    }
+    if (!wrapper || !chatContainerRef.current) return;
 
     const pre = wrapper.querySelector('pre');
     if (!pre) return;
 
-    // Try to get text from a <code> tag, but fall back to the <pre> tag's content
     const codeElement = pre.querySelector('code');
     const codeToCopy = codeElement ? codeElement.innerText : pre.innerText;
-
     if (!codeToCopy) return;
 
     try {
       await navigator.clipboard.writeText(codeToCopy);
       trackAction(GamificationEvent.CLIPBOARD_COPY, { text: codeToCopy, assistantId: assistant?.id });
 
-      const confirmationOverlay = wrapper.querySelector('.confirmation-overlay') as HTMLElement;
-      if (confirmationOverlay) {
-        confirmationOverlay.classList.add('copy-confirmation-visible');
-        setTimeout(() => {
-          confirmationOverlay.classList.remove('copy-confirmation-visible');
-        }, 2000);
-      }
+      const rect = wrapper.getBoundingClientRect();
+      const containerRect = chatContainerRef.current.getBoundingClientRect();
+
+      setCopyFeedback({
+        top: rect.top - containerRect.top + chatContainerRef.current.scrollTop,
+        left: rect.left - containerRect.left,
+        width: rect.width,
+        height: rect.height,
+        key: Date.now(), // Force re-render and re-animation
+      });
+      
+      setTimeout(() => setCopyFeedback(null), 2000); // Clear state after animation
+
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
@@ -111,7 +114,6 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
     if (!assistant) return { __html: md.render(content) };
 
     const copyButtonText = t('copy_button_text');
-    const copiedText = t('copied_confirmation_text');
     const rawHtml = md.render(content);
     const buttonColorClass = getCopyButtonColors(assistant.ringColor);
 
@@ -122,9 +124,6 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
                 <button class="absolute top-2 right-2 z-10 px-2.5 py-1 text-xs font-semibold ${buttonColorClass} text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100" aria-label="${copyButtonText}">
                     ${copyButtonText}
                 </button>
-                <div class="confirmation-overlay absolute inset-0 bg-black/70 flex items-center justify-center text-white font-bold rounded-lg">
-                    ${copiedText}
-                </div>
             </div>
         `;
     });
@@ -282,10 +281,10 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
     >
       <div 
         ref={chatContainerRef} 
-        className="flex-1 overflow-y-auto custom-scrollbar"
+        className="flex-1 overflow-y-auto custom-scrollbar relative"
         onClick={handleContainerClick}
       >
-        <div className="max-w-4xl mx-auto px-4 pt-6 h-full">
+        <div className="max-w-4xl mx-auto px-4 pt-6">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <div className={`relative w-24 h-24 mb-6 border-4 ${assistant.ringColor} rounded-full flex items-center justify-center p-1`}>
@@ -345,6 +344,20 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
           )}
           <div ref={messagesEndRef} />
         </div>
+        {copyFeedback && (
+            <div
+                key={copyFeedback.key}
+                className="absolute bg-black/70 flex items-center justify-center text-white font-bold rounded-lg pointer-events-none animate-fade-in-out"
+                style={{
+                    top: `${copyFeedback.top}px`,
+                    left: `${copyFeedback.left}px`,
+                    width: `${copyFeedback.width}px`,
+                    height: `${copyFeedback.height}px`,
+                }}
+            >
+                {t('copied_confirmation_text')}
+            </div>
+        )}
       </div>
       
       <div className="w-full pt-4 bg-gradient-to-t from-white dark:from-ocs-dark-chat to-transparent">
