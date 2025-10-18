@@ -22,10 +22,18 @@ import ToastContainer from './components/ToastContainer';
 import LogoutAnimation from './components/LogoutAnimation';
 import InteractiveTour from './components/InteractiveTour';
 
+export interface PersonalizedWelcomeData {
+    type: 'last_chat' | 'recent_badge' | 'suggestion';
+    assistant?: Assistant;
+    timeAgo?: string;
+    badgeName?: string;
+}
+
+
 const AppContent: React.FC = () => {
   const { session, user, isPasswordRecovery } = useAuth();
   const { t } = useLanguage();
-  const { trackAction, resetSessionCounters, setNotificationCallback } = useGamification();
+  const { trackAction, resetSessionCounters, setNotificationCallback, userProgress, badges } = useGamification();
   const [activeAssistant, setActiveAssistant] = useState<Assistant | null>(null);
   
   // State for chat history management
@@ -58,6 +66,86 @@ const AppContent: React.FC = () => {
 
   // State for Interactive Tour
   const [showTour, setShowTour] = useState(false);
+  
+  // State for personalized welcome screen data
+  const [personalizedWelcomeData, setPersonalizedWelcomeData] = useState<PersonalizedWelcomeData | null>(null);
+
+
+  const timeAgo = (date: string, lang: string) => {
+    const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
+    const rtf = new Intl.RelativeTimeFormat(lang, { numeric: 'auto' });
+
+    if (seconds < 60) return rtf.format(-seconds, 'second');
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return rtf.format(-minutes, 'minute');
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return rtf.format(-hours, 'hour');
+    const days = Math.floor(hours / 24);
+    if (days < 7) return rtf.format(-days, 'day');
+    const weeks = Math.floor(days / 7);
+    return rtf.format(-weeks, 'week');
+};
+
+
+    useEffect(() => {
+        if (user && !activeAssistant) {
+            const fetchLastActivity = async () => {
+                // 1. Try to find the last chat
+                const { data: lastChatData, error: lastChatError } = await supabase
+                    .from('chats')
+                    .select('assistant_id, created_at')
+                    .eq('user_id', user.id)
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .single();
+
+                if (lastChatData) {
+                    const assistant = ASSISTANTS.find(a => a.id === lastChatData.assistant_id);
+                    if (assistant) {
+                        setPersonalizedWelcomeData({
+                            type: 'last_chat',
+                            assistant: assistant,
+                            timeAgo: timeAgo(lastChatData.created_at, 'en'), // Language will be applied in component
+                        });
+                        return;
+                    }
+                }
+
+                // 2. If no chat, find the most recent unlocked badge
+                const { data: lastBadgeData, error: lastBadgeError } = await supabase
+                    .from('user_badge_progress')
+                    .select('badge_id, unlocked_at')
+                    .eq('user_id', user.id)
+                    .not('unlocked_at', 'is', null)
+                    .order('unlocked_at', { ascending: false })
+                    .limit(1)
+                    .single();
+
+                if (lastBadgeData) {
+                    const badge = badges.find(b => b.id === lastBadgeData.badge_id);
+                    if (badge && !badge.hidden) {
+                        setPersonalizedWelcomeData({
+                            type: 'recent_badge',
+                            badgeName: badge.name,
+                        });
+                        return;
+                    }
+                }
+                
+                // 3. If neither, suggest a random assistant
+                const randomAssistant = ASSISTANTS[Math.floor(Math.random() * ASSISTANTS.length)];
+                setPersonalizedWelcomeData({
+                    type: 'suggestion',
+                    assistant: randomAssistant,
+                });
+            };
+
+            fetchLastActivity();
+        } else if (!user) {
+            setPersonalizedWelcomeData(null);
+        }
+    }, [user, activeAssistant, badges]);
+
 
   // Check if tour should be shown for a new user
   useEffect(() => {
@@ -491,6 +579,8 @@ const AppContent: React.FC = () => {
                 activeChatId={activeChatId}
                 onCreateChat={handleCreateChat}
                 onUpdateChat={handleUpdateChat}
+                personalizedWelcomeData={personalizedWelcomeData}
+                onAssistantClick={handleAssistantClick}
             />
           </div>
         </main>

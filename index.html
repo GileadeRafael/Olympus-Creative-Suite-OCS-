@@ -106,6 +106,48 @@
       .tour-tooltip-animate {
         animation: tourTooltipFadeIn 0.3s ease-out forwards;
       }
+      
+      /* Welcome Screen Animations */
+      @keyframes background-pan {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+      .animate-background-pan {
+        background: linear-gradient(-45deg, #1e1b4b, #4f46e5, #a21caf, #be185d, #4338ca);
+        background-size: 400% 400%;
+        animation: background-pan 25s ease infinite;
+      }
+      
+      @keyframes typing {
+        from { width: 0; }
+        to { width: 100%; }
+      }
+      @keyframes blink-caret {
+        from, to { border-color: transparent; }
+        50% { border-color: #8A5DFF; }
+      }
+      .animate-typing {
+        overflow: hidden;
+        white-space: nowrap;
+        animation: typing var(--animation-duration, 2.5s) steps(var(--animation-steps, 40), end), blink-caret .75s step-end infinite;
+        border-right: .15em solid #8A5DFF;
+        width: 0;
+        animation-fill-mode: forwards;
+      }
+
+      @keyframes wave {
+        0%, 60%, 100% { transform: rotate(0deg); }
+        10%, 30% { transform: rotate(14deg); }
+        20%, 40% { transform: rotate(-8deg); }
+        50% { rotate: 4deg; }
+      }
+      .animate-wave {
+        display: inline-block;
+        animation: wave 2.5s ease-in-out 3;
+        animation-delay: 1.5s;
+      }
+
     </style>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script>

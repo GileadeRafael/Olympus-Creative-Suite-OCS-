@@ -9,6 +9,8 @@ import { Remarkable } from 'remarkable';
 import type { User } from '@supabase/supabase-js';
 import { useGamification } from '../contexts/GamificationContext';
 import { GamificationEvent } from '../constants/badges';
+import type { PersonalizedWelcomeData } from '../App';
+
 
 const md = new Remarkable({
   html: true,
@@ -42,9 +44,11 @@ interface ChatViewProps {
   activeChatId: string | 'new' | null;
   onCreateChat: (firstUserMessage: Message, fullConversation: Message[]) => Promise<string | null>;
   onUpdateChat: (chatId: string, fullConversation: Message[]) => Promise<void>;
+  personalizedWelcomeData: PersonalizedWelcomeData | null;
+  onAssistantClick: (assistant: Assistant) => void;
 }
 
-const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, setMessages, user, activeChatId, onCreateChat, onUpdateChat }) => {
+const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, setMessages, user, activeChatId, onCreateChat, onUpdateChat, personalizedWelcomeData, onAssistantClick }) => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedImages, setSelectedImages] = useState<{ mimeType: string; data: string }[]>([]);
@@ -293,7 +297,7 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
 
 
   if (!assistant) {
-    return <WelcomeScreen user={user} />;
+    return <WelcomeScreen user={user} personalizedData={personalizedWelcomeData} onAssistantClick={onAssistantClick} />;
   }
   
   const isSendDisabled = isLoading || (!input.trim() && selectedImages.length === 0);
