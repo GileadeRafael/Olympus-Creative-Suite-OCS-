@@ -55,6 +55,7 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -64,8 +65,29 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
   const username = user?.user_metadata?.username || 'User';
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    const chatContainer = chatContainerRef.current;
+    const messagesContainer = messagesContainerRef.current;
+
+    if (chatContainer) {
+        const { scrollHeight, scrollTop, clientHeight } = chatContainer;
+        
+        // This is the distance from the bottom, which includes the height of the new message.
+        const scrollOffset = scrollHeight - clientHeight - scrollTop;
+
+        const lastMessageElement = messagesContainer?.lastElementChild as HTMLElement;
+        const lastMessageHeight = lastMessageElement ? lastMessageElement.offsetHeight : 0;
+        
+        // If the user was close to the bottom before the new message appeared (within the height 
+        // of the last message plus a 100px buffer), then we auto-scroll. Otherwise, we don't.
+        // This stops the UI from fighting the user when they scroll up to read history.
+        if (scrollOffset < lastMessageHeight + 100) {
+            messagesEndRef.current?.scrollIntoView({ behavior: isLoading ? 'auto' : 'smooth' });
+        }
+    } else {
+        // Fallback for initial render or when the container isn't available
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isLoading]);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -318,7 +340,7 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
               </div>
             </div>
           ) : (
-            <div className="pb-24">
+            <div className="pb-24" ref={messagesContainerRef}>
               {messages.map((msg) => (
                 <div key={msg.id} id={`message-${msg.id}`} className={`my-6 flex group ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className="relative">
