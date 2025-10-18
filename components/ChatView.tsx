@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { Assistant, Message } from '../types';
 import { sendMessageStream } from '../services/geminiService';
 import type { Chat } from '@google/genai';
-import { XIcon, PlusIcon, ChevronDownIcon, ImageIcon, LightBulbIcon } from './icons/CoreIcons';
+import { XIcon, PlusIcon, ChevronDownIcon, ImageIcon, SparklesIcon } from './icons/CoreIcons';
 import WelcomeScreen from './WelcomeScreen';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Remarkable } from 'remarkable';
@@ -284,70 +284,73 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
         className="flex-1 overflow-y-auto custom-scrollbar relative"
         onClick={handleContainerClick}
       >
-        <div className="max-w-4xl mx-auto px-4 pt-6">
+        <div className="max-w-4xl mx-auto px-4 pt-6 h-full">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <div className={`relative w-24 h-24 mb-6 border-4 ${assistant.ringColor} rounded-full flex items-center justify-center p-1`}>
-                <img src={assistant.iconUrl} alt={assistant.name} className="w-full h-full object-cover rounded-full" />
-              </div>
-              <h1 className="text-5xl font-bold text-gray-800 dark:text-white mb-4">
-                {assistant.name}
-              </h1>
-              <p className="text-zinc-600 dark:text-zinc-400 max-w-lg">
-                {t(assistant.descriptionKey)}
-              </p>
-              
-              <div className="mt-10 w-full max-w-lg">
-                  <h3 className="flex items-center justify-center text-sm font-semibold text-gray-500 dark:text-ocs-text-muted mb-4">
-                      <LightBulbIcon className="w-5 h-5 mr-2" />
-                      {t('example_prompts_title')}
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {assistant.examplePrompts.map(promptKey => (
-                          <button
-                              key={promptKey}
-                              onClick={() => handleSend(t(promptKey))}
-                              className="text-left p-3 bg-gray-100/80 dark:bg-ocs-dark-input/80 backdrop-blur-md rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-ocs-dark-hover transition-colors duration-200"
-                          >
-                            {t(promptKey)}
-                          </button>
-                      ))}
-                  </div>
-              </div>
-
-            </div>
-          ) : (
-            messages.map((msg) => (
-              <div key={msg.id} id={`message-${msg.id}`} className={`my-6 flex group ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className="relative">
-                  <div
-                    className={`p-4 rounded-2xl max-w-2xl prose-p:my-2 prose-p:leading-relaxed prose-headings:my-4 prose-pre:bg-black prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-code:text-white transition-colors ${
-                      msg.role === 'user' 
-                        ? 'bg-gray-200 dark:bg-ocs-dark-hover prose dark:prose-invert'
-                        : 'bg-gray-50 dark:bg-ocs-dark-input text-gray-800 dark:text-gray-200 prose dark:prose-invert'
-                    }`}
-                  >
-                    {msg.content ? <div dangerouslySetInnerHTML={renderMessageContent(msg.content)} /> : null}
-                    {msg.images && msg.images.length > 0 && (
-                      <div className="not-prose mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        {msg.images.map((image, index) => (
-                          <button key={index} onClick={() => setModalImage(`data:${image.mimeType};base64,${image.data}`)} className="focus:outline-none rounded-lg overflow-hidden">
-                            <img
-                              src={`data:${image.mimeType};base64,${image.data}`}
-                              alt={`attachment ${index + 1}`}
-                              className="aspect-square object-cover w-full h-full transition-transform hover:scale-105"
-                            />
-                          </button>
+              <div className="flex flex-col items-center">
+                <div className={`relative w-24 h-24 mb-6 border-4 ${assistant.ringColor} rounded-full flex items-center justify-center p-1`}>
+                  <img src={assistant.iconUrl} alt={assistant.name} className="w-full h-full object-cover rounded-full" />
+                </div>
+                <h1 className="text-5xl font-bold text-gray-800 dark:text-white mb-4">
+                  {assistant.name}
+                </h1>
+                <p className="text-zinc-600 dark:text-zinc-400 max-w-lg">
+                  {t(assistant.descriptionKey)}
+                </p>
+                
+                <div className="mt-10 w-full max-w-lg">
+                    <h3 className="flex items-center justify-center text-sm font-semibold text-gray-500 dark:text-ocs-text-muted mb-4">
+                        <SparklesIcon className="w-5 h-5 mr-2 text-ocs-accent" />
+                        {t('example_prompts_title')}
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {assistant.examplePrompts.map(promptKey => (
+                            <button
+                                key={promptKey}
+                                onClick={() => handleSend(t(promptKey))}
+                                className="text-left p-3 bg-gray-100/80 dark:bg-ocs-dark-input/80 backdrop-blur-md rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-ocs-dark-hover transition-colors duration-200"
+                            >
+                              {t(promptKey)}
+                            </button>
                         ))}
-                      </div>
-                    )}
-                  </div>
-                  {msg.role === 'model' && (
-                    <img src={assistant.iconUrl} alt={assistant.name} className="absolute -bottom-4 -left-5 w-10 h-10 rounded-full border-4 border-white dark:border-ocs-dark-chat" />
-                  )}
+                    </div>
                 </div>
               </div>
-            ))
+            </div>
+          ) : (
+            <div className="pb-24">
+              {messages.map((msg) => (
+                <div key={msg.id} id={`message-${msg.id}`} className={`my-6 flex group ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className="relative">
+                    <div
+                      className={`p-4 rounded-2xl max-w-2xl prose-p:my-2 prose-p:leading-relaxed prose-headings:my-4 prose-pre:bg-black prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-code:text-white transition-colors ${
+                        msg.role === 'user' 
+                          ? 'bg-gray-200 dark:bg-ocs-dark-hover prose dark:prose-invert'
+                          : 'bg-gray-50 dark:bg-ocs-dark-input text-gray-800 dark:text-gray-200 prose dark:prose-invert'
+                      }`}
+                    >
+                      {msg.content ? <div dangerouslySetInnerHTML={renderMessageContent(msg.content)} /> : null}
+                      {msg.images && msg.images.length > 0 && (
+                        <div className="not-prose mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          {msg.images.map((image, index) => (
+                            <button key={index} onClick={() => setModalImage(`data:${image.mimeType};base64,${image.data}`)} className="focus:outline-none rounded-lg overflow-hidden">
+                              <img
+                                src={`data:${image.mimeType};base64,${image.data}`}
+                                alt={`attachment ${index + 1}`}
+                                className="aspect-square object-cover w-full h-full transition-transform hover:scale-105"
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    {msg.role === 'model' && (
+                      <img src={assistant.iconUrl} alt={assistant.name} className="absolute -bottom-4 -left-5 w-10 h-10 rounded-full border-4 border-white dark:border-ocs-dark-chat" />
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
           {isLoading && messages.length > 0 && messages[messages.length-1]?.role === 'user' && (
             <div className="my-4 flex justify-start">
@@ -379,7 +382,7 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
         )}
       </div>
       
-      <div className="w-full pt-4 bg-gradient-to-t from-white dark:from-ocs-dark-chat to-transparent">
+      <div className="absolute bottom-0 left-0 right-0 w-full pt-4 bg-gradient-to-t from-white dark:from-ocs-dark-chat to-transparent">
         <div className="max-w-4xl mx-auto px-4 pb-4">
           {selectedImages.length > 0 && (
             <div className="pb-2 overflow-x-auto">

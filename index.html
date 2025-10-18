@@ -74,6 +74,21 @@
         animation: fadeInOut 2s ease-in-out forwards;
       }
 
+      /* Animation for assistant transition */
+      @keyframes slideInFromRight {
+          from {
+              transform: translateX(20px);
+              opacity: 0;
+          }
+          to {
+              transform: translateX(0);
+              opacity: 1;
+          }
+      }
+      .animate-slide-in-right {
+          animation: slideInFromRight 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      }
+
     </style>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script>

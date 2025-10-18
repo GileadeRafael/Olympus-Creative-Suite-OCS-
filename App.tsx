@@ -52,6 +52,9 @@ const AppContent: React.FC = () => {
   // State for Logout Animation
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
+  // State for transition animation
+  const [animationKey, setAnimationKey] = useState(0);
+
   // Load notifications from localStorage or set defaults
   useEffect(() => {
     if (!user) {
@@ -231,6 +234,7 @@ const AppContent: React.FC = () => {
     // Only track the "switch" event if the assistant is actually different.
     if (activeAssistant?.id !== assistant.id) {
       trackAction(GamificationEvent.ASSISTANT_SWITCHED, { id: assistant.id });
+      setAnimationKey(prev => prev + 1); // Trigger animation
     }
 
     setActiveAssistant(assistant);
@@ -360,6 +364,9 @@ const AppContent: React.FC = () => {
   };
 
   const handleResetToHome = () => {
+    if (activeAssistant) {
+      setAnimationKey(prev => prev + 1); // Trigger animation on reset
+    }
     setActiveAssistant(null);
     setActiveChatId(null);
     setCurrentMessages([]);
@@ -429,7 +436,7 @@ const AppContent: React.FC = () => {
           onToggleNotifications={() => setIsNotificationsModalOpen(p => !p)}
           activeChatId={activeChatId}
         />
-        <main className="flex-1 flex flex-col h-full relative">
+        <main className="flex-1 flex flex-col h-full relative overflow-hidden">
           <header className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
             {user && <Avatar user={user} onOpenBadges={() => setIsBadgesModalOpen(true)} onLogout={handleLogout} />}
           </header>
@@ -447,17 +454,19 @@ const AppContent: React.FC = () => {
               onClose={() => setIsHistoryModalOpen(false)}
             />
           )}
-          <ChatView 
-              key={activeAssistant?.id ? `${activeAssistant.id}-${activeChatId}`: 'welcome'}
-              assistant={activeAssistant}
-              chatSession={chatSession}
-              messages={currentMessages}
-              setMessages={setCurrentMessages}
-              user={user}
-              activeChatId={activeChatId}
-              onCreateChat={handleCreateChat}
-              onUpdateChat={handleUpdateChat}
-          />
+          <div key={animationKey} className="h-full w-full animate-slide-in-right">
+            <ChatView 
+                key={activeAssistant?.id ? `${activeAssistant.id}-${activeChatId}`: 'welcome'}
+                assistant={activeAssistant}
+                chatSession={chatSession}
+                messages={currentMessages}
+                setMessages={setCurrentMessages}
+                user={user}
+                activeChatId={activeChatId}
+                onCreateChat={handleCreateChat}
+                onUpdateChat={handleUpdateChat}
+            />
+          </div>
         </main>
         <PurchaseModal 
           assistant={assistantToPurchase} 
