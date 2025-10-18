@@ -1,6 +1,5 @@
 
-
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { Assistant, Message } from '../types';
 import { sendMessageStream } from '../services/geminiService';
 import type { Chat } from '@google/genai';
@@ -94,7 +93,6 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
 
     try {
       await navigator.clipboard.writeText(codeToCopy);
-      // Track the copy action for gamification (e.g., the 'Crossover' badge)
       trackAction(GamificationEvent.CLIPBOARD_COPY, { text: codeToCopy, assistantId: assistant?.id });
 
       const confirmationOverlay = wrapper.querySelector('.confirmation-overlay') as HTMLElement;
@@ -109,41 +107,34 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
     }
   };
 
-  useEffect(() => {
-    if (!assistant || !chatContainerRef.current) return;
+  const renderMessageContent = useCallback((content: string) => {
+    if (!assistant) return { __html: md.render(content) };
 
+    const rawHtml = md.render(content);
     const buttonColorClass = getCopyButtonColors(assistant.ringColor);
-    const unwrappedPres = chatContainerRef.current.querySelectorAll('pre:not(div.code-block-wrapper > pre)');
-    
-    unwrappedPres.forEach(pre => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'code-block-wrapper relative group cursor-pointer';
-        
-        const copyButton = document.createElement('button');
-        copyButton.className = `absolute top-2 right-2 z-10 px-2.5 py-1 text-xs font-semibold ${buttonColorClass} text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100`;
-        copyButton.setAttribute('aria-label', 'Copiar prompt');
-        copyButton.innerText = 'Copiar';
 
-        const confirmationOverlay = document.createElement('div');
-        // Added a specific class for the delegated click handler to find
-        confirmationOverlay.className = 'confirmation-overlay absolute inset-0 bg-black/70 flex items-center justify-center text-white font-bold rounded-lg opacity-0 pointer-events-none transition-opacity duration-300';
-        confirmationOverlay.innerText = 'Prompt copiado!';
-        
-        // The onclick handler is now delegated to the container, so it's removed from here.
-
-        pre.parentNode?.insertBefore(wrapper, pre);
-        wrapper.appendChild(pre);
-        wrapper.appendChild(copyButton);
-        wrapper.appendChild(confirmationOverlay);
+    const wrappedHtml = rawHtml.replace(/<pre(.*?)>([\s\S]*?)<\/pre>/g, (_match, preAttributes, innerContent) => {
+        return `
+            <div class="code-block-wrapper relative group cursor-pointer">
+                <pre${preAttributes}>${innerContent}</pre>
+                <button class="absolute top-2 right-2 z-10 px-2.5 py-1 text-xs font-semibold ${buttonColorClass} text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100" aria-label="Copiar prompt">
+                    Copiar
+                </button>
+                <div class="confirmation-overlay absolute inset-0 bg-black/70 flex items-center justify-center text-white font-bold rounded-lg opacity-0 pointer-events-none transition-opacity duration-300">
+                    Prompt copiado!
+                </div>
+            </div>
+        `;
     });
-  }, [messages, assistant]);
+
+    return { __html: wrappedHtml };
+  }, [assistant]);
   
     const processFiles = (files: FileList) => {
         if (!files) return;
         
         trackAction(GamificationEvent.FILE_UPLOADED, { count: files.length });
         const fileArray = Array.from(files);
-        // FIX: Explicitly type 'file' as File to resolve TypeScript inference issues.
         const imagePromises = fileArray.map((file: File) => {
             return new Promise<{ mimeType: string; data: string }>((resolve, reject) => {
             const reader = new FileReader();
@@ -152,7 +143,6 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
                 return reject('FileReader result is not a string');
                 }
                 const base64String = reader.result.split(',')[1];
-                // FIX: Corrected typo from `base6String` to `base64String`.
                 resolve({ mimeType: file.type, data: base64String });
             };
             reader.onerror = reject;
@@ -179,12 +169,10 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
     const handleSend = async () => {
         if ((!input.trim() && selectedImages.length === 0) || !chatSession || !assistant) return;
 
-        // Easter Egg Check
         if (input.trim().toLowerCase() === 'olympus') {
             trackAction(GamificationEvent.EASTER_EGG_FOUND);
         }
         
-        // For general message tracking and Crossover badge
         trackAction(GamificationEvent.MESSAGE_SENT, { text: input, assistantId: assistant.id, chatId: activeChatId });
 
         const userMessage: Message = { 
@@ -194,7 +182,6 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
         images: selectedImages 
         };
         
-        // Optimistically update UI
         const newMessages: Message[] = [...messages, userMessage];
         setMessages(newMessages);
         
@@ -317,11 +304,10 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
                     className={`p-4 rounded-2xl max-w-2xl prose-p:my-2 prose-p:leading-relaxed prose-headings:my-4 prose-pre:bg-black prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-code:text-white transition-colors ${
                       msg.role === 'user' 
                         ? 'bg-gray-200 dark:bg-ocs-dark-hover prose dark:prose-invert'
-                        // biome-ignore lint/nursery/noConstantCondition: <explanation>
                         : 'bg-gray-50 dark:bg-ocs-dark-input text-gray-800 dark:text-gray-200 prose dark:prose-invert'
                     }`}
                   >
-                    {msg.content ? <div dangerouslySetInnerHTML={{ __html: md.render(msg.content) }} /> : null}
+                    {msg.content ? <div dangerouslySetInnerHTML={renderMessageContent(msg.content)} /> : null}
                     {msg.images && msg.images.length > 0 && (
                       <div className="not-prose mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
                         {msg.images.map((image, index) => (
