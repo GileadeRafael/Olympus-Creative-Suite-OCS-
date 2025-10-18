@@ -305,6 +305,7 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
+        data-tour-id="chat-view-main"
     >
       <div 
         ref={chatContainerRef} 

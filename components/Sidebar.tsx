@@ -39,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <img src="https://i.imgur.com/QAy8ULl.png" alt="Olympus Logo" className="h-10 w-auto block dark:hidden" />
           <img src="https://i.imgur.com/0vBQm1M.png" alt="Olympus Logo" className="h-10 w-auto hidden dark:block" />
         </button>
-        <div className="relative">
+        <div className="relative" data-tour-id="notifications-bell">
              <button
                 onClick={onToggleNotifications}
                 className="w-12 h-12 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-ocs-dark-hover transition-colors duration-200 ease-in-out focus:outline-none"
@@ -52,7 +52,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             )}
         </div>
       </div>
-      <nav className="flex-1 flex flex-col items-center justify-center space-y-3">
+      <nav className="flex-1 flex flex-col items-center justify-center space-y-3" data-tour-id="assistants-list">
         {assistants.map((assistant) => {
           const isLocked = !isLoading && !unlockedAssistants.has(assistant.id);
           const lockedText = isLocked ? ` ${t('locked_tooltip')}` : '';
@@ -93,8 +93,12 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <HistoryIcon className="w-6 h-6" />
             </button>
         )}
-        <LanguageSelector activeChatId={activeChatId} />
-        <ThemeToggle />
+        <div data-tour-id="language-selector">
+          <LanguageSelector activeChatId={activeChatId} />
+        </div>
+        <div data-tour-id="theme-toggle">
+          <ThemeToggle />
+        </div>
       </div>
     </aside>
   );

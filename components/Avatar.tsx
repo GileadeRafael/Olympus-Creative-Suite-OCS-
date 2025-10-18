@@ -27,7 +27,7 @@ const Avatar: React.FC<AvatarProps> = ({ user, onOpenBadges, onLogout }) => {
   }, []);
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative" ref={dropdownRef} data-tour-id="user-avatar">
       <button
         onClick={() => setDropdownOpen(!dropdownOpen)}
         className="bg-gray-900 dark:bg-white hover:bg-gray-700 dark:hover:bg-gray-200 shadow-lg dark:shadow-black/20 border border-transparent px-6 py-3 rounded-full text-sm text-white dark:text-gray-900 hover:shadow-xl dark:hover:shadow-black/30 transform hover:-translate-y-px transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent dark:focus:ring-offset-ocs-dark-chat focus:ring-ocs-accent"

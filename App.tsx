@@ -20,6 +20,7 @@ import { GamificationEvent } from './constants/badges';
 import { ToastProvider } from './contexts/ToastContext';
 import ToastContainer from './components/ToastContainer';
 import LogoutAnimation from './components/LogoutAnimation';
+import InteractiveTour from './components/InteractiveTour';
 
 const AppContent: React.FC = () => {
   const { session, user, isPasswordRecovery } = useAuth();
@@ -54,6 +55,30 @@ const AppContent: React.FC = () => {
 
   // State for transition animation
   const [animationKey, setAnimationKey] = useState(0);
+
+  // State for Interactive Tour
+  const [showTour, setShowTour] = useState(false);
+
+  // Check if tour should be shown for a new user
+  useEffect(() => {
+    if (user) {
+        const tourKey = `hasCompletedTour_${user.id}`;
+        const hasCompleted = localStorage.getItem(tourKey);
+        if (!hasCompleted) {
+            // Use a small delay to ensure the UI is fully rendered before starting the tour
+            setTimeout(() => setShowTour(true), 500);
+        }
+    }
+  }, [user]);
+
+  const handleTourEnd = () => {
+    if (user) {
+        const tourKey = `hasCompletedTour_${user.id}`;
+        localStorage.setItem(tourKey, 'true');
+        setShowTour(false);
+    }
+  };
+
 
   // Load notifications from localStorage or set defaults
   useEffect(() => {
@@ -423,6 +448,7 @@ const AppContent: React.FC = () => {
 
   return (
     <>
+      {showTour && <InteractiveTour onComplete={handleTourEnd} onSkip={handleTourEnd} />}
       <div className="flex h-screen w-screen text-gray-800 dark:text-gray-200 bg-white dark:bg-ocs-dark-chat font-sans overflow-hidden">
         <Sidebar 
           assistants={ASSISTANTS} 
