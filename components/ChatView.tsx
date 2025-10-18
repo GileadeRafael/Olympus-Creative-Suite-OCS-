@@ -77,64 +77,43 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
   }, [input]);
 
   useEffect(() => {
-    if (!assistant) return;
+    if (!assistant || !chatContainerRef.current) return;
 
-    // Post-render DOM manipulation to add/update copy buttons to code blocks
-    const timer = setTimeout(() => {
-        if (!chatContainerRef.current) return;
+    const buttonColorClass = getCopyButtonColors(assistant.ringColor);
+    const unwrappedPres = chatContainerRef.current.querySelectorAll('pre:not(div.code-block-wrapper > pre)');
+    
+    unwrappedPres.forEach(pre => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-block-wrapper relative group cursor-pointer';
+        
+        const copyButton = document.createElement('button');
+        copyButton.className = `absolute top-2 right-2 z-10 px-2.5 py-1 text-xs font-semibold ${buttonColorClass} text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100`;
+        copyButton.setAttribute('aria-label', 'Copiar prompt');
+        copyButton.innerText = 'Copiar';
 
-        const buttonColorClass = getCopyButtonColors(assistant.ringColor);
-        const [bgColor, hoverBgColor] = buttonColorClass.split(' ');
+        const confirmationOverlay = document.createElement('div');
+        confirmationOverlay.className = 'absolute inset-0 bg-black/70 flex items-center justify-center text-white font-bold rounded-lg opacity-0 pointer-events-none transition-opacity duration-300';
+        confirmationOverlay.innerText = 'Prompt copiado!';
 
-        chatContainerRef.current.querySelectorAll('pre').forEach(pre => {
-            let wrapper = pre.parentElement;
-            
-            // If not wrapped, create wrapper and button
-            if (!wrapper || !wrapper.classList.contains('code-block-wrapper')) {
-                wrapper = document.createElement('div');
-                wrapper.className = 'code-block-wrapper relative group';
-                
-                const copyButton = document.createElement('button');
-                copyButton.className = `p-1.5 ${buttonColorClass} text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100`;
-                copyButton.setAttribute('aria-label', 'Copy code');
-                copyButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.353-.026.692-.04 1.048-.041h.005c.356 0 .703.015 1.048.041 1.13.094 1.976 1.057 1.976 2.192V7.5M8.25 7.5h7.5m-7.5 0l-1 10.5a1.5 1.5 0 001.5 1.5h7.5a1.5 1.5 0 001.5-1.5l-1-10.5m-7.5 0V6.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V7.5m-7.5 0h7.5"></path></svg>`;
-
-                const copiedText = document.createElement('span');
-                copiedText.className = 'absolute right-full mr-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-gray-900 text-white text-xs font-semibold rounded-md shadow-lg opacity-0 transition-opacity pointer-events-none';
-                copiedText.innerText = 'Copied!';
-
-                const copyButtonWrapper = document.createElement('div');
-                copyButtonWrapper.className = 'absolute top-2 right-2 z-10';
-                copyButtonWrapper.appendChild(copyButton);
-                copyButtonWrapper.appendChild(copiedText);
-
-                copyButton.onclick = () => {
-                    const code = pre.querySelector('code')?.innerText || '';
-                    navigator.clipboard.writeText(code).then(() => {
-                        copiedText.classList.add('opacity-100');
-                        setTimeout(() => {
-                            copiedText.classList.remove('opacity-100');
-                        }, 2000);
-                    });
-                };
-
-                pre.parentNode?.insertBefore(wrapper, pre);
-                wrapper.appendChild(pre);
-                wrapper.appendChild(copyButtonWrapper);
-            } else {
-                // If already wrapped, just update the button color
-                const button = wrapper.querySelector('button');
-                if (button) {
-                    // FIX: Explicitly type 'c' as string to resolve TypeScript inference issue with 'startsWith'.
-                    const oldColorClasses = Array.from(button.classList).filter((c: string) => c.startsWith('bg-') || c.startsWith('hover:bg-'));
-                    button.classList.remove(...oldColorClasses);
-                    button.classList.add(bgColor, hoverBgColor);
-                }
+        wrapper.onclick = async () => {
+            const code = pre.querySelector('code')?.innerText || '';
+            if (!code) return;
+            try {
+                await navigator.clipboard.writeText(code);
+                confirmationOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                setTimeout(() => {
+                    confirmationOverlay.classList.add('opacity-0', 'pointer-events-none');
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
             }
-        });
-    }, 100);
+        };
 
-    return () => clearTimeout(timer);
+        pre.parentNode?.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+        wrapper.appendChild(copyButton);
+        wrapper.appendChild(confirmationOverlay);
+    });
   }, [messages, assistant]);
   
     const processFiles = (files: FileList) => {
@@ -151,6 +130,7 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
                 return reject('FileReader result is not a string');
                 }
                 const base64String = reader.result.split(',')[1];
+                // FIX: Corrected typo from `base6String` to `base64String`.
                 resolve({ mimeType: file.type, data: base64String });
             };
             reader.onerror = reject;
@@ -279,12 +259,6 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
     return <WelcomeScreen user={user} />;
   }
   
-  const handleCopy = (text: string) => {
-    if (assistant) {
-      trackAction(GamificationEvent.CLIPBOARD_COPY, { text, assistantId: assistant.id });
-    }
-  };
-
   const isSendDisabled = isLoading || (!input.trim() && selectedImages.length === 0);
 
   return (
@@ -314,7 +288,6 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
               <div key={msg.id} id={`message-${msg.id}`} className={`my-6 flex group ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className="relative">
                   <div
-                    onCopy={msg.role === 'model' ? () => handleCopy(msg.content) : undefined}
                     className={`p-4 rounded-2xl max-w-2xl prose-p:my-2 prose-p:leading-relaxed prose-headings:my-4 prose-pre:bg-black prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-code:text-white transition-colors ${
                       msg.role === 'user' 
                         ? 'bg-gray-200 dark:bg-ocs-dark-hover prose dark:prose-invert'
