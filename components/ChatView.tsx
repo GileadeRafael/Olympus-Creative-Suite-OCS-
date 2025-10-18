@@ -75,6 +75,39 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
       textareaRef.current.style.height = `${Math.min(scrollHeight, maxHeight)}px`;
     }
   }, [input]);
+  
+  const handleContainerClick = async (e: React.MouseEvent<HTMLDivElement>) => {
+    const wrapper = (e.target as HTMLElement).closest('.code-block-wrapper');
+
+    if (!wrapper) {
+      return; // Clicked outside a code block
+    }
+
+    const pre = wrapper.querySelector('pre');
+    if (!pre) return;
+
+    // Try to get text from a <code> tag, but fall back to the <pre> tag's content
+    const codeElement = pre.querySelector('code');
+    const codeToCopy = codeElement ? codeElement.innerText : pre.innerText;
+
+    if (!codeToCopy) return;
+
+    try {
+      await navigator.clipboard.writeText(codeToCopy);
+      // Track the copy action for gamification (e.g., the 'Crossover' badge)
+      trackAction(GamificationEvent.CLIPBOARD_COPY, { text: codeToCopy, assistantId: assistant?.id });
+
+      const confirmationOverlay = wrapper.querySelector('.confirmation-overlay') as HTMLElement;
+      if (confirmationOverlay) {
+        confirmationOverlay.classList.remove('opacity-0', 'pointer-events-none');
+        setTimeout(() => {
+          confirmationOverlay.classList.add('opacity-0', 'pointer-events-none');
+        }, 2000);
+      }
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  };
 
   useEffect(() => {
     if (!assistant || !chatContainerRef.current) return;
@@ -92,22 +125,11 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
         copyButton.innerText = 'Copiar';
 
         const confirmationOverlay = document.createElement('div');
-        confirmationOverlay.className = 'absolute inset-0 bg-black/70 flex items-center justify-center text-white font-bold rounded-lg opacity-0 pointer-events-none transition-opacity duration-300';
+        // Added a specific class for the delegated click handler to find
+        confirmationOverlay.className = 'confirmation-overlay absolute inset-0 bg-black/70 flex items-center justify-center text-white font-bold rounded-lg opacity-0 pointer-events-none transition-opacity duration-300';
         confirmationOverlay.innerText = 'Prompt copiado!';
-
-        wrapper.onclick = async () => {
-            const code = pre.querySelector('code')?.innerText || '';
-            if (!code) return;
-            try {
-                await navigator.clipboard.writeText(code);
-                confirmationOverlay.classList.remove('opacity-0', 'pointer-events-none');
-                setTimeout(() => {
-                    confirmationOverlay.classList.add('opacity-0', 'pointer-events-none');
-                }, 2000);
-            } catch (err) {
-                console.error('Failed to copy text: ', err);
-            }
-        };
+        
+        // The onclick handler is now delegated to the container, so it's removed from here.
 
         pre.parentNode?.insertBefore(wrapper, pre);
         wrapper.appendChild(pre);
@@ -269,7 +291,11 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
     >
-      <div ref={chatContainerRef} className="flex-1 overflow-y-auto custom-scrollbar">
+      <div 
+        ref={chatContainerRef} 
+        className="flex-1 overflow-y-auto custom-scrollbar"
+        onClick={handleContainerClick}
+      >
         <div className="max-w-4xl mx-auto px-4 pt-6 h-full">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
