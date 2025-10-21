@@ -115,7 +115,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ user, personalizedData, o
             
             {/* Glassmorphism overlay covering the whole screen */}
             <div className="relative z-10 flex flex-col items-center justify-center w-full h-full p-4 bg-black/10 backdrop-blur-xl">
-                <div className="max-w-3xl">
+                <div className="max-w-3xl px-4">
                     <h1
                         key={greetingKey}
                         className="text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-4 mx-auto animate-typing [text-shadow:0_2px_10px_rgba(0,0,0,0.5)]"

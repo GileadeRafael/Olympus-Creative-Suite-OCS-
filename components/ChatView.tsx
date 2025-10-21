@@ -326,7 +326,7 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
         className="flex-1 overflow-y-auto custom-scrollbar relative"
         onClick={handleContainerClick}
       >
-        <div className={`max-w-4xl mx-auto px-2 sm:px-4 ${messages.length === 0 ? 'h-full flex flex-col' : 'pt-6'}`} style={{ paddingBottom: `${inputHeight + 16}px` }}>
+        <div className={`max-w-4xl mx-auto px-6 ${messages.length === 0 ? 'h-full flex flex-col' : 'pt-6'}`} style={{ paddingBottom: `${inputHeight + 16}px` }}>
           {messages.length === 0 ? (
              <div className="flex flex-col items-center justify-center flex-1 text-center">
                 <div className={`relative w-20 h-20 sm:w-24 sm:h-24 mb-6 border-4 ${assistant.ringColor} rounded-full flex items-center justify-center p-1`}>
@@ -364,7 +364,7 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
                   <div key={msg.id} id={`message-${msg.id}`} className={`my-3 sm:my-4 flex group ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className="relative">
                       <div
-                        className={`p-3 sm:p-4 rounded-2xl max-w-[80%] sm:max-w-[85%] md:max-w-2xl prose-p:my-2 prose-p:leading-relaxed prose-headings:my-4 prose-pre:bg-black prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-code:text-white transition-colors break-words ${
+                        className={`p-3 sm:p-4 rounded-2xl max-w-[80%] md:max-w-2xl prose-p:my-2 prose-p:leading-relaxed prose-headings:my-4 prose-pre:bg-black prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-code:text-white transition-colors break-words ${
                           msg.role === 'user' 
                             ? 'bg-gray-200 dark:bg-ocs-dark-hover prose dark:prose-invert'
                             : 'bg-gray-50 dark:bg-ocs-dark-input text-gray-800 dark:text-gray-200 prose dark:prose-invert'
