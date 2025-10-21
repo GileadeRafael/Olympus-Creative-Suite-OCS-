@@ -94,9 +94,10 @@ const AuthPage: React.FC = () => {
   };
   
   // Conditional theming for Halloween
-  // Set the user-provided image as the permanent background.
-  // Other seasonal elements like buttons and titles will still apply conditionally.
-  const backgroundImageUrl = 'https://i.imgur.com/zoORyZ9.jpeg';
+  const backgroundImageUrl = isHalloween
+    ? 'https://i.imgur.com/zoORyZ9.jpeg' // Halloween background
+    : 'https://i.imgur.com/SDbDZkl.png'; // Default abstract background
+
   const backgroundStyle = {
     backgroundImage: `url('${backgroundImageUrl}')`,
     backgroundSize: 'cover',
