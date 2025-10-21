@@ -108,15 +108,19 @@
       }
       
       /* Welcome Screen Animations */
-      @keyframes background-pan {
+      @keyframes subtle-aurora-pan {
         0% { background-position: 0% 50%; }
         50% { background-position: 100% 50%; }
         100% { background-position: 0% 50%; }
       }
-      .animate-background-pan {
-        background: linear-gradient(-45deg, #1e1b4b, #4f46e5, #a21caf, #be185d, #4338ca);
-        background-size: 400% 400%;
-        animation: background-pan 25s ease infinite;
+      .aurora-background {
+          background-color: #01040a;
+          background-image: 
+              radial-gradient(circle at 35% 30%, hsl(190, 80%, 60%) 0%, transparent 20%), /* Main cyan glow */
+              radial-gradient(circle at 65% 70%, hsl(260, 60%, 40%) 0%, transparent 25%), /* Purple hint */
+              radial-gradient(circle at 50% 50%, hsl(220, 80%, 25%) 5%, #01040a 60%); /* Deep blue base */
+          background-size: 200% 150%;
+          animation: subtle-aurora-pan 45s ease-in-out infinite;
       }
       
       @keyframes typing {

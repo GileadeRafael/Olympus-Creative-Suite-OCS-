@@ -111,7 +111,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ user, personalizedData, o
     return (
         <div className="relative flex flex-col items-center justify-center h-full text-center overflow-hidden">
             {/* Animated background layer that will be blurred by the overlay */}
-            <div className="absolute inset-0 w-full h-full animate-background-pan z-0"></div>
+            <div className="absolute inset-0 w-full h-full aurora-background z-0"></div>
             
             {/* Glassmorphism overlay covering the whole screen */}
             <div className="relative z-10 flex flex-col items-center justify-center w-full h-full px-6 py-4 bg-black/10 backdrop-blur-xl">
