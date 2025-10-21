@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Assistant, Message, ChatHistoryItem, Notification } from './types';
 import { ASSISTANTS } from './constants';
@@ -279,7 +280,8 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     // If there's no user, reset the state and do nothing further.
     if (!user) {
-        setUnlockedAssistants(new Set());
+        // FIX: Explicitly type the new Set to match the state's type `Set<string>`.
+        setUnlockedAssistants(new Set<string>());
         setIsUnlockStatusLoading(false);
         return;
     }
@@ -295,9 +297,12 @@ const AppContent: React.FC = () => {
 
         if (error) {
             console.error("Error fetching unlocked assistants:", error.message);
-            setUnlockedAssistants(new Set());
+            // FIX: Explicitly type the new Set to match the state's type `Set<string>`.
+            setUnlockedAssistants(new Set<string>());
         } else {
-            const unlockedIds = new Set(data.map((item: { assistant_id: string }) => item.assistant_id));
+            // FIX: Explicitly type the new Set as Set<string> to resolve a TypeScript inference issue
+            // where `new Set(any[])` can result in `Set<unknown>`, which is not assignable to `Set<string>`.
+            const unlockedIds = new Set<string>(data.map((item: { assistant_id: string }) => item.assistant_id));
             setUnlockedAssistants(unlockedIds);
         }
         setIsUnlockStatusLoading(false);

@@ -2,6 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { MailIcon, EyeIcon, EyeSlashIcon } from './icons/CoreIcons';
 
+// Function to check if the current date is within the Halloween season
+const isHalloweenSeason = (): boolean => {
+  const today = new Date();
+  const month = today.getMonth(); // 0-indexed, so October is 9
+  const day = today.getDate();
+
+  // Halloween season from October 21st to November 2nd
+  return (month === 9 && day >= 21) || (month === 10 && day <= 2);
+};
+
+
 const AuthPage: React.FC = () => {
   type AuthMode = 'signUp' | 'signIn' | 'forgotPassword';
   const [authMode, setAuthMode] = useState<AuthMode>('signUp');
@@ -12,6 +23,9 @@ const AuthPage: React.FC = () => {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
+
+  // Check if it's Halloween season to apply the theme
+  const isHalloween = isHalloweenSeason();
 
   useEffect(() => {
     if (toast) {
@@ -78,15 +92,31 @@ const AuthPage: React.FC = () => {
     setPassword('');
     setUsername('');
   };
-
+  
+  // Conditional theming for Halloween
+  // Set the user-provided image as the permanent background.
+  // Other seasonal elements like buttons and titles will still apply conditionally.
+  const backgroundImageUrl = 'https://i.imgur.com/zoORyZ9.jpeg';
   const backgroundStyle = {
-    backgroundImage: `url('https://i.imgur.com/SDbDZkl.png')`,
+    backgroundImage: `url('${backgroundImageUrl}')`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
   };
 
+  const primaryButtonClass = isHalloween 
+    ? "w-full bg-orange-600 text-white font-semibold py-3 rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50"
+    : "w-full bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50";
+  
+  const forgotPasswordLinkClass = isHalloween
+    ? "text-xs font-medium text-orange-200/80 hover:text-orange-200 hover:underline transition-colors"
+    : "text-xs font-medium text-white/60 hover:text-white hover:underline transition-colors";
+
+  const signUpTitle = isHalloween ? 'Create a spooky account 🎃' : 'Create an account';
+  const signInTitle = isHalloween ? 'Welcome back 👻' : 'Welcome back';
+
+
   return (
-    <div className="min-h-screen w-screen flex items-center justify-center p-4" style={backgroundStyle}>
+    <div className="min-h-screen w-screen flex items-center justify-center p-4 transition-all duration-500" style={backgroundStyle}>
        {toast && (
         <div className={`fixed top-5 right-5 px-6 py-3 rounded-lg text-white ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
           {toast.message}
@@ -113,7 +143,7 @@ const AuthPage: React.FC = () => {
                 </p>
                 <button
                     onClick={handleCloseConfirmationModal}
-                    className="w-full bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors"
+                    className={primaryButtonClass}
                 >
                     OK
                 </button>
@@ -138,7 +168,7 @@ const AuthPage: React.FC = () => {
                   <button 
                     type="submit" 
                     disabled={loading} 
-                    className="w-full bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                    className={primaryButtonClass}
                   >
                     {loading ? 'Sending...' : 'Send Instructions'}
                   </button>
@@ -151,12 +181,12 @@ const AuthPage: React.FC = () => {
           <>
             <div className="flex justify-between items-center mb-6">
                 <div className="flex bg-black/20 rounded-full p-1 border border-white/10">
-                  <button onClick={() => setAuthMode('signUp')} className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${authMode === 'signUp' ? 'bg-white text-black' : 'text-white/70 hover:text-white'}`}>Sign up</button>
-                  <button onClick={() => setAuthMode('signIn')} className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${authMode === 'signIn' ? 'bg-white text-black' : 'text-white/70 hover:text-white'}`}>Sign in</button>
+                  <button onClick={() => setAuthMode('signUp')} className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${authMode === 'signUp' ? (isHalloween ? 'bg-orange-600 text-white' : 'bg-white text-black') : 'text-white/70 hover:text-white'}`}>Sign up</button>
+                  <button onClick={() => setAuthMode('signIn')} className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-colors ${authMode === 'signIn' ? (isHalloween ? 'bg-orange-600 text-white' : 'bg-white text-black') : 'text-white/70 hover:text-white'}`}>Sign in</button>
                 </div>
             </div>
 
-            <h2 className="text-3xl font-bold text-white mb-6">{authMode === 'signUp' ? 'Create an account' : 'Welcome back'}</h2>
+            <h2 className="text-3xl font-bold text-white mb-6">{authMode === 'signUp' ? signUpTitle : signInTitle}</h2>
 
             <form onSubmit={handleAuth} className="space-y-4">
               <div className="grid grid-cols-1 gap-4">
@@ -190,7 +220,7 @@ const AuthPage: React.FC = () => {
                       <button 
                           type="button"
                           onClick={() => { setAuthMode('forgotPassword'); setPassword(''); }} 
-                          className="text-xs font-medium text-white/60 hover:text-white hover:underline transition-colors"
+                          className={forgotPasswordLinkClass}
                       >
                           Forgot Password?
                       </button>
@@ -198,7 +228,7 @@ const AuthPage: React.FC = () => {
               )}
 
 
-              <button type="submit" disabled={loading} className="w-full bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 !mt-6">
+              <button type="submit" disabled={loading} className={`${primaryButtonClass} !mt-6`}>
                 {loading ? 'Processing...' : (authMode === 'signUp' ? 'Create an account' : 'Sign in')}
               </button>
             </form>
