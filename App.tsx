@@ -21,6 +21,7 @@ import { ToastProvider } from './contexts/ToastContext';
 import ToastContainer from './components/ToastContainer';
 import LogoutAnimation from './components/LogoutAnimation';
 import InteractiveTour from './components/InteractiveTour';
+import { ChevronDoubleLeftIcon } from './components/icons/CoreIcons';
 
 export interface PersonalizedWelcomeItem {
     type: 'last_chat' | 'recent_badge' | 'suggestion';
@@ -44,6 +45,7 @@ const AppContent: React.FC = () => {
   const [chatSession, setChatSession] = useState<Chat | null>(null);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [isHistoryPanelVisible, setIsHistoryPanelVisible] = useState(true);
 
   // State for assistant purchase/unlocking
   const [unlockedAssistants, setUnlockedAssistants] = useState<Set<string>>(new Set());
@@ -584,7 +586,19 @@ const AppContent: React.FC = () => {
               isLoading={isHistoryLoading}
               isOpen={isHistoryModalOpen}
               onClose={() => setIsHistoryModalOpen(false)}
+              isPanelVisible={isHistoryPanelVisible}
+              onToggleHistoryPanel={() => setIsHistoryPanelVisible(p => !p)}
             />
+          )}
+          {activeAssistant && !isHistoryPanelVisible && (
+              <button
+                  onClick={() => setIsHistoryPanelVisible(true)}
+                  aria-label={t('expand_history')}
+                  className="hidden md:flex fixed top-1/2 -translate-y-1/2 right-6 z-30 items-center justify-center w-8 h-16 bg-white/80 dark:bg-ocs-dark-input/80 backdrop-blur-lg rounded-l-full shadow-lg border border-r-0 border-gray-200/50 dark:border-ocs-dark-hover/50 hover:bg-white dark:hover:bg-ocs-dark-input transition-all duration-300 ease-in-out animate-slide-in-right"
+                  style={{ animationDelay: '300ms', animationFillMode: 'backwards' }}
+              >
+                  <ChevronDoubleLeftIcon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+              </button>
           )}
           <div key={animationKey} className="h-full w-full animate-slide-in-right">
             <ChatView 

@@ -99,6 +99,9 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'recent_badge_prompt_2': 'Keep it up! ✨',
     'suggestion_prompt_1': 'Try starting a project with',
     'suggestion_prompt_2': 'today?',
+    'toggle_chat_history': 'Toggle chat history',
+    'collapse_history': 'Collapse history',
+    'expand_history': 'Expand history',
   },
   pt: {
     'greeting_morning': 'bom dia',
@@ -198,6 +201,9 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'recent_badge_prompt_2': 'Continue assim! ✨',
     'suggestion_prompt_1': 'Que tal começar um projeto com',
     'suggestion_prompt_2': 'hoje?',
+    'toggle_chat_history': 'Alternar histórico de chat',
+    'collapse_history': 'Recolher histórico',
+    'expand_history': 'Expandir histórico',
   },
   es: {
     'greeting_morning': 'buenos días',
@@ -277,6 +283,9 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'recent_badge_prompt_2': '¡Sigue así! ✨',
     'suggestion_prompt_1': '¿Por qué no empezar un proyecto con',
     'suggestion_prompt_2': 'hoy?',
+    'toggle_chat_history': 'Alternar historial de chat',
+    'collapse_history': 'Contraer historial',
+    'expand_history': 'Expandir historial',
   },
   zh: {
     'greeting_morning': '早上好',
@@ -356,6 +365,9 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'recent_badge_prompt_2': '继续努力！✨',
     'suggestion_prompt_1': '尝试开始一个新项目',
     'suggestion_prompt_2': '今天？',
+    'toggle_chat_history': '切换聊天记录',
+    'collapse_history': '折叠历史记录',
+    'expand_history': '展开历史记录',
   },
   fr: {
     'greeting_morning': 'bonjour',
@@ -435,5 +447,8 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'recent_badge_prompt_2': 'Continuez comme ça ! ✨',
     'suggestion_prompt_1': 'Essayez de démarrer un projet avec',
     'suggestion_prompt_2': 'aujourd\'hui ?',
+    'toggle_chat_history': 'Alterner l\'historique des discussions',
+    'collapse_history': 'Réduire l\'historique',
+    'expand_history': 'Développer l\'historique',
   }
 };

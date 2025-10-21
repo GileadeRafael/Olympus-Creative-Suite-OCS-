@@ -88,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <button
                 onClick={onToggleHistory}
                 className="md:hidden w-12 h-12 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-ocs-dark-hover transition-colors duration-200 ease-in-out focus:outline-none"
-                aria-label="Toggle chat history"
+                aria-label={t('toggle_chat_history')}
             >
                 <HistoryIcon className="w-6 h-6" />
             </button>

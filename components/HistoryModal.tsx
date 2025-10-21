@@ -1,7 +1,6 @@
-
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import type { Assistant, ChatHistoryItem } from '../types';
-import { TrashIcon, PlusIcon, PencilIcon, SearchIcon } from './icons/CoreIcons';
+import { TrashIcon, PlusIcon, PencilIcon, SearchIcon, ChevronDoubleRightIcon } from './icons/CoreIcons';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useGamification } from '../contexts/GamificationContext';
 import { GamificationEvent } from '../constants/badges';
@@ -17,9 +16,11 @@ interface HistoryModalProps {
     isLoading: boolean;
     isOpen: boolean;
     onClose: () => void;
+    isPanelVisible: boolean;
+    onToggleHistoryPanel: () => void;
 }
 
-const HistoryModal: React.FC<HistoryModalProps> = ({ assistant, history, activeChatId, onSelectChat, onNewChat, onDeleteChat, onUpdateChatTitle, isLoading, isOpen, onClose }) => {
+const HistoryModal: React.FC<HistoryModalProps> = ({ assistant, history, activeChatId, onSelectChat, onNewChat, onDeleteChat, onUpdateChatTitle, isLoading, isOpen, onClose, isPanelVisible, onToggleHistoryPanel }) => {
     const { t } = useLanguage();
     const { trackAction } = useGamification();
     const [editingChatId, setEditingChatId] = useState<string | null>(null);
@@ -85,11 +86,12 @@ const HistoryModal: React.FC<HistoryModalProps> = ({ assistant, history, activeC
 
     return (
          <div
-            // Wrapper: Full screen modal on mobile, fixed panel on desktop.
-            // Visibility is toggled by `isOpen` on mobile, but it's always 'block' on desktop.
+            // Wrapper: Full screen modal on mobile, sliding panel on desktop.
             className={`
-                ${isOpen ? 'fixed inset-0 z-40' : 'hidden'}
-                md:block md:fixed md:top-1/2 md:right-6 md:-translate-y-1/2 md:z-20 md:w-72 md:h-[70vh] md:inset-auto
+                ${isOpen ? 'fixed inset-0 z-40' : 'hidden'} md:block
+                md:fixed md:top-1/2 md:right-6 md:-translate-y-1/2 md:z-20 md:w-72 md:h-[70vh] md:inset-auto
+                transition-transform duration-300 ease-in-out
+                ${isPanelVisible ? 'md:translate-x-0' : 'md:translate-x-full'}
             `}
             onClick={onClose}
             role="dialog"
@@ -104,8 +106,15 @@ const HistoryModal: React.FC<HistoryModalProps> = ({ assistant, history, activeC
                            md:mx-0 md:mt-0 md:w-full md:h-full md:max-w-none"
                 onClick={e => e.stopPropagation()}
             >
-                <header className="p-4 border-b border-black/10 dark:border-white/10">
+                <header className="p-4 border-b border-black/10 dark:border-white/10 flex items-center justify-between">
                     <h2 className="font-bold text-lg text-gray-800 dark:text-white">{t('chats')}</h2>
+                    <button
+                        onClick={onToggleHistoryPanel}
+                        aria-label={t('collapse_history')}
+                        className="hidden md:block p-1.5 text-gray-500 dark:text-gray-400 rounded-full hover:bg-gray-500/10 hover:text-gray-800 dark:hover:text-white dark:hover:bg-white/10 transition-colors"
+                    >
+                        <ChevronDoubleRightIcon className="w-5 h-5" />
+                    </button>
                 </header>
                 
                 <div className="p-2 border-b border-black/10 dark:border-white/10">
