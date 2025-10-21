@@ -9,7 +9,7 @@ import { Remarkable } from 'remarkable';
 import type { User } from '@supabase/supabase-js';
 import { useGamification } from '../contexts/GamificationContext';
 import { GamificationEvent } from '../constants/badges';
-import type { PersonalizedWelcomeData } from '../App';
+import type { PersonalizedWelcomeItem } from '../App';
 
 
 const md = new Remarkable({
@@ -44,7 +44,7 @@ interface ChatViewProps {
   activeChatId: string | 'new' | null;
   onCreateChat: (firstUserMessage: Message, fullConversation: Message[]) => Promise<string | null>;
   onUpdateChat: (chatId: string, fullConversation: Message[]) => Promise<void>;
-  personalizedWelcomeData: PersonalizedWelcomeData | null;
+  personalizedWelcomeData: PersonalizedWelcomeItem[] | null;
   onAssistantClick: (assistant: Assistant) => void;
 }
 
@@ -61,6 +61,8 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isAtBottomRef = useRef(true);
+  const inputContainerRef = useRef<HTMLDivElement>(null);
+  const [inputHeight, setInputHeight] = useState(100); // Default height
 
   const { trackAction } = useGamification();
   const { t } = useLanguage();
@@ -74,6 +76,14 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
       messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
     }
   }, [messages]);
+  
+  // Update input height for scroll padding
+  useEffect(() => {
+    if (inputContainerRef.current) {
+      setInputHeight(inputContainerRef.current.offsetHeight);
+    }
+  }, [input, selectedImages]);
+
 
   // Sets up a scroll listener to detect if the user has scrolled up
   useEffect(() => {
@@ -316,9 +326,9 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
         className="flex-1 overflow-y-auto custom-scrollbar relative"
         onClick={handleContainerClick}
       >
-        <div className="max-w-4xl mx-auto px-4 pt-6 pb-48">
+        <div className="max-w-4xl mx-auto px-4 pt-6" style={{ paddingBottom: `${inputHeight + 16}px` }}>
           {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center">
+             <div className="flex flex-col items-center justify-center min-h-full text-center" style={{ minHeight: `calc(100vh - ${inputHeight + 60}px)` }}>
               <div className="flex flex-col items-center">
                 <div className={`relative w-24 h-24 mb-6 border-4 ${assistant.ringColor} rounded-full flex items-center justify-center p-1`}>
                   <img src={assistant.iconUrl} alt={assistant.name} className="w-full h-full object-cover rounded-full" />
@@ -414,7 +424,10 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
         )}
       </div>
       
-      <div className="absolute bottom-0 left-0 right-0 w-full pt-4 bg-gradient-to-t from-white dark:from-ocs-dark-chat to-transparent">
+      <div 
+        ref={inputContainerRef}
+        className="absolute bottom-0 left-0 right-0 w-full pt-4 bg-gradient-to-t from-white dark:from-ocs-dark-chat to-transparent"
+      >
         <div className="max-w-4xl mx-auto px-4 pb-4">
           {selectedImages.length > 0 && (
             <div className="pb-2 overflow-x-auto">

@@ -22,17 +22,18 @@ import ToastContainer from './components/ToastContainer';
 import LogoutAnimation from './components/LogoutAnimation';
 import InteractiveTour from './components/InteractiveTour';
 
-export interface PersonalizedWelcomeData {
+export interface PersonalizedWelcomeItem {
     type: 'last_chat' | 'recent_badge' | 'suggestion';
     assistant?: Assistant;
     timeAgo?: string;
     badgeName?: string;
+    badgeIcon?: string;
 }
 
 
 const AppContent: React.FC = () => {
   const { session, user, isPasswordRecovery } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { trackAction, resetSessionCounters, setNotificationCallback, userProgress, badges } = useGamification();
   const [activeAssistant, setActiveAssistant] = useState<Assistant | null>(null);
   
@@ -68,7 +69,7 @@ const AppContent: React.FC = () => {
   const [showTour, setShowTour] = useState(false);
   
   // State for personalized welcome screen data
-  const [personalizedWelcomeData, setPersonalizedWelcomeData] = useState<PersonalizedWelcomeData | null>(null);
+  const [personalizedWelcomeData, setPersonalizedWelcomeData] = useState<PersonalizedWelcomeItem[] | null>(null);
 
 
   const timeAgo = (date: string, lang: string) => {
@@ -89,62 +90,79 @@ const AppContent: React.FC = () => {
 
     useEffect(() => {
         if (user && !activeAssistant) {
-            const fetchLastActivity = async () => {
-                // 1. Try to find the last chat
-                const { data: lastChatData, error: lastChatError } = await supabase
+            const fetchActivities = async () => {
+                const activities: PersonalizedWelcomeItem[] = [];
+                const usedAssistantIds = new Set<string>();
+
+                // 1. Fetch up to 2 recent chats
+                const { data: recentChats, error: chatsError } = await supabase
                     .from('chats')
                     .select('assistant_id, created_at')
                     .eq('user_id', user.id)
                     .order('created_at', { ascending: false })
-                    .limit(1)
-                    .single();
+                    .limit(2);
 
-                if (lastChatData) {
-                    const assistant = ASSISTANTS.find(a => a.id === lastChatData.assistant_id);
-                    if (assistant) {
-                        setPersonalizedWelcomeData({
-                            type: 'last_chat',
-                            assistant: assistant,
-                            timeAgo: timeAgo(lastChatData.created_at, 'en'), // Language will be applied in component
-                        });
-                        return;
+                if (recentChats) {
+                    for (const chat of recentChats) {
+                        const assistant = ASSISTANTS.find(a => a.id === chat.assistant_id);
+                        if (assistant && !usedAssistantIds.has(assistant.id)) {
+                            activities.push({
+                                type: 'last_chat',
+                                assistant: assistant,
+                                timeAgo: timeAgo(chat.created_at, language),
+                            });
+                            usedAssistantIds.add(assistant.id);
+                        }
                     }
                 }
 
-                // 2. If no chat, find the most recent unlocked badge
-                const { data: lastBadgeData, error: lastBadgeError } = await supabase
-                    .from('user_badge_progress')
-                    .select('badge_id, unlocked_at')
-                    .eq('user_id', user.id)
-                    .not('unlocked_at', 'is', null)
-                    .order('unlocked_at', { ascending: false })
-                    .limit(1)
-                    .single();
+                // 2. Fetch up to 2 recent badges, if we still need activities
+                if (activities.length < 3) {
+                    const { data: recentBadges, error: badgesError } = await supabase
+                        .from('user_badge_progress')
+                        .select('badge_id, unlocked_at')
+                        .eq('user_id', user.id)
+                        .not('unlocked_at', 'is', null)
+                        .order('unlocked_at', { ascending: false })
+                        .limit(2);
 
-                if (lastBadgeData) {
-                    const badge = badges.find(b => b.id === lastBadgeData.badge_id);
-                    if (badge && !badge.hidden) {
-                        setPersonalizedWelcomeData({
-                            type: 'recent_badge',
-                            badgeName: badge.name,
-                        });
-                        return;
+                    if (recentBadges) {
+                        for (const badgeProgress of recentBadges) {
+                            if (activities.length >= 3) break;
+                            const badge = badges.find(b => b.id === badgeProgress.badge_id);
+                            if (badge && !badge.hidden) {
+                                activities.push({
+                                    type: 'recent_badge',
+                                    badgeName: badge.name,
+                                    badgeIcon: badge.icon,
+                                    timeAgo: timeAgo(badgeProgress.unlocked_at!, language),
+                                });
+                            }
+                        }
                     }
                 }
                 
-                // 3. If neither, suggest a random assistant
-                const randomAssistant = ASSISTANTS[Math.floor(Math.random() * ASSISTANTS.length)];
-                setPersonalizedWelcomeData({
-                    type: 'suggestion',
-                    assistant: randomAssistant,
-                });
+                // 3. Fill with suggestions if we still have space
+                while (activities.length < 3) {
+                    const availableAssistants = ASSISTANTS.filter(a => !usedAssistantIds.has(a.id));
+                    if (availableAssistants.length === 0) break;
+                    
+                    const randomAssistant = availableAssistants[Math.floor(Math.random() * availableAssistants.length)];
+                    activities.push({
+                        type: 'suggestion',
+                        assistant: randomAssistant,
+                    });
+                    usedAssistantIds.add(randomAssistant.id);
+                }
+
+                setPersonalizedWelcomeData(activities.slice(0, 3));
             };
 
-            fetchLastActivity();
+            fetchActivities();
         } else if (!user) {
             setPersonalizedWelcomeData(null);
         }
-    }, [user, activeAssistant, badges]);
+    }, [user, activeAssistant, badges, language]);
 
 
   // Check if tour should be shown for a new user

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { User } from '@supabase/supabase-js';
-import type { PersonalizedWelcomeData } from '../App';
+import type { PersonalizedWelcomeItem } from '../App';
 import type { Assistant } from '../types';
 import { SparklesIcon } from './icons/CoreIcons';
 
@@ -19,7 +19,7 @@ const quotes = [
 
 interface WelcomeScreenProps {
     user: User | null;
-    personalizedData: PersonalizedWelcomeData | null;
+    personalizedData: PersonalizedWelcomeItem[] | null;
     onAssistantClick: (assistant: Assistant) => void;
 }
 
@@ -45,41 +45,65 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ user, personalizedData, o
     const greetingText = t('personalized_greeting', { greeting: getGreeting(), username });
 
     const PersonalizedContent = () => {
-        if (!personalizedData) return null;
+        if (!personalizedData || personalizedData.length === 0) return null;
 
-        const { type, assistant, timeAgo, badgeName } = personalizedData;
-        let content;
+        const renderActivity = (activity: PersonalizedWelcomeItem, index: number) => {
+            const { type, assistant, timeAgo, badgeName, badgeIcon } = activity;
 
-        switch (type) {
-            case 'last_chat':
-                content = (
-                    <>
-                        {t('last_used_prompt_1')} <button onClick={() => onAssistantClick(assistant!)} className="font-bold text-white hover:underline">{assistant!.name}</button> {t('last_used_prompt_2')} {timeAgo}.
-                    </>
-                );
-                break;
-            case 'recent_badge':
-                content = (
-                    <>
-                       {t('recent_badge_prompt_1')} <span className="font-bold text-white">"{badgeName}"</span>! {t('recent_badge_prompt_2')} ✨
-                    </>
-                );
-                break;
-            case 'suggestion':
-                content = (
-                    <>
-                       {t('suggestion_prompt_1')} <button onClick={() => onAssistantClick(assistant!)} className="font-bold text-white hover:underline">{assistant!.name}</button> {t('suggestion_prompt_2')}
-                    </>
-                );
-                break;
-            default:
-                return null;
-        }
+            let iconElement: React.ReactNode;
+            let textElement: React.ReactNode;
+
+            switch (type) {
+                case 'last_chat':
+                    iconElement = <img src={assistant!.iconUrl} alt={assistant!.name} className="w-7 h-7 rounded-full object-cover" />;
+                    textElement = (
+                        <>
+                            {t('last_used_prompt_1')}{' '}
+                            <button onClick={() => onAssistantClick(assistant!)} className="font-semibold text-white hover:underline">{assistant!.name}</button>{' '}
+                            <span className="text-white/70">({t('last_used_prompt_2')} {timeAgo})</span>.
+                        </>
+                    );
+                    break;
+                case 'recent_badge':
+                    iconElement = <span className="text-3xl">{badgeIcon}</span>;
+                    textElement = (
+                        <>
+                            {t('recent_badge_prompt_1')}{' '}
+                            <span className="font-semibold text-white">"{badgeName}"</span>{' '}
+                            <span className="text-white/70">({timeAgo})</span>.{' '}
+                            {t('recent_badge_prompt_2')}
+                        </>
+                    );
+                    break;
+                case 'suggestion':
+                    iconElement = <img src={assistant!.iconUrl} alt={assistant!.name} className="w-7 h-7 rounded-full object-cover" />;
+                    textElement = (
+                        <>
+                            {t('suggestion_prompt_1')}{' '}
+                            <button onClick={() => onAssistantClick(assistant!)} className="font-semibold text-white hover:underline">{assistant!.name}</button>
+                            {t('suggestion_prompt_2')}
+                        </>
+                    );
+                    break;
+                default:
+                    return null;
+            }
+
+            return (
+                <div key={index} className="flex items-center space-x-4 w-full bg-white/10 px-4 py-3 rounded-full border border-white/10 shadow-lg text-left transition-all duration-300 hover:bg-white/20 hover:border-white/20 transform hover:scale-105">
+                    <div className="flex-shrink-0 w-12 h-12 bg-black/20 rounded-full flex items-center justify-center">
+                        {iconElement}
+                    </div>
+                    <p className="text-sm text-white/90">
+                        {textElement}
+                    </p>
+                </div>
+            );
+        };
 
         return (
-            <div className="mt-8 flex items-center justify-center space-x-3 text-sm bg-white/20 px-4 py-2.5 rounded-full border border-white/10 shadow-lg">
-                <SparklesIcon className="w-5 h-5 text-ocs-accent flex-shrink-0" />
-                <p className="text-white/90">{content}</p>
+            <div className="mt-10 w-full max-w-md mx-auto space-y-3">
+                {personalizedData.map(renderActivity)}
             </div>
         );
     };
@@ -108,15 +132,6 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ user, personalizedData, o
                     </p>
                     
                     <PersonalizedContent />
-
-                    {personalizedData && (
-                        <>
-                            <div className="my-8 h-px w-48 bg-white/20 mx-auto"></div>
-                            <p className="text-white/80 text-base [text-shadow:0_1px_5px_rgba(0,0,0,0.5)]">
-                                {t('select_assistant_prompt')}
-                            </p>
-                        </>
-                    )}
                 </div>
 
                 {/* Footer content */}
