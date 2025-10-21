@@ -362,9 +362,9 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
               <div>
                 {messages.map((msg) => (
                   <div key={msg.id} id={`message-${msg.id}`} className={`my-3 sm:my-4 flex group ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className="relative">
+                    <div className="relative max-w-[80%] md:max-w-2xl">
                       <div
-                        className={`p-3 sm:p-4 rounded-2xl max-w-[80%] md:max-w-2xl prose-p:my-2 prose-p:leading-relaxed prose-headings:my-4 prose-pre:bg-black prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-code:text-white transition-colors break-words ${
+                        className={`p-3 sm:p-4 rounded-2xl prose-p:my-2 prose-p:leading-relaxed prose-headings:my-4 prose-pre:bg-black prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-code:text-white transition-colors break-words ${
                           msg.role === 'user' 
                             ? 'bg-gray-200 dark:bg-ocs-dark-hover prose dark:prose-invert'
                             : 'bg-gray-50 dark:bg-ocs-dark-input text-gray-800 dark:text-gray-200 prose dark:prose-invert'
