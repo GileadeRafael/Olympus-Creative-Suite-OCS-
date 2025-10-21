@@ -316,7 +316,7 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
         className="flex-1 overflow-y-auto custom-scrollbar relative"
         onClick={handleContainerClick}
       >
-        <div className="max-w-4xl mx-auto px-4 pt-6 h-full">
+        <div className="max-w-4xl mx-auto px-4 pt-6 pb-48">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <div className="flex flex-col items-center">
@@ -350,7 +350,7 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
               </div>
             </div>
           ) : (
-            <div className="pb-24">
+            <div>
               {messages.map((msg) => (
                 <div key={msg.id} id={`message-${msg.id}`} className={`my-6 flex group ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className="relative">
