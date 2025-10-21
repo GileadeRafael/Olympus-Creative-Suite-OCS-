@@ -114,8 +114,8 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ user, personalizedData, o
             <div className="absolute inset-0 w-full h-full animate-background-pan z-0"></div>
             
             {/* Glassmorphism overlay covering the whole screen */}
-            <div className="relative z-10 flex flex-col items-center justify-center w-full h-full p-4 bg-black/10 backdrop-blur-xl">
-                <div className="max-w-3xl px-4">
+            <div className="relative z-10 flex flex-col items-center justify-center w-full h-full px-6 py-4 bg-black/10 backdrop-blur-xl">
+                <div className="max-w-3xl">
                     <h1
                         key={greetingKey}
                         className="text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-4 mx-auto animate-typing [text-shadow:0_2px_10px_rgba(0,0,0,0.5)]"
@@ -135,7 +135,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ user, personalizedData, o
                 </div>
 
                 {/* Footer content */}
-                <div className="absolute bottom-4 md:bottom-8 left-0 right-0 px-4">
+                <div className="absolute bottom-4 md:bottom-8 left-0 right-0 px-6">
                      <div className="max-w-4xl mx-auto">
                         <p className="text-zinc-200/90 text-base [text-shadow:0_2px_8px_rgba(0,0,0,0.6)]">
                             "{t(dynamicQuote)}"

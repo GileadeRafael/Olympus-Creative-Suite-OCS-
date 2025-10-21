@@ -221,7 +221,7 @@ const InteractiveTour: React.FC<InteractiveTourProps> = ({ onComplete, onSkip })
             
              <div
                 ref={tooltipRef}
-                className={`fixed w-11/12 max-w-[240px] bg-ocs-dark-sidebar rounded-2xl shadow-2xl border border-white/10 p-4 sm:p-6 text-white tour-tooltip-animate
+                className={`fixed w-11/12 max-w-[200px] bg-ocs-dark-sidebar rounded-2xl shadow-2xl border border-white/10 p-4 sm:p-6 text-white tour-tooltip-animate
                             ${isCentered ? 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2' : ''}
                 `}
                 style={!isCentered ? getTooltipPosition() : {}}
