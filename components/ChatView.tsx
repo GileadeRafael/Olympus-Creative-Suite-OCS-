@@ -326,10 +326,9 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
         className="flex-1 overflow-y-auto custom-scrollbar relative"
         onClick={handleContainerClick}
       >
-        <div className="max-w-4xl mx-auto px-4 pt-6" style={{ paddingBottom: `${inputHeight + 16}px` }}>
+        <div className={`max-w-4xl mx-auto px-4 ${messages.length === 0 ? 'h-full' : 'pt-6'}`} style={{ paddingBottom: `${inputHeight + 16}px` }}>
           {messages.length === 0 ? (
-             <div className="flex flex-col items-center justify-center min-h-full text-center" style={{ minHeight: `calc(100vh - ${inputHeight + 60}px)` }}>
-              <div className="flex flex-col items-center">
+             <div className="flex flex-col items-center justify-center h-full text-center">
                 <div className={`relative w-24 h-24 mb-6 border-4 ${assistant.ringColor} rounded-full flex items-center justify-center p-1`}>
                   <img src={assistant.iconUrl} alt={assistant.name} className="w-full h-full object-cover rounded-full" />
                 </div>
@@ -357,56 +356,57 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
                         ))}
                     </div>
                 </div>
-              </div>
             </div>
           ) : (
-            <div>
-              {messages.map((msg) => (
-                <div key={msg.id} id={`message-${msg.id}`} className={`my-6 flex group ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className="relative">
-                    <div
-                      className={`p-4 rounded-2xl max-w-2xl prose-p:my-2 prose-p:leading-relaxed prose-headings:my-4 prose-pre:bg-black prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-code:text-white transition-colors ${
-                        msg.role === 'user' 
-                          ? 'bg-gray-200 dark:bg-ocs-dark-hover prose dark:prose-invert'
-                          : 'bg-gray-50 dark:bg-ocs-dark-input text-gray-800 dark:text-gray-200 prose dark:prose-invert'
-                      }`}
-                    >
-                      {msg.content ? <div dangerouslySetInnerHTML={renderMessageContent(msg.content)} /> : null}
-                      {msg.images && msg.images.length > 0 && (
-                        <div className="not-prose mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
-                          {msg.images.map((image, index) => (
-                            <button key={index} onClick={() => setModalImage(`data:${image.mimeType};base64,${image.data}`)} className="focus:outline-none rounded-lg overflow-hidden">
-                              <img
-                                src={`data:${image.mimeType};base64,${image.data}`}
-                                alt={`attachment ${index + 1}`}
-                                className="aspect-square object-cover w-full h-full transition-transform hover:scale-105"
-                              />
-                            </button>
-                          ))}
-                        </div>
+            <>
+              <div>
+                {messages.map((msg) => (
+                  <div key={msg.id} id={`message-${msg.id}`} className={`my-6 flex group ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className="relative">
+                      <div
+                        className={`p-4 rounded-2xl max-w-2xl prose-p:my-2 prose-p:leading-relaxed prose-headings:my-4 prose-pre:bg-black prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-code:text-white transition-colors ${
+                          msg.role === 'user' 
+                            ? 'bg-gray-200 dark:bg-ocs-dark-hover prose dark:prose-invert'
+                            : 'bg-gray-50 dark:bg-ocs-dark-input text-gray-800 dark:text-gray-200 prose dark:prose-invert'
+                        }`}
+                      >
+                        {msg.content ? <div dangerouslySetInnerHTML={renderMessageContent(msg.content)} /> : null}
+                        {msg.images && msg.images.length > 0 && (
+                          <div className="not-prose mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            {msg.images.map((image, index) => (
+                              <button key={index} onClick={() => setModalImage(`data:${image.mimeType};base64,${image.data}`)} className="focus:outline-none rounded-lg overflow-hidden">
+                                <img
+                                  src={`data:${image.mimeType};base64,${image.data}`}
+                                  alt={`attachment ${index + 1}`}
+                                  className="aspect-square object-cover w-full h-full transition-transform hover:scale-105"
+                                />
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      {msg.role === 'model' && (
+                        <img src={assistant.iconUrl} alt={assistant.name} className="absolute -bottom-4 -left-5 w-10 h-10 rounded-full border-4 border-white dark:border-ocs-dark-chat" />
                       )}
                     </div>
-                    {msg.role === 'model' && (
-                      <img src={assistant.iconUrl} alt={assistant.name} className="absolute -bottom-4 -left-5 w-10 h-10 rounded-full border-4 border-white dark:border-ocs-dark-chat" />
-                    )}
+                  </div>
+                ))}
+              </div>
+              {isLoading && messages.length > 0 && messages[messages.length-1]?.role === 'user' && (
+                <div className="my-4 flex justify-start">
+                   <div className="relative group">
+                    <div className="p-4 rounded-2xl max-w-2xl bg-gray-50 dark:bg-ocs-dark-input flex items-center">
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse mr-2"></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse mr-2 delay-75"></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-150"></div>
+                    </div>
+                    <img src={assistant.iconUrl} alt={assistant.name} className="absolute -bottom-4 -left-5 w-10 h-10 rounded-full border-4 border-white dark:border-ocs-dark-chat" />
                   </div>
                 </div>
-              ))}
-            </div>
+              )}
+              <div ref={messagesEndRef} />
+            </>
           )}
-          {isLoading && messages.length > 0 && messages[messages.length-1]?.role === 'user' && (
-            <div className="my-4 flex justify-start">
-               <div className="relative group">
-                <div className="p-4 rounded-2xl max-w-2xl bg-gray-50 dark:bg-ocs-dark-input flex items-center">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse mr-2"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse mr-2 delay-75"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-150"></div>
-                </div>
-                <img src={assistant.iconUrl} alt={assistant.name} className="absolute -bottom-4 -left-5 w-10 h-10 rounded-full border-4 border-white dark:border-ocs-dark-chat" />
-              </div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
         </div>
         {copyFeedback && (
             <div
