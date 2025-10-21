@@ -326,13 +326,13 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
         className="flex-1 overflow-y-auto custom-scrollbar relative"
         onClick={handleContainerClick}
       >
-        <div className={`max-w-4xl mx-auto px-4 ${messages.length === 0 ? 'h-full' : 'pt-6'}`} style={{ paddingBottom: `${inputHeight + 16}px` }}>
+        <div className={`max-w-4xl mx-auto px-2 sm:px-4 ${messages.length === 0 ? 'h-full flex flex-col' : 'pt-6'}`} style={{ paddingBottom: `${inputHeight + 16}px` }}>
           {messages.length === 0 ? (
-             <div className="flex flex-col items-center justify-center h-full text-center">
-                <div className={`relative w-24 h-24 mb-6 border-4 ${assistant.ringColor} rounded-full flex items-center justify-center p-1`}>
+             <div className="flex flex-col items-center justify-center flex-1 text-center">
+                <div className={`relative w-20 h-20 sm:w-24 sm:h-24 mb-6 border-4 ${assistant.ringColor} rounded-full flex items-center justify-center p-1`}>
                   <img src={assistant.iconUrl} alt={assistant.name} className="w-full h-full object-cover rounded-full" />
                 </div>
-                <h1 className="text-5xl font-bold text-gray-800 dark:text-white mb-4">
+                <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 dark:text-white mb-4">
                   {assistant.name}
                 </h1>
                 <p className="text-zinc-600 dark:text-zinc-400 max-w-lg">
@@ -361,10 +361,10 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
             <>
               <div>
                 {messages.map((msg) => (
-                  <div key={msg.id} id={`message-${msg.id}`} className={`my-6 flex group ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div key={msg.id} id={`message-${msg.id}`} className={`my-3 sm:my-4 flex group ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className="relative">
                       <div
-                        className={`p-4 rounded-2xl max-w-2xl prose-p:my-2 prose-p:leading-relaxed prose-headings:my-4 prose-pre:bg-black prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-code:text-white transition-colors ${
+                        className={`p-3 sm:p-4 rounded-2xl max-w-[80%] sm:max-w-[85%] md:max-w-2xl prose-p:my-2 prose-p:leading-relaxed prose-headings:my-4 prose-pre:bg-black prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-code:text-white transition-colors break-words ${
                           msg.role === 'user' 
                             ? 'bg-gray-200 dark:bg-ocs-dark-hover prose dark:prose-invert'
                             : 'bg-gray-50 dark:bg-ocs-dark-input text-gray-800 dark:text-gray-200 prose dark:prose-invert'
@@ -467,12 +467,12 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
                 <button
                     onClick={() => handleSend()}
                     disabled={isSendDisabled}
-                    className="flex items-center space-x-2.5 text-white bg-gray-900 dark:bg-white dark:text-gray-900 font-semibold rounded-lg px-4 py-2 transition-all duration-200 transform
+                    className="flex items-center space-x-2.5 text-white bg-gray-900 dark:bg-white dark:text-gray-900 font-semibold rounded-lg px-3 sm:px-4 py-2 transition-all duration-200 transform
                     hover:bg-gray-700 dark:hover:bg-gray-200
                     disabled:bg-gray-300 dark:disabled:bg-zinc-800 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed disabled:scale-100"
                     aria-label="Send message now"
                 >
-                    <span className="text-sm">Send now</span>
+                    <span className="text-sm">Send<span className="hidden sm:inline"> now</span></span>
                     <span className="h-4 w-px bg-gray-500/50 dark:bg-gray-500/50"></span>
                     <ChevronDownIcon className="w-4 h-4 text-gray-400 dark:text-gray-600" />
                 </button>

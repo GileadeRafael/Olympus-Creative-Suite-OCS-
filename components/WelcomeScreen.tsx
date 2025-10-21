@@ -55,7 +55,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ user, personalizedData, o
 
             switch (type) {
                 case 'last_chat':
-                    iconElement = <img src={assistant!.iconUrl} alt={assistant!.name} className="w-7 h-7 rounded-full object-cover" />;
+                    iconElement = <img src={assistant!.iconUrl} alt={assistant!.name} className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover" />;
                     textElement = (
                         <>
                             {t('last_used_prompt_1')}{' '}
@@ -65,7 +65,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ user, personalizedData, o
                     );
                     break;
                 case 'recent_badge':
-                    iconElement = <span className="text-3xl">{badgeIcon}</span>;
+                    iconElement = <span className="text-xl sm:text-2xl">{badgeIcon}</span>;
                     textElement = (
                         <>
                             {t('recent_badge_prompt_1')}{' '}
@@ -76,7 +76,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ user, personalizedData, o
                     );
                     break;
                 case 'suggestion':
-                    iconElement = <img src={assistant!.iconUrl} alt={assistant!.name} className="w-7 h-7 rounded-full object-cover" />;
+                    iconElement = <img src={assistant!.iconUrl} alt={assistant!.name} className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover" />;
                     textElement = (
                         <>
                             {t('suggestion_prompt_1')}{' '}
@@ -90,11 +90,11 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ user, personalizedData, o
             }
 
             return (
-                <div key={index} className="flex items-center space-x-4 w-full bg-white/10 px-4 py-3 rounded-full border border-white/10 shadow-lg text-left transition-all duration-300 hover:bg-white/20 hover:border-white/20 transform hover:scale-105">
-                    <div className="flex-shrink-0 w-12 h-12 bg-black/20 rounded-full flex items-center justify-center">
+                <div key={index} className="flex items-center space-x-3 sm:space-x-4 w-full bg-white/10 px-3 py-2 rounded-2xl border border-white/10 shadow-lg text-left transition-all duration-300 hover:bg-white/20 hover:border-white/20 transform hover:scale-105">
+                    <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-black/20 rounded-full flex items-center justify-center">
                         {iconElement}
                     </div>
-                    <p className="text-sm text-white/90">
+                    <p className="text-xs sm:text-sm text-white/90">
                         {textElement}
                     </p>
                 </div>
@@ -115,10 +115,10 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ user, personalizedData, o
             
             {/* Glassmorphism overlay covering the whole screen */}
             <div className="relative z-10 flex flex-col items-center justify-center w-full h-full p-4 bg-black/10 backdrop-blur-xl">
-                <div className="max-w-4xl">
+                <div className="max-w-3xl">
                     <h1
                         key={greetingKey}
-                        className="text-4xl md:text-5xl font-bold text-white mb-4 w-max mx-auto animate-typing [text-shadow:0_2px_10px_rgba(0,0,0,0.5)]"
+                        className="text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-4 mx-auto animate-typing [text-shadow:0_2px_10px_rgba(0,0,0,0.5)]"
                         style={{
                             '--animation-duration': `${(greetingText.length + 2) * 0.07}s`,
                             '--animation-steps': greetingText.length + 2,
@@ -135,7 +135,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ user, personalizedData, o
                 </div>
 
                 {/* Footer content */}
-                <div className="absolute bottom-8 left-0 right-0 px-4">
+                <div className="absolute bottom-4 md:bottom-8 left-0 right-0 px-4">
                      <div className="max-w-4xl mx-auto">
                         <p className="text-zinc-200/90 text-base [text-shadow:0_2px_8px_rgba(0,0,0,0.6)]">
                             "{t(dynamicQuote)}"

@@ -221,16 +221,16 @@ const InteractiveTour: React.FC<InteractiveTourProps> = ({ onComplete, onSkip })
             
              <div
                 ref={tooltipRef}
-                className={`fixed w-80 max-w-[90vw] bg-ocs-dark-sidebar rounded-2xl shadow-2xl border border-white/10 p-6 text-white tour-tooltip-animate
+                className={`fixed w-11/12 max-w-sm bg-ocs-dark-sidebar rounded-2xl shadow-2xl border border-white/10 p-4 sm:p-6 text-white tour-tooltip-animate
                             ${isCentered ? 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2' : ''}
                 `}
                 style={!isCentered ? getTooltipPosition() : {}}
             >
                 {stepIndex === 0 ? (
                     <>
-                        <h3 className="text-xl font-bold mb-2">{t(currentStep.titleKey)}</h3>
-                        <p className="text-sm text-ocs-text-muted mb-6">{t(currentStep.contentKey)}</p>
-                        <div className="flex space-x-3">
+                        <h3 className="text-lg sm:text-xl font-bold mb-2">{t(currentStep.titleKey)}</h3>
+                        <p className="text-xs sm:text-sm text-ocs-text-muted mb-6">{t(currentStep.contentKey)}</p>
+                        <div className="flex flex-col sm:flex-row sm:space-x-3 space-y-2 sm:space-y-0">
                             <button onClick={() => handleLangSelect('en')} className="w-full flex items-center justify-center px-4 py-2 text-sm bg-ocs-dark-hover rounded-lg hover:bg-zinc-700 font-semibold">
                                 English
                             </button>
@@ -244,8 +244,8 @@ const InteractiveTour: React.FC<InteractiveTourProps> = ({ onComplete, onSkip })
                     </>
                 ) : (
                     <>
-                        <h3 className="text-xl font-bold mb-2">{t(currentStep.titleKey)}</h3>
-                        <p className="text-sm text-ocs-text-muted mb-6">{t(currentStep.contentKey)}</p>
+                        <h3 className="text-lg sm:text-xl font-bold mb-2">{t(currentStep.titleKey)}</h3>
+                        <p className="text-xs sm:text-sm text-ocs-text-muted mb-6">{t(currentStep.contentKey)}</p>
 
                         <div className="flex justify-between items-center">
                             <button onClick={onSkip} className="text-xs text-ocs-text-muted hover:text-white">{t('tour_skip')}</button>
