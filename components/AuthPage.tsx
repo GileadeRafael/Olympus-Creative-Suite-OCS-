@@ -151,7 +151,7 @@ const AuthPage: React.FC = () => {
                 />
                 <div className={`
                     flex items-center overflow-hidden transition-all duration-500 ease-in-out whitespace-nowrap
-                    ${notificationState === 'expanded' ? 'max-w-[300px] opacity-100' : 'max-w-0 opacity-0'}
+                    ${notificationState === 'expanded' ? 'max-w-sm opacity-100' : 'max-w-0 opacity-0'}
                 `}>
                     <div className="text-white text-sm pr-2">
                         <span className="font-semibold">Novo assistente adicionado:</span> VYNE.
