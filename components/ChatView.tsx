@@ -30,8 +30,8 @@ const getCopyButtonColors = (ringColor: string): string => {
       return 'bg-lime-400/80 hover:bg-lime-400';
     case 'border-pink-500':
       return 'bg-pink-500/80 hover:bg-pink-500';
-    case 'border-vyne-ring':
-      return 'bg-vyne-ring/80 hover:bg-vyne-ring';
+    case 'border-purple-500':
+      return 'bg-purple-500/80 hover:bg-purple-500';
     default:
       return 'bg-gray-700/50 hover:bg-gray-700/70';
   }
