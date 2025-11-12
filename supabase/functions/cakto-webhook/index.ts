@@ -105,6 +105,7 @@ serve(async (req: Request) => {
     'https://pay.cakto.com.br/3bdnyhd_586003': 'luma',
     'https://pay.cakto.com.br/44zjs9q_586007': 'loki',
     'https://pay.cakto.com.br/zyruzzx_586010': 'iris',
+    'https://pay.cakto.com.br/placeholder_vyne_url': 'vyne',
   };
 
   const assistantId = ASSISTANT_MAP[productUrl];

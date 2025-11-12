@@ -206,7 +206,7 @@ export const BADGES: Badge[] = [
         level: BadgeLevel.Advanced,
         secret: false,
         event: GamificationEvent.ASSISTANT_SWITCHED,
-        target: 5, // There are 5 assistants
+        target: 6, // There are 6 assistants now
         icon: '🧑‍🤝‍🧑',
         colorClass: { bg: 'bg-purple-500/10', text: 'text-purple-500', progress: 'bg-purple-500' },
     },
@@ -290,12 +290,12 @@ export const BADGES: Badge[] = [
         level: BadgeLevel.Master,
         secret: false,
         event: GamificationEvent.META_BADGE_CHECK,
-        target: 5,
+        target: 6,
         icon: '🔥',
         colorClass: { bg: 'bg-red-500/10', text: 'text-red-500', progress: 'bg-red-500' },
         dependentBadges: [
             'hidden_legendary_zora', 'hidden_legendary_wizi', 'hidden_legendary_luma',
-            'hidden_legendary_loki', 'hidden_legendary_iris'
+            'hidden_legendary_loki', 'hidden_legendary_iris', 'hidden_legendary_vyne'
         ]
     },
     {
@@ -459,7 +459,7 @@ export const BADGES: Badge[] = [
 
 
     // --- Hidden Tracking Badges ---
-    ...(['zora', 'wizi', 'luma', 'loki', 'iris'].map(assistantId => ({
+    ...(['zora', 'wizi', 'luma', 'loki', 'iris', 'vyne'].map(assistantId => ({
         id: `hidden_legendary_${assistantId}`,
         name: `Legendary User (${assistantId.toUpperCase()})`,
         description: `Start 20 chats with ${assistantId.toUpperCase()}.`,
