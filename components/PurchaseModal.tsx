@@ -84,8 +84,8 @@ const getButtonColors = (ringColor: string): string => {
             return 'bg-lime-400 text-black hover:bg-lime-300 shadow-lime-400/30';
         case 'border-pink-500':
             return 'bg-pink-500 text-white hover:bg-pink-400 shadow-pink-500/30';
-        case 'border-purple-500':
-            return 'bg-purple-500 text-white hover:bg-purple-400 shadow-purple-500/30';
+        case 'border-[#f08080]':
+            return 'bg-[#f08080] text-white hover:bg-[#e67676] shadow-[#f08080]/30';
         default:
             return 'bg-ocs-accent text-white hover:bg-purple-500 shadow-purple-600/30';
     }
