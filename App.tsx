@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Assistant, Message, ChatHistoryItem, Notification } from './types';
 import { ASSISTANTS } from './constants';
@@ -562,7 +563,7 @@ const AppContent: React.FC = () => {
   return (
     <>
       {showTour && <InteractiveTour onComplete={handleTourEnd} onSkip={handleTourEnd} />}
-      <div className="flex h-screen w-screen text-gray-800 dark:text-gray-200 bg-white dark:bg-ocs-dark-chat font-sans overflow-hidden">
+      <div className="flex h-screen w-screen text-gray-800 dark:text-gray-200 bg-white dark:bg-ocs-dark-chat font-sans">
         <Sidebar 
           assistants={ASSISTANTS} 
           onAssistantClick={handleAssistantClick} 
@@ -575,7 +576,7 @@ const AppContent: React.FC = () => {
           onToggleNotifications={() => setIsNotificationsModalOpen(p => !p)}
           activeChatId={activeChatId}
         />
-        <main className="flex-1 flex flex-col h-full relative overflow-hidden">
+        <main className="flex-1 flex flex-col h-full relative">
           <header className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
             {user && <Avatar user={user} onOpenBadges={() => setIsBadgesModalOpen(true)} onLogout={handleLogout} />}
           </header>
