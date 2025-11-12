@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabaseClient';
-import { MailIcon, EyeIcon, EyeSlashIcon } from './icons/CoreIcons';
+import { MailIcon, EyeIcon, EyeSlashIcon, XIcon } from './icons/CoreIcons';
+import { ASSISTANTS } from '../constants';
 
 // Function to check if the current date is within the Halloween season
 const isHalloweenSeason = (): boolean => {
@@ -23,6 +24,9 @@ const AuthPage: React.FC = () => {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
+  
+  type NotificationState = 'expanded' | 'collapsed' | 'hidden';
+  const [notificationState, setNotificationState] = useState<NotificationState>('expanded');
 
   // Check if it's Halloween season to apply the theme
   const isHalloween = isHalloweenSeason();
@@ -33,6 +37,15 @@ const AuthPage: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [toast]);
+
+  // Auto-collapse after an initial delay, runs only once
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setNotificationState(currentState => (currentState === 'expanded' ? 'collapsed' : currentState));
+    }, 5000); 
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,6 +106,8 @@ const AuthPage: React.FC = () => {
     setUsername('');
   };
   
+  const vyneAssistant = ASSISTANTS.find(a => a.id === 'vyne');
+
   // Conditional theming for Halloween
   const backgroundImageUrl = isHalloween
     ? 'https://i.imgur.com/zoORyZ9.jpeg' // Halloween background
@@ -118,6 +133,41 @@ const AuthPage: React.FC = () => {
 
   return (
     <div className="min-h-screen w-screen flex items-center justify-center p-4 transition-all duration-500" style={backgroundStyle}>
+       {vyneAssistant && (
+         <div 
+            className={`fixed top-4 z-50 transition-opacity duration-500 ${notificationState === 'hidden' ? 'animate-dynamic-island-out pointer-events-none' : 'animate-dynamic-island-in'}`}
+            onMouseEnter={() => notificationState === 'collapsed' && setNotificationState('expanded')}
+            onMouseLeave={() => notificationState === 'expanded' && setNotificationState('collapsed')}
+         >
+            <div className={`
+              flex items-center bg-black/80 backdrop-blur-lg rounded-full shadow-2xl border border-white/10
+              transition-all duration-500 ease-in-out
+              ${notificationState === 'expanded' ? 'p-2 space-x-3' : 'p-2 w-12 h-12 justify-center cursor-pointer'}
+            `}>
+                <img 
+                    src={vyneAssistant.iconUrl} 
+                    alt={vyneAssistant.name} 
+                    className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                />
+                <div className={`
+                    flex items-center overflow-hidden transition-all duration-500 ease-in-out whitespace-nowrap
+                    ${notificationState === 'expanded' ? 'max-w-[300px] opacity-100' : 'max-w-0 opacity-0'}
+                `}>
+                    <div className="text-white text-sm pr-2">
+                        <span className="font-semibold">Novo assistente adicionado:</span> VYNE.
+                        <span className="hidden sm:inline"> Dê uma olhada!</span>
+                    </div>
+                    <button 
+                        onClick={() => setNotificationState('hidden')}
+                        className="p-1 rounded-full text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+                        aria-label="Dispensar notificação"
+                    >
+                        <XIcon className="w-4 h-4" />
+                    </button>
+                </div>
+            </div>
+         </div>
+       )}
        {toast && (
         <div className={`fixed top-5 right-5 px-6 py-3 rounded-lg text-white ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
           {toast.message}
