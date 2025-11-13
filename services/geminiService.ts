@@ -1,11 +1,16 @@
 import { GoogleGenAI, Chat, Part } from "@google/genai";
 import type { Message } from '../types';
+import { API_KEY } from '../secrets';
 
-if (!process.env.API_KEY) {
-    throw new Error("API_KEY environment variable not set.");
+// This logic allows the app to work both locally (using secrets.ts)
+// and in production on Vercel (using Environment Variables).
+const geminiApiKey = import.meta.env?.VITE_API_KEY || API_KEY;
+
+if (!geminiApiKey) {
+    throw new Error("A chave da API Gemini não foi configurada. Verifique suas variáveis de ambiente Vercel (VITE_API_KEY) ou o arquivo secrets.ts.");
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: geminiApiKey });
 
 // Helper to convert our Message array to Gemini's history format
 const messagesToHistory = (messages: Message[]) => {
