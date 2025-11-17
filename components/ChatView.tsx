@@ -119,9 +119,11 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
     }
   }, [input]);
   
-  const handleContainerClick = async (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMessageClick = async (e: React.MouseEvent<HTMLDivElement>) => {
     const wrapper = (e.target as HTMLElement).closest('.code-block-wrapper');
     if (!wrapper || !chatContainerRef.current) return;
+
+    e.stopPropagation();
 
     const pre = wrapper.querySelector('pre');
     if (!pre) return;
@@ -287,6 +289,7 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
       e.stopPropagation();
+      // Use relatedTarget to prevent flickering when moving over child elements
       if (!e.currentTarget.contains(e.relatedTarget as Node)) {
           setIsDraggingOver(false);
       }
@@ -306,213 +309,213 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
           e.dataTransfer.clearData();
       }
   };
-
-
-  if (!assistant) {
-    return <WelcomeScreen user={user} personalizedData={personalizedWelcomeData} onAssistantClick={onAssistantClick} />;
-  }
   
-  const isSendDisabled = isLoading || (!input.trim() && selectedImages.length === 0);
+  if (!assistant) {
+    return (
+      <div className="h-full w-full" data-tour-id="chat-view-main">
+          <WelcomeScreen user={user} personalizedData={personalizedWelcomeData} onAssistantClick={onAssistantClick} />
+      </div>
+    );
+  }
 
   return (
-    <div
-        className="flex flex-col h-full w-full relative"
+    <div 
+        className="flex flex-col h-full relative" 
         onDragEnter={handleDragEnter}
-        onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
+        onDragOver={handleDragOver}
         onDrop={handleDrop}
         data-tour-id="chat-view-main"
     >
-      <div 
-        ref={chatContainerRef} 
-        className="flex-1 overflow-y-auto custom-scrollbar relative"
-        onClick={handleContainerClick}
+      {isDraggingOver && (
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm z-20 flex flex-col items-center justify-center pointer-events-none">
+              <div className="border-4 border-dashed border-white/50 rounded-3xl p-12 text-center">
+                  <ImageIcon className="w-16 h-16 text-white/80 mx-auto" />
+                  <p className="mt-4 text-2xl font-bold text-white">{t('drop_files_here')}</p>
+              </div>
+          </div>
+      )}
+      {modalImage && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-lg z-50 flex items-center justify-center" onClick={() => setModalImage(null)}>
+          <img src={modalImage} alt="Selected preview" className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg" />
+           <button onClick={() => setModalImage(null)} className="absolute top-4 right-4 text-white hover:text-gray-300">
+             <XIcon className="w-8 h-8"/>
+           </button>
+        </div>
+      )}
+
+      <div
+          ref={chatContainerRef}
+          className="flex-1 overflow-y-auto custom-scrollbar"
+          style={{ paddingBottom: `${inputHeight}px` }}
       >
-        <div className={`max-w-4xl mx-auto px-6 ${messages.length === 0 ? 'h-full flex flex-col' : 'pt-6'}`} style={{ paddingBottom: `${inputHeight + 16}px` }}>
+        <div className="max-w-full md:max-w-3xl mx-auto py-8">
           {messages.length === 0 ? (
-             <div className="flex flex-col items-center justify-center flex-1 text-center">
-                <div className={`relative w-20 h-20 sm:w-24 sm:h-24 mb-6 border-4 ${assistant.ringColor} rounded-full flex items-center justify-center p-1`}>
-                  <img src={assistant.iconUrl} alt={assistant.name} className="w-full h-full object-cover rounded-full" />
+            <div className="flex flex-col items-center text-center px-4">
+              <div className={`relative w-28 h-28 border-4 ${assistant.ringColor} rounded-full flex items-center justify-center p-1.5`}>
+                <img src={assistant.iconUrl} alt={assistant.name} className="w-full h-full object-cover rounded-full" />
+              </div>
+              <h1 className="text-3xl font-bold mt-6 text-gray-800 dark:text-white">{assistant.name}</h1>
+              <p className="mt-2 text-gray-600 dark:text-ocs-text-muted max-w-md">{t(assistant.descriptionKey)}</p>
+              
+              <div className="mt-8 w-full max-w-lg">
+                <h3 className="text-sm font-semibold text-gray-500 dark:text-ocs-text-muted mb-3 flex items-center justify-center space-x-2">
+                  <SparklesIcon className="w-4 h-4" />
+                  <span>{t('example_prompts_title')}</span>
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {assistant.examplePrompts.map((promptKey) => (
+                    <button 
+                      key={promptKey}
+                      onClick={() => handleSend(t(promptKey))}
+                      className="text-left text-sm bg-gray-100 dark:bg-ocs-dark-input hover:bg-gray-200 dark:hover:bg-ocs-dark-hover p-3 rounded-lg transition-colors"
+                    >
+                      {t(promptKey)}
+                    </button>
+                  ))}
                 </div>
-                <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 dark:text-white mb-4">
-                  {assistant.name}
-                </h1>
-                <p className="text-zinc-600 dark:text-zinc-400 max-w-lg">
-                  {t(assistant.descriptionKey)}
-                </p>
-                
-                <div className="mt-10 w-full max-w-lg">
-                    <h3 className="flex items-center justify-center text-sm font-semibold text-gray-500 dark:text-ocs-text-muted mb-4">
-                        <SparklesIcon className="w-5 h-5 mr-2 text-ocs-accent" />
-                        {t('example_prompts_title')}
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {assistant.examplePrompts.map(promptKey => (
-                            <button
-                                key={promptKey}
-                                onClick={() => handleSend(t(promptKey))}
-                                className="text-left p-3 bg-gray-100/80 dark:bg-ocs-dark-input/80 backdrop-blur-md rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-ocs-dark-hover transition-colors duration-200"
-                            >
-                              {t(promptKey)}
-                            </button>
-                        ))}
-                    </div>
-                </div>
+              </div>
+
             </div>
           ) : (
-            <>
-              <div>
-                {messages.map((msg) => (
-                  <div key={msg.id} id={`message-${msg.id}`} className={`my-3 sm:my-4 flex group ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className="relative max-w-[80%] md:max-w-2xl">
-                      <div
-                        className={`p-3 sm:p-4 rounded-2xl prose-p:my-2 prose-p:leading-relaxed prose-headings:my-4 prose-pre:bg-black prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-code:text-white transition-colors break-words ${
-                          msg.role === 'user' 
-                            ? 'bg-gray-200 dark:bg-ocs-dark-hover prose dark:prose-invert'
-                            : 'bg-gray-50 dark:bg-ocs-dark-input text-gray-800 dark:text-gray-200 prose dark:prose-invert'
-                        }`}
-                      >
-                        {msg.content ? <div dangerouslySetInnerHTML={renderMessageContent(msg.content)} /> : null}
-                        {msg.images && msg.images.length > 0 && (
-                          <div className="not-prose mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
-                            {msg.images.map((image, index) => (
-                              <button key={index} onClick={() => setModalImage(`data:${image.mimeType};base64,${image.data}`)} className="focus:outline-none rounded-lg overflow-hidden">
-                                <img
-                                  src={`data:${image.mimeType};base64,${image.data}`}
-                                  alt={`attachment ${index + 1}`}
-                                  className="aspect-square object-cover w-full h-full transition-transform hover:scale-105"
-                                />
-                              </button>
-                            ))}
-                          </div>
-                        )}
+            <div className="space-y-6">
+              {messages.map((msg, index) => (
+                <div key={msg.id || index} className={`flex items-start gap-3 sm:gap-4 px-4 md:px-8 ${msg.role === 'user' ? 'justify-end' : ''}`}>
+                  {msg.role === 'model' && (
+                    <img src={assistant.iconUrl} alt={assistant.name} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex-shrink-0" />
+                  )}
+                  <div
+                    className={`relative max-w-full md:max-w-2xl px-4 py-3 sm:px-5 sm:py-3 rounded-2xl message-bubble ${
+                      msg.role === 'user'
+                        ? 'bg-ocs-accent text-white rounded-br-lg'
+                        : 'bg-gray-200 dark:bg-ocs-dark-input text-gray-800 dark:text-gray-200 rounded-bl-lg'
+                    }`}
+                    onClick={handleMessageClick}
+                  >
+                    {msg.images && msg.images.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {msg.images.map((img, idx) => {
+                          const imageUrl = `data:${img.mimeType};base64,${img.data}`;
+                          return (
+                            <img
+                              key={idx}
+                              src={imageUrl}
+                              alt={`uploaded content ${idx + 1}`}
+                              className="w-20 h-20 object-cover rounded-lg cursor-pointer"
+                              onClick={(e) => { e.stopPropagation(); setModalImage(imageUrl); }}
+                            />
+                          );
+                        })}
                       </div>
-                      {msg.role === 'model' && (
-                        <img src={assistant.iconUrl} alt={assistant.name} className="absolute -bottom-4 -left-5 w-10 h-10 rounded-full border-4 border-white dark:border-ocs-dark-chat" />
-                      )}
-                    </div>
+                    )}
+                    {msg.content && (
+                      <div
+                        className="prose prose-sm dark:prose-invert max-w-none prose-p:my-2 prose-pre:my-2 prose-pre:p-0 prose-pre:bg-transparent"
+                        dangerouslySetInnerHTML={renderMessageContent(msg.content)}
+                      />
+                    )}
                   </div>
-                ))}
-              </div>
-              {isLoading && messages.length > 0 && messages[messages.length-1]?.role === 'user' && (
-                <div className="my-4 flex justify-start">
-                   <div className="relative group">
-                    <div className="p-4 rounded-2xl max-w-2xl bg-gray-50 dark:bg-ocs-dark-input flex items-center">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse mr-2"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse mr-2 delay-75"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-150"></div>
+                  {msg.role === 'user' && (
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex-shrink-0 bg-gray-300 dark:bg-ocs-light-gray flex items-center justify-center text-sm font-bold text-gray-600 dark:text-gray-200">
+                      {username.charAt(0).toUpperCase()}
                     </div>
-                    <img src={assistant.iconUrl} alt={assistant.name} className="absolute -bottom-4 -left-5 w-10 h-10 rounded-full border-4 border-white dark:border-ocs-dark-chat" />
+                  )}
+                </div>
+              ))}
+              {isLoading && (
+                 <div className="flex items-start gap-3 sm:gap-4 px-4 md:px-8">
+                  <img src={assistant.iconUrl} alt={assistant.name} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex-shrink-0" />
+                  <div className="max-w-full md:max-w-2xl px-4 py-3 sm:px-5 sm:py-3 rounded-2xl bg-gray-200 dark:bg-ocs-dark-input text-gray-800 dark:text-gray-200 rounded-bl-lg">
+                    <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" style={{ animationDelay: '0s' }}></div>
+                        <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                        <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                    </div>
                   </div>
                 </div>
               )}
-              <div ref={messagesEndRef} />
-            </>
-          )}
-        </div>
-        {copyFeedback && (
-            <div
-                key={copyFeedback.key}
-                className="absolute bg-black/70 flex items-center justify-center text-white font-bold rounded-lg pointer-events-none animate-fade-in-out"
-                style={{
-                    top: `${copyFeedback.top}px`,
-                    left: `${copyFeedback.left}px`,
-                    width: `${copyFeedback.width}px`,
-                    height: `${copyFeedback.height}px`,
-                }}
-            >
-                {t('copied_confirmation_text')}
             </div>
-        )}
+          )}
+           <div ref={messagesEndRef} />
+        </div>
       </div>
-      
+       {copyFeedback && (
+          <div
+            key={copyFeedback.key}
+            className="absolute z-10 bg-black/70 text-white text-xs font-semibold px-2.5 py-1 rounded-full flex items-center justify-center animate-fade-in-out pointer-events-none"
+            style={{
+              top: `${copyFeedback.top}px`,
+              left: `${copyFeedback.left}px`,
+              width: `${copyFeedback.width}px`,
+              height: `${copyFeedback.height}px`,
+            }}
+          >
+           {t('copied_confirmation_text')}
+          </div>
+        )}
       <div 
         ref={inputContainerRef}
-        className="absolute bottom-0 left-0 right-0 w-full pt-4 bg-gradient-to-t from-white dark:from-ocs-dark-chat to-transparent"
+        className="absolute bottom-0 left-0 right-0 bg-white dark:bg-ocs-dark-chat pt-3"
       >
-        <div className="max-w-4xl mx-auto px-4 pb-4">
-          {selectedImages.length > 0 && (
-            <div className="pb-2 overflow-x-auto">
-              <div className="flex space-x-2">
-                {selectedImages.map((image, index) => (
+        <div className="max-w-full md:max-w-3xl mx-auto px-4">
+            {selectedImages.length > 0 && (
+            <div className="bg-gray-100 dark:bg-ocs-dark-input p-2 rounded-t-xl border-b border-gray-200 dark:border-ocs-light-gray/50">
+              <div className="flex space-x-2 overflow-x-auto no-scrollbar">
+                {selectedImages.map((img, index) => (
                   <div key={index} className="relative flex-shrink-0">
-                    <img src={`data:${image.mimeType};base64,${image.data}`} alt="Selected thumbnail" className="w-16 h-16 rounded-md object-cover" />
-                    <button onClick={() => removeSelectedImage(index)} className="absolute -top-1.5 -right-1.5 bg-gray-800 text-white rounded-full p-0.5 hover:bg-gray-900 transition-colors">
-                      <XIcon className="w-4 h-4" />
+                    <img
+                      src={`data:${img.mimeType};base64,${img.data}`}
+                      alt={`upload preview ${index}`}
+                      className="w-16 h-16 object-cover rounded-md"
+                    />
+                    <button
+                      onClick={() => removeSelectedImage(index)}
+                      className="absolute -top-1.5 -right-1.5 bg-gray-800 text-white rounded-full p-0.5"
+                    >
+                      <XIcon className="w-3 h-3" />
                     </button>
                   </div>
                 ))}
               </div>
             </div>
           )}
-          <div className="bg-gray-100/80 dark:bg-ocs-dark-input/80 backdrop-blur-lg rounded-2xl p-3 flex flex-col w-full shadow-lg border border-gray-200/50 dark:border-ocs-dark-hover/50">
-            <textarea
-                ref={textareaRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder={t('message_placeholder', { assistantName: assistant.name })}
-                className="flex-1 bg-transparent text-gray-800 dark:text-gray-200 dark:placeholder-ocs-text-muted/70 focus:outline-none resize-none max-h-40 overflow-y-auto custom-scrollbar w-full px-1 pt-1"
-                rows={1}
+          <div className={`relative flex items-end p-2 bg-gray-100 dark:bg-ocs-dark-input ${selectedImages.length > 0 ? 'rounded-b-xl' : 'rounded-xl'}`}>
+            <button
+                onClick={() => fileInputRef.current?.click()}
+                className="p-2 text-gray-500 dark:text-ocs-text-muted hover:text-gray-800 dark:hover:text-white"
+                aria-label="Attach image"
+            >
+                <ImageIcon className="w-6 h-6" />
+            </button>
+            <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+                accept="image/*"
+                multiple
             />
-            <div className="mt-3 flex items-center justify-between">
-                <div className="flex items-center space-x-1">
-                    <input type="file" ref={fileInputRef} onChange={handleFileChange} multiple accept="image/jpeg, image/png, image/webp" className="hidden" />
-                    <button 
-                        onClick={() => fileInputRef.current?.click()} 
-                        className="p-2 text-gray-600 dark:text-gray-300 bg-gray-200/70 dark:bg-ocs-dark-hover/70 rounded-lg transition-colors hover:bg-gray-300 dark:hover:bg-zinc-700"
-                        aria-label="Add attachment"
-                    >
-                        <PlusIcon className="w-5 h-5" />
-                    </button>
-                </div>
-                <button
-                    onClick={() => handleSend()}
-                    disabled={isSendDisabled}
-                    className="flex items-center space-x-2.5 text-white bg-gray-900 dark:bg-white dark:text-gray-900 font-semibold rounded-lg px-3 sm:px-4 py-2 transition-all duration-200 transform
-                    hover:bg-gray-700 dark:hover:bg-gray-200
-                    disabled:bg-gray-300 dark:disabled:bg-zinc-800 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed disabled:scale-100"
-                    aria-label="Send message now"
-                >
-                    <span className="text-sm">Send<span className="hidden sm:inline"> now</span></span>
-                    <span className="h-4 w-px bg-gray-500/50 dark:bg-gray-500/50"></span>
-                    <ChevronDownIcon className="w-4 h-4 text-gray-400 dark:text-gray-600" />
-                </button>
-            </div>
+            <textarea
+              ref={textareaRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={t('message_placeholder', { assistantName: assistant.name })}
+              className="flex-1 bg-transparent resize-none outline-none text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-ocs-text-muted px-3 py-2.5 max-h-40 custom-scrollbar"
+              rows={1}
+            />
+            <button
+              onClick={() => handleSend()}
+              disabled={isLoading || (!input.trim() && selectedImages.length === 0)}
+              className="p-2.5 rounded-full bg-ocs-accent text-white disabled:bg-gray-300 dark:disabled:bg-ocs-light-gray disabled:cursor-not-allowed transition-colors"
+              aria-label="Send message"
+            >
+              <ChevronDownIcon className="w-5 h-5 -rotate-90" />
+            </button>
           </div>
         </div>
+        <div className="h-4 sm:h-6 md:h-8" />
       </div>
-      {modalImage && (
-        <div 
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 cursor-pointer" 
-            onClick={() => setModalImage(null)}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Enlarged image view"
-        >
-            <img 
-                src={modalImage} 
-                alt="Enlarged view" 
-                className="max-w-full max-h-full rounded-lg object-contain cursor-default shadow-2xl" 
-                onClick={(e) => e.stopPropagation()} 
-            />
-            <button 
-                onClick={() => setModalImage(null)} 
-                className="absolute top-4 right-4 text-white bg-black/50 rounded-full p-2 hover:bg-black/75 transition-colors"
-                aria-label="Close image view"
-            >
-                <XIcon className="w-6 h-6"/>
-            </button>
-        </div>
-      )}
-       {isDraggingOver && assistant && (
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-30 flex items-center justify-center p-4 transition-opacity duration-300">
-                <div className="w-full h-full border-4 border-dashed border-ocs-accent rounded-3xl flex flex-col items-center justify-center text-white pointer-events-none">
-                    <ImageIcon className="w-16 h-16 mb-4 text-ocs-accent" />
-                    <p className="text-2xl font-bold">{t('drop_files_here')}</p>
-                </div>
-            </div>
-        )}
     </div>
   );
 };
