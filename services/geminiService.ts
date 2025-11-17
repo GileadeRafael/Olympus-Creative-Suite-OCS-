@@ -25,7 +25,7 @@ const messagesToHistory = (messages: Message[]) => {
 
 export function startChatSession(systemInstruction: string, history: Message[] = []): Chat {
   const chat = ai.chats.create({
-    model: 'gemini-2.5-pro',
+    model: 'gemini-2.5-flash',
     config: {
       systemInstruction: systemInstruction,
     },
