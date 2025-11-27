@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabaseClient';
-import { MailIcon, EyeIcon, EyeSlashIcon, XIcon, ChevronDoubleRightIcon } from './icons/CoreIcons';
+import { MailIcon, EyeIcon, EyeSlashIcon, ChevronDoubleRightIcon } from './icons/CoreIcons';
 import { ASSISTANTS } from '../constants';
 
 const AuthPage: React.FC = () => {
@@ -126,18 +126,15 @@ const AuthPage: React.FC = () => {
          {/* Rounded Gradient Card */}
         <div className="relative w-full h-full rounded-[40px] overflow-hidden flex flex-col items-center justify-center isolate border border-white/5 shadow-2xl">
             
-            {/* Background Gradient - TOP DOWN SPOTLIGHT */}
+            {/* Background Gradient */}
             <div className="absolute inset-0 z-0 bg-black">
-                {/* Main Spotlight Gradient */}
+                {/* Main Spotlight Gradient - Radial Bottom-Up */}
                 <div 
                     className="absolute inset-0" 
                     style={{
-                        background: 'radial-gradient(120% 120% at 50% 0%, #e4caff 0%, #a465ff 25%, #5c1c74 50%, #000000 100%)'
+                        background: 'radial-gradient(circle at 50% 100%, #0d0d0d 0%, #0d0d0d 50%, #5c1c74 80%, #a465ff 92%, #e4caff 100%)'
                     }}
                 ></div>
-
-                {/* Subtle top glow to enhance the start */}
-                <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[60%] h-[30%] bg-purple-400 opacity-20 blur-[80px] rounded-full mix-blend-screen pointer-events-none"></div>
 
                 {/* Noise Texture */}
                 <div className="absolute inset-0 opacity-[0.07] mix-blend-overlay" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`}}></div>
