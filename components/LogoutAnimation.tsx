@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 interface LogoutAnimationProps {
@@ -12,8 +13,8 @@ const LogoutAnimation: React.FC<LogoutAnimationProps> = ({ username }) => {
             aria-modal="true"
         >
             <div className="relative mb-6 animate-pulse">
-                <img src="https://i.imgur.com/QAy8ULl.png" alt="Olympus Logo" className="h-20 w-auto block dark:hidden" />
-                <img src="https://i.imgur.com/0vBQm1M.png" alt="Olympus Logo" className="h-20 w-auto hidden dark:block" />
+                <img src="https://i.imgur.com/3y8nUBS.png" alt="Zion Peak Logo" className="h-20 w-auto block dark:hidden" />
+                <img src="https://i.imgur.com/7P8v6DA.png" alt="Zion Peak Logo" className="h-20 w-auto hidden dark:block" />
             </div>
             <p className="text-white text-lg">
                 Até breve, {username}!

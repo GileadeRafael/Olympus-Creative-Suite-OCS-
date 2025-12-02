@@ -161,5 +161,5 @@ export async function generatePdf(messages: Message[], assistant: Assistant) {
         y += pdfImgHeight;
     }
 
-    doc.save(`OCS_${assistant.name}_Chat_History.pdf`);
+    doc.save(`ZPS_${assistant.name}_Chat_History.pdf`);
 }

@@ -213,7 +213,7 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
         const textToSend = promptOverride ?? input;
         if ((!textToSend.trim() && selectedImages.length === 0) || !chatSession || !assistant) return;
 
-        if (textToSend.trim().toLowerCase() === 'olympus') {
+        if (textToSend.trim().toLowerCase() === 'zion') {
             trackAction(GamificationEvent.EASTER_EGG_FOUND);
         }
         

@@ -162,8 +162,8 @@ const AuthPage: React.FC = () => {
             {/* Centered Content */}
             <div className="relative z-10 flex flex-col items-center text-center px-8">
                  <div className="mb-8 flex items-center space-x-3 bg-white/5 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10">
-                    <img src="https://i.imgur.com/0vBQm1M.png" alt="Olympus Logo" className="h-5 w-auto" />
-                    <span className="font-semibold text-base tracking-tight text-white/90">Olympus Creative Suite</span>
+                    <img src="https://i.imgur.com/7P8v6DA.png" alt="Zion Peak Logo" className="h-5 w-auto" />
+                    <span className="font-semibold text-base tracking-tight text-white/90">Zion Peak Suite</span>
                  </div>
                  
                  <h1 className="text-5xl lg:text-6xl font-bold text-white mb-6 leading-[1.1] tracking-tight drop-shadow-xl">
@@ -182,7 +182,7 @@ const AuthPage: React.FC = () => {
             
             {/* Mobile Logo */}
             <div className="lg:hidden flex justify-center mb-8">
-                <img src="https://i.imgur.com/0vBQm1M.png" alt="Olympus Logo" className="h-10 w-auto" />
+                <img src="https://i.imgur.com/7P8v6DA.png" alt="Zion Peak Logo" className="h-10 w-auto" />
             </div>
 
             {authMode === 'forgotPassword' ? (

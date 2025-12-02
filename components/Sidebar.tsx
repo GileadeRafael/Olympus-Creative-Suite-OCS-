@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { Assistant } from '../types';
 import ThemeToggle from './ThemeToggle';
@@ -74,8 +75,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     <aside className="bg-gray-100 dark:bg-ocs-dark-sidebar w-20 flex flex-col items-center py-6">
       <div className="flex flex-col items-center space-y-4 mb-6">
         <button onClick={onResetToHome} className="transition-transform duration-200 hover:scale-110 focus:outline-none" aria-label="Go to homepage">
-          <img src="https://i.imgur.com/QAy8ULl.png" alt="Olympus Logo" className="h-10 w-auto block dark:hidden" />
-          <img src="https://i.imgur.com/0vBQm1M.png" alt="Olympus Logo" className="h-10 w-auto hidden dark:block" />
+          <img src="https://i.imgur.com/3y8nUBS.png" alt="Zion Peak Logo" className="h-10 w-auto block dark:hidden" />
+          <img src="https://i.imgur.com/7P8v6DA.png" alt="Zion Peak Logo" className="h-10 w-auto hidden dark:block" />
         </button>
         <div className="relative" data-tour-id="notifications-bell">
              <button
