@@ -170,7 +170,7 @@ const AuthPage: React.FC = () => {
                     Get Started<br/>with Us
                  </h1>
                  <p className="text-zinc-300/80 text-lg max-w-sm mx-auto leading-relaxed">
-                    Complete these easy steps to register your account.
+                    Built at the Peak.
                  </p>
             </div>
         </div>
