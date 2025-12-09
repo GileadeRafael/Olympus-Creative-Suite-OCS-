@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { MailIcon, EyeIcon, EyeSlashIcon, ChevronDoubleRightIcon } from './icons/CoreIcons';
 import { ASSISTANTS } from '../constants';
@@ -15,6 +15,9 @@ const AuthPage: React.FC = () => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
 
+  // Background Ref for performance
+  const backgroundRef = useRef<HTMLDivElement>(null);
+
   // Slideshow State
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isSlideVisible, setIsSlideVisible] = useState(true);
@@ -25,6 +28,38 @@ const AuthPage: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [toast]);
+
+  // Mouse Interaction Effect
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+        if (!backgroundRef.current) return;
+
+        const x = e.clientX;
+        const y = e.clientY;
+        const width = window.innerWidth;
+
+        // Calculate color ratio (0 to 1) based on X position
+        const ratio = x / width;
+
+        // Interpolate between Purple (138, 93, 255) and Lime (204, 255, 0)
+        // You can adjust these RGB values to tweak the colors
+        const startColor = { r: 138, g: 93, b: 255 }; // Purple
+        const endColor = { r: 204, g: 255, b: 0 };    // Lime
+
+        const r = Math.round(startColor.r + (endColor.r - startColor.r) * ratio);
+        const g = Math.round(startColor.g + (endColor.g - startColor.g) * ratio);
+        const b = Math.round(startColor.b + (endColor.b - startColor.b) * ratio);
+
+        backgroundRef.current.style.background = `radial-gradient(
+            800px circle at ${x}px ${y}px, 
+            rgba(${r}, ${g}, ${b}, 0.25), 
+            transparent 60%
+        )`;
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   // Dynamic Island Slideshow Logic
   const slides = [
@@ -122,14 +157,17 @@ const AuthPage: React.FC = () => {
     <div className="min-h-screen w-full relative flex items-center justify-center bg-[#030303] overflow-hidden font-sans text-white selection:bg-lime-500/30">
        
        {/* Background Grid & Effects */}
-       <div className="absolute inset-0 z-0 bg-quantum-grid bg-quantum-plus pointer-events-none"></div>
+       <div className="absolute inset-0 z-0 bg-quantum-grid bg-quantum-plus pointer-events-none opacity-50"></div>
        
-       {/* Glowing Orbs (Gradient Accents) */}
-       {/* Top Left - Purple/Pink */}
-       <div className="quantum-glow-blob top-[-10%] left-[-10%] w-[600px] h-[600px] bg-gradient-to-r from-purple-800 to-pink-600 opacity-40"></div>
-       
-       {/* Bottom Right - Green/Lime */}
-       <div className="quantum-glow-blob bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-gradient-to-l from-emerald-800 to-lime-600 opacity-30" style={{ animationDelay: '-5s' }}></div>
+       {/* Dynamic Interactive Gradient Background */}
+       <div 
+         ref={backgroundRef}
+         className="absolute inset-0 z-0 pointer-events-none transition-opacity duration-300"
+         style={{
+             // Initial state before JavaScript kicks in
+             background: 'radial-gradient(800px circle at 50% 50%, rgba(138, 93, 255, 0.15), transparent 60%)'
+         }}
+       />
 
        {/* Global Toast */}
        {toast && (
