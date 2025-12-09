@@ -21,8 +21,8 @@ import { GamificationEvent } from './constants/badges';
 import { ToastProvider } from './contexts/ToastContext';
 import ToastContainer from './components/ToastContainer';
 import LogoutAnimation from './components/LogoutAnimation';
-import InteractiveTour from './components/InteractiveTour';
 import { ChevronDoubleLeftIcon } from './components/icons/CoreIcons';
+import WelcomeScreen from './components/WelcomeScreen'; // Explicit import
 
 export interface PersonalizedWelcomeItem {
     type: 'last_chat' | 'recent_badge' | 'suggestion';
@@ -67,9 +67,6 @@ const AppContent: React.FC = () => {
 
   // State for transition animation
   const [animationKey, setAnimationKey] = useState(0);
-
-  // State for Interactive Tour
-  const [showTour, setShowTour] = useState(false);
   
   // State for personalized welcome screen data
   const [personalizedWelcomeData, setPersonalizedWelcomeData] = useState<PersonalizedWelcomeItem[] | null>(null);
@@ -166,27 +163,6 @@ const AppContent: React.FC = () => {
             setPersonalizedWelcomeData(null);
         }
     }, [user, activeAssistant, badges, language]);
-
-
-  // Check if tour should be shown for a new user
-  useEffect(() => {
-    if (user) {
-        const tourKey = `hasCompletedTour_${user.id}`;
-        const hasCompleted = localStorage.getItem(tourKey);
-        if (!hasCompleted) {
-            // Use a small delay to ensure the UI is fully rendered before starting the tour
-            setTimeout(() => setShowTour(true), 500);
-        }
-    }
-  }, [user]);
-
-  const handleTourEnd = () => {
-    if (user) {
-        const tourKey = `hasCompletedTour_${user.id}`;
-        localStorage.setItem(tourKey, 'true');
-        setShowTour(false);
-    }
-  };
 
 
   // Load notifications from localStorage or set defaults
@@ -561,24 +537,27 @@ const AppContent: React.FC = () => {
 
   return (
     <>
-      {showTour && <InteractiveTour onComplete={handleTourEnd} onSkip={handleTourEnd} />}
       <div className="flex h-screen w-screen text-gray-800 dark:text-gray-200 bg-white dark:bg-ocs-dark-chat font-sans overflow-hidden">
-        <Sidebar 
-          assistants={ASSISTANTS} 
-          onAssistantClick={handleAssistantClick} 
-          activeAssistantId={activeAssistant?.id}
-          onResetToHome={handleResetToHome}
-          unlockedAssistants={unlockedAssistants}
-          isLoading={isUnlockStatusLoading}
-          onToggleHistory={() => setIsHistoryModalOpen(p => !p)}
-          hasUnreadNotifications={hasUnreadNotifications}
-          onToggleNotifications={() => setIsNotificationsModalOpen(p => !p)}
-          activeChatId={activeChatId}
-        />
-        <main className="flex-1 flex flex-col h-full relative overflow-hidden">
-          <header className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
-            {user && <Avatar user={user} onOpenBadges={() => setIsBadgesModalOpen(true)} onLogout={handleLogout} />}
-          </header>
+        {activeAssistant && (
+            <Sidebar 
+                assistants={ASSISTANTS} 
+                onAssistantClick={handleAssistantClick} 
+                activeAssistantId={activeAssistant?.id}
+                onResetToHome={handleResetToHome}
+                unlockedAssistants={unlockedAssistants}
+                isLoading={isUnlockStatusLoading}
+                onToggleHistory={() => setIsHistoryModalOpen(p => !p)}
+                hasUnreadNotifications={hasUnreadNotifications}
+                onToggleNotifications={() => setIsNotificationsModalOpen(p => !p)}
+                activeChatId={activeChatId}
+            />
+        )}
+        <main className="flex-1 flex flex-col h-full relative overflow-x-hidden">
+          {activeAssistant && (
+             <header className="absolute top-4 left-1/2 -translate-x-1/2 z-50">
+                {user && <Avatar user={user} onOpenBadges={() => setIsBadgesModalOpen(true)} onLogout={handleLogout} />}
+             </header>
+          )}
            {activeAssistant && user && (
             <HistoryModal
               assistant={activeAssistant}
@@ -605,21 +584,34 @@ const AppContent: React.FC = () => {
                   <ChevronDoubleLeftIcon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
               </button>
           )}
-          <div key={animationKey} className="h-full w-full animate-slide-in-right">
-            <ChatView 
-                key={activeAssistant?.id ? `${activeAssistant.id}-${activeChatId}`: 'welcome'}
-                assistant={activeAssistant}
-                chatSession={chatSession}
-                messages={currentMessages}
-                setMessages={setCurrentMessages}
-                user={user}
-                activeChatId={activeChatId}
-                onCreateChat={handleCreateChat}
-                onUpdateChat={handleUpdateChat}
-                personalizedWelcomeData={personalizedWelcomeData}
+          
+          {activeAssistant ? (
+            <div key={animationKey} className="h-full w-full animate-slide-in-right">
+                <ChatView 
+                    key={activeAssistant?.id ? `${activeAssistant.id}-${activeChatId}`: 'welcome'}
+                    assistant={activeAssistant}
+                    chatSession={chatSession}
+                    messages={currentMessages}
+                    setMessages={setCurrentMessages}
+                    user={user}
+                    activeChatId={activeChatId}
+                    onCreateChat={handleCreateChat}
+                    onUpdateChat={handleUpdateChat}
+                    personalizedWelcomeData={personalizedWelcomeData}
+                    onAssistantClick={handleAssistantClick}
+                />
+            </div>
+          ) : (
+             <WelcomeScreen 
+                user={user} 
+                personalizedData={personalizedWelcomeData} 
                 onAssistantClick={handleAssistantClick}
-            />
-          </div>
+                assistants={ASSISTANTS}
+                unlockedAssistants={unlockedAssistants}
+                onLogout={handleLogout}
+                onOpenBadges={() => setIsBadgesModalOpen(true)}
+             />
+          )}
         </main>
         <PurchaseModal 
           assistant={assistantToPurchase} 

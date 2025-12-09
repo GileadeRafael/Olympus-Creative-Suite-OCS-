@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { Assistant } from '../types';
-import ThemeToggle from './ThemeToggle';
 import LanguageSelector from './LanguageSelector';
 import { DiamondIcon, HistoryIcon, BellIcon, ChevronUpIcon, ChevronDownIcon } from './icons/CoreIcons';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -80,7 +79,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <img src="https://i.imgur.com/3y8nUBS.png" alt="Zion Peak Logo" className="h-10 w-auto block dark:hidden" />
           <img src="https://i.imgur.com/7P8v6DA.png" alt="Zion Peak Logo" className="h-10 w-auto hidden dark:block" />
         </button>
-        <div className="relative" data-tour-id="notifications-bell">
+        <div className="relative">
              <button
                 onClick={onToggleNotifications}
                 className="w-12 h-12 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-ocs-dark-hover transition-colors duration-200 ease-in-out focus:outline-none"
@@ -103,7 +102,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <ChevronUpIcon className="w-5 h-5" />
         </button>
 
-        <div className="relative w-full h-80 overflow-visible" data-tour-id="assistants-list">
+        <div className="relative w-full h-80 overflow-visible">
           <div className={`absolute top-0 left-0 right-0 h-6 bg-gradient-to-b from-gray-100 dark:from-ocs-dark-sidebar to-transparent pointer-events-none z-10 transition-opacity ${canScrollUp ? 'opacity-100' : 'opacity-0'}`} />
           
           <nav 
@@ -167,11 +166,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <HistoryIcon className="w-6 h-6" />
             </button>
         )}
-        <div data-tour-id="language-selector">
+        <div className="mb-2">
           <LanguageSelector activeChatId={activeChatId} />
-        </div>
-        <div data-tour-id="theme-toggle">
-          <ThemeToggle />
         </div>
       </div>
     </aside>

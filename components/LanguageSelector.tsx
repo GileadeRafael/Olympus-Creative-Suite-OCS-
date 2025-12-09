@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { LanguageCode } from '../lib/i18n';
@@ -54,23 +53,36 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ activeChatId }) => 
         setIsOpen(false);
     };
 
+    // Determine position based on usage context (Sidebar has activeChatId defined (even if null for new chat), WelcomeScreen passes null explicitly)
+    // Actually, App.tsx passes null for WelcomeScreen and activeChatId string/'new' for Sidebar.
+    // Logic: If on Welcome Screen (activeChatId is null), dropdown goes DOWN.
+    // If on Sidebar (activeChatId is defined), we check if it fits. 
+    // Given the request "open downwards", we will default to downwards.
+    // However, in the sidebar (bottom left), opening down clips. 
+    // We will make it adaptive: Sidebar (bottom-full mb-2), WelcomeScreen (top-full mt-2).
+    
+    const isSidebar = activeChatId !== null;
+    const dropdownClasses = isSidebar 
+        ? "bottom-full mb-2 left-0 flex-col space-y-2" // Sidebar: Open Upwards (stack vertical)
+        : "top-full mt-3 left-1/2 -translate-x-1/2 flex-col space-y-2"; // Welcome: Open Downwards (stack vertical, centered)
+
     return (
-        <div ref={wrapperRef} className="relative flex items-center">
+        <div ref={wrapperRef} className="relative flex items-center justify-center">
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-12 h-12 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-ocs-dark-hover transition-colors duration-200 ease-in-out focus:outline-none"
                 title={t('select_language')}
                 aria-label={t('select_language')}
             >
-                <img src={selectedLang.flagUrl} alt={selectedLang.name} className="w-8 h-8 rounded-full object-cover" />
+                <img src={selectedLang.flagUrl} alt={selectedLang.name} className="w-8 h-8 rounded-full object-cover shadow-sm" />
             </button>
             {isOpen && (
-                <div className="absolute left-full ml-3 flex space-x-2 bg-gray-100 dark:bg-ocs-dark-sidebar p-2 rounded-full shadow-lg z-10">
+                <div className={`absolute ${dropdownClasses} flex bg-gray-100 dark:bg-ocs-dark-sidebar p-2 rounded-2xl shadow-xl z-50 border border-gray-200 dark:border-gray-700`}>
                     {languages.filter(lang => lang.code !== selectedLang.code).map(lang => (
                         <button
                             key={lang.code}
                             onClick={() => handleSelectLang(lang)}
-                            className="w-12 h-12 rounded-full flex items-center justify-center hover:bg-gray-300 dark:hover:bg-ocs-dark-hover transition-colors duration-200 ease-in-out transform hover:scale-110 focus:outline-none"
+                            className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-300 dark:hover:bg-ocs-dark-hover transition-colors duration-200 ease-in-out transform hover:scale-110 focus:outline-none"
                             title={lang.name}
                             aria-label={t('switch_to_language', { languageName: lang.name })}
                         >
