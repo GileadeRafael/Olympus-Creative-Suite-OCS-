@@ -15,12 +15,52 @@ const AuthPage: React.FC = () => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
 
+  // Slideshow State
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isSlideVisible, setIsSlideVisible] = useState(true);
+
   useEffect(() => {
     if (toast) {
       const timer = setTimeout(() => setToast(null), 5000);
       return () => clearTimeout(timer);
     }
   }, [toast]);
+
+  // Dynamic Island Slideshow Logic
+  const slides = [
+    {
+        id: 'vyne',
+        assistant: ASSISTANTS.find(a => a.id === 'vyne'),
+        label: 'New Assistant',
+        text: 'VYNE is now available',
+        colorClass: 'text-purple-300'
+    },
+    {
+        id: 'zora_json',
+        assistant: ASSISTANTS.find(a => a.id === 'zora'), // Using Zora icon
+        label: 'New Feature',
+        text: 'Zora JSON Edition',
+        colorClass: 'text-orange-300'
+    }
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+        // Start exit animation
+        setIsSlideVisible(false);
+        
+        // Wait for animation to finish, then swap data and enter
+        setTimeout(() => {
+            setCurrentSlide((prev) => (prev + 1) % slides.length);
+            setIsSlideVisible(true);
+        }, 500); // Matches the duration-500 class
+    }, 5000); // Change slide every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [slides.length]);
+
+  const activeSlide = slides[currentSlide];
+
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,8 +119,6 @@ const AuthPage: React.FC = () => {
     setUsername('');
   };
   
-  const vyneAssistant = ASSISTANTS.find(a => a.id === 'vyne');
-
   const primaryButtonClass = "w-full bg-white text-black font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 shadow-[0_0_20px_rgba(255,255,255,0.1)]";
   
   return (
@@ -140,19 +178,27 @@ const AuthPage: React.FC = () => {
                 <div className="absolute inset-0 opacity-[0.07] mix-blend-overlay" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`}}></div>
             </div>
 
-            {/* Notification (Dynamic Island) - Centered & Always Expanded */}
-            <div className="absolute top-8 left-1/2 -translate-x-1/2 z-30">
-                 {vyneAssistant && (
-                    <div className="transition-all duration-500 ease-out opacity-100 scale-100">
+            {/* Notification (Dynamic Island) - Slideshow */}
+            <div className="absolute top-8 left-1/2 -translate-x-1/2 z-30 h-12 w-64 flex items-center justify-center">
+                 {activeSlide.assistant && (
+                    <div 
+                        className={`transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] transform absolute
+                        ${isSlideVisible ? 'opacity-100 translate-y-0 scale-100 blur-0' : 'opacity-0 -translate-y-4 scale-95 blur-sm'}`}
+                    >
                         <div className="flex items-center bg-black/40 backdrop-blur-xl rounded-full border border-white/10 shadow-lg overflow-hidden pr-4 pl-1 py-1 gap-3">
-                            <img 
-                                src={vyneAssistant.iconUrl} 
-                                alt={vyneAssistant.name} 
-                                className="w-8 h-8 rounded-full object-cover flex-shrink-0 border border-white/10"
-                            />
+                            <div className="relative w-8 h-8">
+                                <img 
+                                    src={activeSlide.assistant.iconUrl} 
+                                    alt={activeSlide.assistant.name} 
+                                    className="w-full h-full rounded-full object-cover flex-shrink-0 border border-white/10"
+                                />
+                                {activeSlide.id === 'zora_json' && (
+                                    <div className="absolute -bottom-1 -right-1 bg-orange-500 text-white text-[6px] font-bold px-1 rounded-sm border border-black">JSON</div>
+                                )}
+                            </div>
                             <div className="flex flex-col">
-                                <span className="text-[10px] text-purple-300 font-bold uppercase tracking-wider">New Assistant</span>
-                                <span className="text-xs text-white font-medium whitespace-nowrap">VYNE is now available</span>
+                                <span className={`text-[10px] font-bold uppercase tracking-wider ${activeSlide.colorClass}`}>{activeSlide.label}</span>
+                                <span className="text-xs text-white font-medium whitespace-nowrap">{activeSlide.text}</span>
                             </div>
                         </div>
                     </div>
