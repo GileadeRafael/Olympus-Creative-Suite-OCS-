@@ -85,6 +85,15 @@
         animation: fadeInOut 2s ease-in-out forwards;
       }
 
+      /* Correct Modal Entry Animation (Persistent) */
+      @keyframes simpleFadeIn {
+        from { opacity: 0; transform: scale(0.98); }
+        to { opacity: 1; transform: scale(1); }
+      }
+      .animate-modal-enter {
+        animation: simpleFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+
       /* Animation for assistant transition */
       @keyframes slideInFromRight {
           from {
@@ -191,6 +200,40 @@
         animation-delay: 1.5s;
       }
 
+      /* --- QUANTUM GRID STYLES (NEW) --- */
+      .bg-quantum-grid {
+        background-size: 60px 60px;
+        background-image:
+          linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        background-color: #030303;
+      }
+      
+      .bg-grid-plus {
+        background-size: 60px 60px;
+        background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.2) 1px, transparent 0);
+        background-position: -1px -1px; /* Center dot on intersection */
+      }
+      /* Alternative: SVG Plus pattern for clearer crosses at intersections */
+      .bg-quantum-plus {
+          background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 0V2M0 1H2' stroke='rgba(255,255,255,0.1)' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+          background-size: 60px 60px;
+          background-position: 0 0;
+      }
+
+      .quantum-glow-blob {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(80px);
+          opacity: 0.6;
+          animation: blob-pulse 10s infinite alternate;
+      }
+      
+      @keyframes blob-pulse {
+          0% { transform: scale(1); opacity: 0.5; }
+          100% { transform: scale(1.2); opacity: 0.7; }
+      }
+
     </style>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script>
@@ -209,6 +252,8 @@
               'ocs-text-muted': '#A1A1AA',
               'ocs-light-gray': '#3A3A43',
               'ocs-accent': '#8A5DFF',
+              'quantum-lime': '#ccff00',
+              'quantum-purple': '#8A5DFF',
             },
           },
         },
