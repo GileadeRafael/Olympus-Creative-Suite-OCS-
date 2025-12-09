@@ -10,6 +10,7 @@ export interface Assistant {
   price: number;
   purchaseUrl: string;
   examplePrompts: string[];
+  excludeFromSidebar?: boolean;
 }
 
 export interface Message {

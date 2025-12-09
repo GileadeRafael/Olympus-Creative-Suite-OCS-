@@ -1,3 +1,4 @@
+
 export type LanguageCode = 'en' | 'pt' | 'es' | 'zh' | 'fr';
 
 export const translations: Record<LanguageCode, Record<string, string>> = {
@@ -15,6 +16,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'switch_to_dark_mode': 'Switch to dark mode',
     'switch_to_light_mode': 'Switch to light mode',
     'zora_description': 'Creative assistant specializing in turning ideas and photos into optimized prompts for generative image AIs.',
+    'zora_json_description': 'ZORA™ JSON Edition: Specialized for outputting structured JSON prompts compatible with Nano Banana syntax, perfect for integration pipelines.',
     'wizi_description': 'A lucid and detailed assistant that helps you build complex visual prompts for image generation, element by element.',
     'luma_description': 'A visual engineer who breaks down ideas into technical layers (camera, light, color) to create structured and educational prompts.',
     'loki_description': 'A multifaceted creative screenwriter who provides ideas, formats, and stories for videos, texts, and campaigns with a unique twist.',
@@ -121,6 +123,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'switch_to_dark_mode': 'Mudar para o modo escuro',
     'switch_to_light_mode': 'Mudar para o modo claro',
     'zora_description': 'Assistente criativo especializado em transformar ideias e fotos em prompts otimizados para IAs generativas de imagem.',
+    'zora_json_description': 'ZORA™ JSON Edition: Especializado em gerar prompts estruturados em JSON no padrão Nano Banana, perfeito para pipelines de integração.',
     'wizi_description': 'Um assistente lúcido e detalhista que ajuda você a construir prompts visuais complexos para geração de imagens, elemento por elemento.',
     'luma_description': 'Uma engenheira visual que decompõe ideias em camadas técnicas (câmera, luz, cor) para criar prompts estruturados e educacionais.',
     'loki_description': 'Um roteirista criativo multifacetado que fornece ideias, formatos e histórias para vídeos, textos e campanhas com um toque único.',
@@ -227,6 +230,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'switch_to_dark_mode': 'Cambiar a modo oscuro',
     'switch_to_light_mode': 'Cambiar a modo claro',
     'zora_description': 'Asistente creativo especializado en convertir ideas y fotos en prompts optimizados para IAs generativas de imágenes.',
+    'zora_json_description': 'ZORA™ JSON Edition: Especializado en generar prompts estructurados en JSON estándar Nano Banana, perfecto para pipelines de integración.',
     'wizi_description': 'Un asistente lúcido y detallado que te ayuda a construir prompts visuales complejos para la generación de imágenes, elemento por elemento.',
     'luma_description': 'Una ingeniera visual que descompone ideas en capas técnicas (cámara, luz, color) para crear prompts estructurados y educativos.',
     'loki_description': 'Un guionista creativo multifacético que proporciona ideas, formatos e historias para videos, textos y campañas con un toque único.',
@@ -313,6 +317,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'switch_to_dark_mode': '切换到深色模式',
     'switch_to_light_mode': '切换到浅色模式',
     'zora_description': '专注于将想法和照片转化为为生成式图像 AI 优化的提示的创意助手。',
+    'zora_json_description': 'ZORA™ JSON Edition: 专门输出符合 Nano Banana 语法的结构化 JSON 提示，非常适合集成管道。',
     'wizi_description': '一个清晰而详细的助手，帮助您逐个元素地为图像生成构建复杂的视觉提示。',
     'luma_description': '一位视觉工程师，将想法分解为技术层面（相机、光线、颜色），以创建结构化和教育性的提示。',
     'loki_description': '一位多才多艺的创意编剧，为视频、文本和宣传活动提供具有独特风格的想法、格式和故事。',
@@ -399,6 +404,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'switch_to_dark_mode': 'Passer en mode sombre',
     'switch_to_light_mode': 'Passer en mode clair',
     'zora_description': 'Assistant créatif spécialisé dans la transformation d\'idées et de photos en prompts optimisés pour les IA génératives d\'images.',
+    'zora_json_description': 'ZORA™ JSON Edition: Spécialisé dans la génération de prompts JSON structurés au format Nano Banana, parfait pour les pipelines d\'intégration.',
     'wizi_description': 'Un assistant lucide et détaillé qui vous aide à construire des prompts visuels complexes pour la génération d\'images, élément par élément.',
     'luma_description': 'Une ingénieure visuelle qui décompose les idées en couches techniques (caméra, lumière, couleur) pour créer des prompts structurés et éducatifs.',
     'loki_description': 'Un scénariste créatif aux multiples facettes qui fournit des idées, des formats et des histoires pour des vidéos, des textes et des campagnes avec une touche unique.',
@@ -454,7 +460,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'quote_1': 'La créativité, c\'est l\'intelligence qui s\'amuse.',
     'quote_2': 'La meilleure façon de prédire l\'avenir, c\'est de l\'inventer.',
     'quote_3': 'La technologie est meilleure quand elle rassemble les gens.',
-    'quote_4': 'La simplicité est la sophistication suprême.',
+    'quote_4': 'La simplicidade est la sophistication suprême.',
     'quote_5': 'Toute grande œuvre d\'art est un triomphe de l\'intuition.',
     'quote_6': 'L\'ordinateur est une bicyclette pour nos esprits.',
     'quote_7': 'Créer, c\'est se souvenir de ce que l\'on désire ardemment.',

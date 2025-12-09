@@ -147,7 +147,7 @@ const AppContent: React.FC = () => {
                 
                 // 3. Fill with suggestions if we still have space
                 while (activities.length < 3) {
-                    const availableAssistants = ASSISTANTS.filter(a => !usedAssistantIds.has(a.id));
+                    const availableAssistants = ASSISTANTS.filter(a => !usedAssistantIds.has(a.id) && !a.excludeFromSidebar);
                     if (availableAssistants.length === 0) break;
                     
                     const randomAssistant = availableAssistants[Math.floor(Math.random() * availableAssistants.length)];
@@ -280,7 +280,6 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     // If there's no user, reset the state and do nothing further.
     if (!user) {
-        // FIX: Explicitly type the new Set to match the state's type `Set<string>`.
         setUnlockedAssistants(new Set<string>());
         setIsUnlockStatusLoading(false);
         return;
@@ -288,8 +287,6 @@ const AppContent: React.FC = () => {
 
     const fetchUnlocked = async () => {
         setIsUnlockStatusLoading(true);
-        // Reverted to a direct table query to fix the "Failed to send a request to the Edge Function" error.
-        // This method was working previously and is more stable for this environment.
         const { data, error } = await supabase
             .from('user_assistants')
             .select('assistant_id')
@@ -297,12 +294,15 @@ const AppContent: React.FC = () => {
 
         if (error) {
             console.error("Error fetching unlocked assistants:", error.message);
-            // FIX: Explicitly type the new Set to match the state's type `Set<string>`.
             setUnlockedAssistants(new Set<string>());
         } else {
-            // FIX: Explicitly type the new Set as Set<string> to resolve a TypeScript inference issue
-            // where `new Set(any[])` can result in `Set<unknown>`, which is not assignable to `Set<string>`.
             const unlockedIds = new Set<string>(data.map((item: { assistant_id: string }) => item.assistant_id));
+            
+            // Automatically grant access to zora_json if zora is unlocked
+            if (unlockedIds.has('zora')) {
+                unlockedIds.add('zora_json');
+            }
+
             setUnlockedAssistants(unlockedIds);
         }
         setIsUnlockStatusLoading(false);

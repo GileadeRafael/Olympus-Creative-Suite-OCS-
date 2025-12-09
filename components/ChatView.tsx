@@ -1,5 +1,7 @@
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { Assistant, Message } from '../types';
+import { ASSISTANTS } from '../constants';
 import { sendMessageStream } from '../services/geminiService';
 import type { Chat } from '@google/genai';
 import { XIcon, PlusIcon, ChevronDownIcon, ImageIcon, SparklesIcon } from './icons/CoreIcons';
@@ -209,6 +211,13 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
         setSelectedImages(prev => prev.filter((_, i) => i !== index));
     };
 
+    const handleSwitchToZoraJson = () => {
+        const zoraJson = ASSISTANTS.find(a => a.id === 'zora_json');
+        if (zoraJson) {
+            onAssistantClick(zoraJson);
+        }
+    };
+
     const handleSend = async (promptOverride?: string) => {
         const textToSend = promptOverride ?? input;
         if ((!textToSend.trim() && selectedImages.length === 0) || !chatSession || !assistant) return;
@@ -334,9 +343,21 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
                 <div className={`relative w-20 h-20 sm:w-24 sm:h-24 mb-6 border-4 ${assistant.ringColor} rounded-full flex items-center justify-center p-1`}>
                   <img src={assistant.iconUrl} alt={assistant.name} className="w-full h-full object-cover rounded-full" />
                 </div>
-                <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 dark:text-white mb-4">
-                  {assistant.name}
-                </h1>
+                <div className="flex items-center justify-center gap-3 mb-4">
+                    <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 dark:text-white">
+                        {assistant.name}
+                    </h1>
+                    {assistant.id === 'zora' && (
+                        <button
+                            onClick={handleSwitchToZoraJson}
+                            className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1 transition-all hover:scale-105 shadow-md"
+                            title="Switch to Zora JSON Edition"
+                        >
+                            <span>{`{ }`}</span>
+                            <span className="hidden sm:inline">Zora in JSON</span>
+                        </button>
+                    )}
+                </div>
                 <p className="text-zinc-600 dark:text-zinc-400 max-w-lg">
                   {t(assistant.descriptionKey)}
                 </p>
