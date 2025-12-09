@@ -342,6 +342,11 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
              <div className="flex flex-col items-center justify-center flex-1 text-center">
                 <div className={`relative w-20 h-20 sm:w-24 sm:h-24 mb-6 border-4 ${assistant.ringColor} rounded-full flex items-center justify-center p-1`}>
                   <img src={assistant.iconUrl} alt={assistant.name} className="w-full h-full object-cover rounded-full" />
+                  {assistant.id === 'zora_json' && (
+                      <div className="absolute bottom-0 right-0 bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-lg border-2 border-white dark:border-ocs-dark-chat transform translate-x-2 translate-y-2 shadow-sm">
+                          JSON
+                      </div>
+                  )}
                 </div>
                 <div className="flex items-center justify-center gap-3 mb-4">
                     <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 dark:text-white">
@@ -409,7 +414,14 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
                         )}
                       </div>
                       {msg.role === 'model' && (
-                        <img src={assistant.iconUrl} alt={assistant.name} className="absolute -bottom-4 -left-5 w-10 h-10 rounded-full border-4 border-white dark:border-ocs-dark-chat" />
+                        <div className="absolute -bottom-4 -left-5 w-10 h-10">
+                            <img src={assistant.iconUrl} alt={assistant.name} className="w-full h-full rounded-full border-4 border-white dark:border-ocs-dark-chat object-cover" />
+                            {assistant.id === 'zora_json' && (
+                                <div className="absolute -bottom-1 -right-1 bg-orange-500 text-white text-[8px] leading-tight font-bold px-1 py-px rounded border border-white dark:border-ocs-dark-chat">
+                                    JSON
+                                </div>
+                            )}
+                        </div>
                       )}
                     </div>
                   </div>
@@ -423,7 +435,14 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse mr-2 delay-75"></div>
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-150"></div>
                     </div>
-                    <img src={assistant.iconUrl} alt={assistant.name} className="absolute -bottom-4 -left-5 w-10 h-10 rounded-full border-4 border-white dark:border-ocs-dark-chat" />
+                    <div className="absolute -bottom-4 -left-5 w-10 h-10">
+                        <img src={assistant.iconUrl} alt={assistant.name} className="w-full h-full rounded-full border-4 border-white dark:border-ocs-dark-chat object-cover" />
+                        {assistant.id === 'zora_json' && (
+                            <div className="absolute -bottom-1 -right-1 bg-orange-500 text-white text-[8px] leading-tight font-bold px-1 py-px rounded border border-white dark:border-ocs-dark-chat">
+                                JSON
+                            </div>
+                        )}
+                    </div>
                   </div>
                 </div>
               )}
