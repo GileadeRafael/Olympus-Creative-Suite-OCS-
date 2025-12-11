@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { MailIcon, EyeIcon, EyeSlashIcon, ChevronDoubleRightIcon } from './icons/CoreIcons';
@@ -63,6 +64,13 @@ const AuthPage: React.FC = () => {
 
   // Dynamic Island Slideshow Logic
   const slides = [
+    {
+        id: 'node',
+        assistant: ASSISTANTS.find(a => a.id === 'node'),
+        label: 'NEW IA',
+        text: 'Director Node Available',
+        colorClass: 'text-[#800080]'
+    },
     {
         id: 'vyne',
         assistant: ASSISTANTS.find(a => a.id === 'vyne'),
