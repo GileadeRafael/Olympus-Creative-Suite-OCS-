@@ -1,4 +1,5 @@
 
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { Assistant, Message } from '../types';
 import { ASSISTANTS } from '../constants';
@@ -34,6 +35,8 @@ const getCopyButtonColors = (ringColor: string): string => {
       return 'bg-pink-500/80 hover:bg-pink-500';
     case 'border-[#f08080]':
       return 'bg-[#f08080]/80 hover:bg-[#f08080]';
+    case 'border-[#800080]':
+      return 'bg-[#800080]/80 hover:bg-[#800080]';
     default:
       return 'bg-gray-700/50 hover:bg-gray-700/70';
   }
