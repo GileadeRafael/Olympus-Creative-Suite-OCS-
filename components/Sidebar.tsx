@@ -80,10 +80,10 @@ const Sidebar: React.FC<SidebarProps> = ({
               </span>
             </button>
 
-            {/* History Toggle (Crucial for Mobile) */}
+            {/* History Toggle (Crucial for Mobile) - Hidden on Desktop */}
             <button
               onClick={() => { onToggleHistory(); setIsMobileExpanded(false); }}
-              className="group relative flex items-center justify-center w-12 h-12 rounded-full hover:bg-white/10 text-white transition-all duration-200 focus:outline-none"
+              className="md:hidden group relative flex items-center justify-center w-12 h-12 rounded-full hover:bg-white/10 text-white transition-all duration-200 focus:outline-none"
               aria-label="View History"
             >
               <HistoryIcon className="w-6 h-6" />
