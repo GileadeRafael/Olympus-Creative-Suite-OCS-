@@ -1,6 +1,4 @@
-
-
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { User } from '@supabase/supabase-js';
 import type { PersonalizedWelcomeItem } from '../App';
@@ -29,40 +27,11 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 }) => {
     const { t } = useLanguage();
     const [greetingKey, setGreetingKey] = useState(0);
-    const backgroundRef = useRef<HTMLDivElement>(null);
     const [activeInfoCard, setActiveInfoCard] = useState<string | null>(null);
 
     useEffect(() => {
         setGreetingKey(prev => prev + 1);
     }, [user]);
-
-    // Mouse Interaction Effect for Quantum Background
-    useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            if (!backgroundRef.current) return;
-
-            const x = e.clientX;
-            const y = e.clientY;
-            const width = window.innerWidth;
-
-            const ratio = x / width;
-            const startColor = { r: 138, g: 93, b: 255 }; // Purple
-            const endColor = { r: 204, g: 255, b: 0 };    // Lime
-
-            const r = Math.round(startColor.r + (endColor.r - startColor.r) * ratio);
-            const g = Math.round(startColor.g + (endColor.g - startColor.g) * ratio);
-            const b = Math.round(startColor.b + (endColor.b - startColor.b) * ratio);
-
-            backgroundRef.current.style.background = `radial-gradient(
-                800px circle at ${x}px ${y}px, 
-                rgba(${r}, ${g}, ${b}, 0.15), 
-                transparent 60%
-            )`;
-        };
-
-        window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
-    }, []);
     
     const getGreeting = () => {
         const hour = new Date().getHours();
@@ -88,18 +57,15 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
     };
 
     return (
-        <div className="relative min-h-screen w-full flex flex-col bg-[#030303] overflow-x-hidden font-sans text-white selection:bg-lime-500/30">
-            
-            {/* --- Background Effects (Copied from AuthPage) --- */}
-            <div className="absolute inset-0 z-0 bg-quantum-grid bg-quantum-plus pointer-events-none opacity-50"></div>
-            <div 
-                ref={backgroundRef}
-                className="absolute inset-0 z-0 pointer-events-none transition-opacity duration-300"
-                style={{
-                    background: 'radial-gradient(800px circle at 50% 50%, rgba(138, 93, 255, 0.15), transparent 60%)'
-                }}
-            />
-
+        <div 
+            className="relative min-h-screen w-full flex flex-col overflow-x-hidden font-sans text-white selection:bg-lime-500/30"
+            style={{
+                backgroundImage: "url('https://i.imgur.com/jgJOxlU.jpeg')",
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+            }}
+        >
             {/* --- Header (Navigation & Settings) --- */}
             <div className="relative z-20 w-full p-6 flex justify-between items-center">
                 {/* Logo */}
@@ -130,7 +96,6 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
                 {/* Assistant Cards Grid - Mobile Optimized to Grid to prevent cutoff */}
                 <div className="w-full max-w-7xl mx-auto">
-                    {/* Changed from flex overflow to grid for better mobile visibility */}
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6 justify-center">
                         {visibleAssistants.map((assistant) => {
                             const isLocked = !unlockedAssistants.has(assistant.id);
