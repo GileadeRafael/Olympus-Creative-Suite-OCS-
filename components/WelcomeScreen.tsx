@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { User } from '@supabase/supabase-js';
@@ -77,7 +76,14 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
                 {/* Right Controls */}
                 <div className="flex items-center space-x-4">
                     <LanguageSelector activeChatId={null} />
-                    {user && <Avatar user={user} onOpenBadges={onOpenBadges} onLogout={onLogout} />}
+                    {user && (
+                        <Avatar 
+                            user={user} 
+                            onOpenBadges={onOpenBadges} 
+                            onLogout={onLogout} 
+                            isSidebar={false} 
+                        />
+                    )}
                 </div>
             </div>
 

@@ -11,7 +11,6 @@ import type { Chat } from '@google/genai';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import { GamificationProvider, useGamification } from './contexts/GamificationContext';
 import { useAuth } from './hooks/useAuth';
-import Avatar from './components/Avatar';
 import { supabase } from './services/supabaseClient';
 import HistoryModal from './components/HistoryModal';
 import NotificationsModal from './components/NotificationsModal';
@@ -38,7 +37,6 @@ const AppContent: React.FC = () => {
   const { trackAction, resetSessionCounters, setNotificationCallback, userProgress, badges } = useGamification();
   const [activeAssistant, setActiveAssistant] = useState<Assistant | null>(null);
   
-  // State for chat history management
   const [chatHistory, setChatHistory] = useState<ChatHistoryItem[]>([]);
   const [activeChatId, setActiveChatId] = useState<string | 'new' | null>(null);
   const [currentMessages, setCurrentMessages] = useState<Message[]>([]);
@@ -47,27 +45,18 @@ const AppContent: React.FC = () => {
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [isHistoryPanelVisible, setIsHistoryPanelVisible] = useState(true);
 
-  // State for assistant purchase/unlocking
   const [unlockedAssistants, setUnlockedAssistants] = useState<Set<string>>(new Set());
   const [isUnlockStatusLoading, setIsUnlockStatusLoading] = useState(true);
   const [assistantToPurchase, setAssistantToPurchase] = useState<Assistant | null>(null);
 
-  // State for notifications
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isNotificationsLoaded, setIsNotificationsLoaded] = useState(false);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const [isNotificationsModalOpen, setIsNotificationsModalOpen] = useState(false);
   
-  // State for Badges Modal
   const [isBadgesModalOpen, setIsBadgesModalOpen] = useState(false);
-
-  // State for Logout Animation
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-  // State for transition animation
   const [animationKey, setAnimationKey] = useState(0);
-  
-  // State for personalized welcome screen data
   const [personalizedWelcomeData, setPersonalizedWelcomeData] = useState<PersonalizedWelcomeItem[] | null>(null);
 
 
@@ -93,7 +82,6 @@ const AppContent: React.FC = () => {
                 const activities: PersonalizedWelcomeItem[] = [];
                 const usedAssistantIds = new Set<string>();
 
-                // 1. Fetch up to 2 recent chats
                 const { data: recentChats, error: chatsError } = await supabase
                     .from('chats')
                     .select('assistant_id, created_at')
@@ -115,7 +103,6 @@ const AppContent: React.FC = () => {
                     }
                 }
 
-                // 2. Fetch up to 2 recent badges, if we still need activities
                 if (activities.length < 3) {
                     const { data: recentBadges, error: badgesError } = await supabase
                         .from('user_badge_progress')
@@ -141,7 +128,6 @@ const AppContent: React.FC = () => {
                     }
                 }
                 
-                // 3. Fill with suggestions if we still have space
                 while (activities.length < 3) {
                     const availableAssistants = ASSISTANTS.filter(a => !usedAssistantIds.has(a.id) && !a.excludeFromSidebar);
                     if (availableAssistants.length === 0) break;
@@ -164,11 +150,10 @@ const AppContent: React.FC = () => {
     }, [user, activeAssistant, badges, language]);
 
 
-  // Load notifications from localStorage or set defaults
   useEffect(() => {
     if (!user) {
         setNotifications([]);
-        setIsNotificationsLoaded(false); // Reset on logout
+        setIsNotificationsLoaded(false);
         return;
     }
 
@@ -189,7 +174,6 @@ const AppContent: React.FC = () => {
     setIsNotificationsLoaded(true);
   }, [user]);
   
-  // Persist notifications to localStorage whenever they change
   useEffect(() => {
     if (!user || !isNotificationsLoaded) return;
     
@@ -208,13 +192,11 @@ const AppContent: React.FC = () => {
         }
         return () => {
             if (setNotificationCallback) {
-                // Clean up by setting a no-op function
                 setNotificationCallback(() => {});
             }
         };
     }, [addNotification, setNotificationCallback]);
 
-  // Check notification read status from localStorage when user is available
   useEffect(() => {
     if (user && notifications.length > 0) {
         const seenCount = parseInt(localStorage.getItem(`notificationsSeenCount_${user.id}`) || '0', 10);
@@ -224,12 +206,10 @@ const AppContent: React.FC = () => {
             setHasUnreadNotifications(false);
         }
     } else {
-        // Reset notification status on logout or if there are no notifications
         setHasUnreadNotifications(false);
     }
   }, [user, notifications]);
 
-  // Logic for the 'Silent One' badge - runs once when the user logs in.
   useEffect(() => {
     if (user) {
       const lastSeenKey = `lastSeen_${user.id}`;
@@ -251,9 +231,7 @@ const AppContent: React.FC = () => {
   }, [user, trackAction]);
 
 
-  // Fetch unlocked assistants when the user is available and listen for real-time changes
   useEffect(() => {
-    // If there's no user, reset the state and do nothing further.
     if (!user) {
         setUnlockedAssistants(new Set<string>());
         setIsUnlockStatusLoading(false);
@@ -272,12 +250,9 @@ const AppContent: React.FC = () => {
             setUnlockedAssistants(new Set<string>());
         } else {
             const unlockedIds = new Set<string>(data.map((item: { assistant_id: string }) => item.assistant_id));
-            
-            // Automatically grant access to zora_json if zora is unlocked
             if (unlockedIds.has('zora')) {
                 unlockedIds.add('zora_json');
             }
-
             setUnlockedAssistants(unlockedIds);
         }
         setIsUnlockStatusLoading(false);
@@ -285,8 +260,6 @@ const AppContent: React.FC = () => {
 
     fetchUnlocked();
 
-    // Set up a real-time subscription to the user_assistants table.
-    // This will automatically update the UI when a user's permissions change.
     const channel = supabase
         .channel(`user_assistants_changes_for_${user.id}`)
         .on(
@@ -298,20 +271,16 @@ const AppContent: React.FC = () => {
                 filter: `user_id=eq.${user.id}`,
             },
             (payload) => {
-                console.log('Permission change detected, refetching unlocked assistants.', payload);
-                // Refetch all data to ensure the UI is perfectly in sync.
                 fetchUnlocked();
             }
         )
         .subscribe();
 
-    // Clean up the subscription when the component unmounts or the user changes.
     return () => {
         supabase.removeChannel(channel);
     };
   }, [user]);
 
-  // Recreate chat session when assistant or the active chat changes
   useEffect(() => {
     if (activeAssistant) {
       const newSession = startChatSession(activeAssistant.systemInstruction, currentMessages);
@@ -340,23 +309,15 @@ const AppContent: React.FC = () => {
   };
 
   const handleSelectUnlockedAssistant = async (assistant: Assistant) => {
-    // If the user clicks the same assistant icon while already on its "new chat" screen, do nothing.
-    // Otherwise, clicking the same assistant icon while in a conversation will reset the view to a "new chat" screen.
     if (activeAssistant?.id === assistant.id && activeChatId === 'new') return;
 
-    // Only track the "switch" event if the assistant is actually different.
     if (activeAssistant?.id !== assistant.id) {
       trackAction(GamificationEvent.ASSISTANT_SWITCHED, { id: assistant.id });
-      setAnimationKey(prev => prev + 1); // Trigger animation
+      setAnimationKey(prev => prev + 1);
     }
 
     setActiveAssistant(assistant);
-    
-    // Fetch chat history for the selected assistant so it's available in the history modal.
-    // We don't await this, allowing the UI to update immediately while history loads in the background.
     fetchChatHistory(assistant.id);
-
-    // As requested, always start a new chat to show the assistant's presentation screen.
     handleNewChat(); 
   };
 
@@ -372,7 +333,7 @@ const AppContent: React.FC = () => {
     if (activeChatId === chatId) return;
     
     trackAction(GamificationEvent.HISTORY_VIEWED);
-    resetSessionCounters(); // Reset for badges like "Marathon Runner"
+    resetSessionCounters();
 
     const { data, error } = await supabase
       .from('chats')
@@ -387,14 +348,14 @@ const AppContent: React.FC = () => {
         setActiveChatId(chatId);
         setCurrentMessages(data.messages || []);
     }
-    setIsHistoryModalOpen(false); // Close modal on selection
+    setIsHistoryModalOpen(false);
   };
   
   const handleNewChat = () => {
-    resetSessionCounters(); // Reset for badges like "Marathon Runner"
+    resetSessionCounters();
     setActiveChatId('new');
     setCurrentMessages([]);
-    setIsHistoryModalOpen(false); // Close modal on new chat
+    setIsHistoryModalOpen(false);
   };
 
   const handleDeleteChat = (chatId: string) => {
@@ -478,7 +439,7 @@ const AppContent: React.FC = () => {
 
   const handleResetToHome = () => {
     if (activeAssistant) {
-      setAnimationKey(prev => prev + 1); // Trigger animation on reset
+      setAnimationKey(prev => prev + 1);
     }
     setActiveAssistant(null);
     setActiveChatId(null);
@@ -490,19 +451,17 @@ const AppContent: React.FC = () => {
   const handleCloseNotifications = () => {
     trackAction(GamificationEvent.NOTIFICATION_INTERACTED);
     setIsNotificationsModalOpen(false);
-    setHasUnreadNotifications(false); // Mark as read for the UI
+    setHasUnreadNotifications(false);
     if (user) {
-        // Persist the "read" status in localStorage for the specific user by storing the count of notifications they've seen
         localStorage.setItem(`notificationsSeenCount_${user.id}`, notifications.length.toString());
     }
   };
   
   const handleClearNotifications = () => {
-    setNotifications([]); // This will trigger the persistence useEffect to save an empty array
+    setNotifications([]);
     setHasUnreadNotifications(false);
     setIsNotificationsModalOpen(false);
     if (user) {
-        // When clearing, reset the seen counter to 0 relative to the new empty list.
         localStorage.setItem(`notificationsSeenCount_${user.id}`, '0');
     }
   };
@@ -512,12 +471,9 @@ const AppContent: React.FC = () => {
     setTimeout(async () => {
       await supabase.auth.signOut();
       setIsLoggingOut(false);
-    }, 1500); // Wait for animation
+    }, 1500);
   };
 
-  // By checking for isPasswordRecovery before checking for a session,
-  // we ensure the user is directed to the password reset page even when
-  // Supabase has created a temporary session for them.
   if (isPasswordRecovery) {
     return (
       <LanguageProvider>
@@ -550,14 +506,12 @@ const AppContent: React.FC = () => {
                 onToggleNotifications={() => setIsNotificationsModalOpen(p => !p)}
                 activeChatId={activeChatId}
                 onNewChat={handleNewChat}
+                user={user}
+                onOpenBadges={() => setIsBadgesModalOpen(true)}
+                onLogout={handleLogout}
             />
         )}
         <main className="flex-1 flex flex-col h-full relative overflow-x-hidden">
-          {activeAssistant && (
-             <header className="absolute top-4 left-1/2 -translate-x-1/2 z-50">
-                {user && <Avatar user={user} onOpenBadges={() => setIsBadgesModalOpen(true)} onLogout={handleLogout} />}
-             </header>
-          )}
            {activeAssistant && user && (
             <HistoryModal
               assistant={activeAssistant}
