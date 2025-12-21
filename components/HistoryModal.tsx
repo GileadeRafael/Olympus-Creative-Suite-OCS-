@@ -45,7 +45,7 @@ const HistoryModal: React.FC<HistoryModalProps> = ({ assistant, history, activeC
     }, [editingChatId]);
 
     const handleDelete = (e: React.MouseEvent, chatId: string) => {
-        e.stopPropagation(); // Prevent onSelectChat from firing
+        e.stopPropagation();
         if (window.confirm(t('delete_chat_confirm'))) {
             trackAction(GamificationEvent.CHAT_DELETED);
             onDeleteChat(chatId);
@@ -86,9 +86,9 @@ const HistoryModal: React.FC<HistoryModalProps> = ({ assistant, history, activeC
 
     return (
          <div
-            // Wrapper: Full screen modal on mobile, sliding panel on desktop.
+            // Wrapper: High Z-index on mobile to stay above sidebar. Sliding panel on desktop.
             className={`
-                ${isOpen ? 'fixed inset-0 z-40' : 'hidden'} md:block
+                ${isOpen ? 'fixed inset-0 z-[80]' : 'hidden'} md:block
                 md:fixed md:top-1/2 md:right-6 md:-translate-y-1/2 md:z-20 md:w-72 md:h-[70vh] md:inset-auto
                 transition-transform duration-300 ease-in-out
                 ${isPanelVisible ? 'md:translate-x-0' : 'md:translate-x-full'}
@@ -98,16 +98,16 @@ const HistoryModal: React.FC<HistoryModalProps> = ({ assistant, history, activeC
             aria-modal="true"
         >
             {/* Mobile-only overlay */}
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm md:hidden" aria-hidden="true" />
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-md md:hidden" aria-hidden="true" />
             
             {/* The Panel itself */}
             <div
-                className="relative mx-auto mt-[10vh] w-[90%] max-w-sm h-[80vh] flex flex-col bg-white/60 dark:bg-ocs-dark-input/60 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 dark:border-ocs-dark-hover/50 overflow-hidden
-                           md:mx-0 md:mt-0 md:w-full md:h-full md:max-w-none"
+                className="relative mx-auto mt-[5vh] w-[92%] max-w-sm h-[85vh] flex flex-col bg-[#111111] backdrop-blur-2xl rounded-[32px] shadow-[0_30px_60px_rgba(0,0,0,0.8)] border border-white/10 overflow-hidden
+                           md:mx-0 md:mt-0 md:w-full md:h-full md:max-w-none md:bg-white/60 md:dark:bg-ocs-dark-input/60"
                 onClick={e => e.stopPropagation()}
             >
-                <header className="p-4 border-b border-black/10 dark:border-white/10 flex items-center justify-between">
-                    <h2 className="font-bold text-lg text-gray-800 dark:text-white">{t('chats')}</h2>
+                <header className="p-6 border-b border-white/5 flex items-center justify-between">
+                    <h2 className="font-bold text-2xl text-white md:text-gray-800 md:dark:text-white">{t('chats')}</h2>
                     <button
                         onClick={onToggleHistoryPanel}
                         aria-label={t('collapse_history')}
@@ -117,39 +117,39 @@ const HistoryModal: React.FC<HistoryModalProps> = ({ assistant, history, activeC
                     </button>
                 </header>
                 
-                <div className="p-2 border-b border-black/10 dark:border-white/10">
+                <div className="px-6 py-4">
                     <div className="relative">
-                        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500 pointer-events-none" />
+                        <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                         <input
                             type="text"
                             placeholder={t('search_chats_placeholder')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-gray-100 dark:bg-ocs-dark-hover/50 rounded-lg pl-9 pr-3 py-2 text-sm text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-ocs-accent"
+                            className="w-full bg-white/5 md:bg-gray-100 md:dark:bg-ocs-dark-hover/50 rounded-xl pl-11 pr-4 py-3 text-sm text-white md:text-gray-800 md:dark:text-gray-200 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-ocs-accent"
                         />
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1">
+                <div className="flex-1 overflow-y-auto custom-scrollbar px-4 pb-4 space-y-1">
                     {isLoading && (
-                        <div className="flex justify-center items-center h-full">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">{t('loading_history')}</p>
+                        <div className="flex justify-center items-center h-32">
+                            <div className="w-6 h-6 border-2 border-ocs-accent border-t-transparent rounded-full animate-spin"></div>
                         </div>
                     )}
                     {!isLoading && history.length === 0 && (
-                        <div className="flex justify-center items-center h-full px-4">
-                            <p className="text-center text-sm text-gray-500 dark:text-gray-400">{t('no_chats_yet', { assistantName: assistant.name })}</p>
+                        <div className="flex justify-center items-center h-32 px-6">
+                            <p className="text-center text-sm text-zinc-500">{t('no_chats_yet', { assistantName: assistant.name })}</p>
                         </div>
                     )}
                     {!isLoading && history.length > 0 && filteredHistory.length === 0 && (
-                        <div className="flex justify-center items-center h-full px-4">
-                            <p className="text-center text-sm text-gray-500 dark:text-gray-400">{t('no_search_results')}</p>
+                        <div className="flex justify-center items-center h-32 px-6">
+                            <p className="text-center text-sm text-zinc-500">{t('no_search_results')}</p>
                         </div>
                     )}
                     {!isLoading && filteredHistory.map(chat => (
                         <div 
                             key={chat.id} 
-                            className={`group relative w-full text-left p-2.5 rounded-lg cursor-pointer transition-colors ${activeChatId === chat.id ? 'bg-gray-900/10 dark:bg-white/10' : 'hover:bg-gray-900/5 dark:hover:bg-white/5'}`}
+                            className={`group relative w-full text-left p-4 rounded-2xl cursor-pointer transition-all ${activeChatId === chat.id ? 'bg-white/10 md:bg-gray-900/10 md:dark:bg-white/10' : 'hover:bg-white/5 md:hover:bg-gray-900/5 md:dark:hover:bg-white/5'}`}
                             onClick={() => editingChatId !== chat.id && onSelectChat(chat.id)}
                         >
                             {editingChatId === chat.id ? (
@@ -160,22 +160,22 @@ const HistoryModal: React.FC<HistoryModalProps> = ({ assistant, history, activeC
                                     onChange={(e) => setEditingTitle(e.target.value)}
                                     onKeyDown={handleKeyDown}
                                     onBlur={handleSaveTitle}
-                                    className="w-full bg-transparent text-sm font-medium text-gray-800 dark:text-gray-200 outline-none border-b border-ocs-accent"
+                                    className="w-full bg-transparent text-sm font-medium text-white md:text-gray-800 md:dark:text-gray-200 outline-none border-b border-ocs-accent"
                                 />
                             ) : (
                                 <>
-                                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate pr-16">{chat.title}</p>
-                                    <div className="absolute top-1/2 right-2 -translate-y-1/2 flex items-center space-x-0.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+                                    <p className="text-sm font-medium text-white/90 md:text-gray-800 md:dark:text-gray-200 truncate pr-16">{chat.title}</p>
+                                    <div className="absolute top-1/2 right-4 -translate-y-1/2 flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <button
                                             onClick={(e) => handleStartEdit(e, chat)}
-                                            className="p-1.5 text-gray-500 dark:text-gray-400 rounded-full hover:bg-gray-500/10 hover:text-gray-800 dark:hover:text-white dark:hover:bg-white/10"
+                                            className="p-2 text-zinc-500 hover:text-white md:hover:text-gray-800 md:dark:hover:text-white transition-colors"
                                             aria-label={t('edit_chat_title')}
                                         >
                                             <PencilIcon className="w-4 h-4" />
                                         </button>
                                         <button
                                             onClick={(e) => handleDelete(e, chat.id)}
-                                            className="p-1.5 text-gray-500 dark:text-gray-400 rounded-full hover:bg-red-500/10 hover:text-red-500 dark:hover:bg-red-500/10"
+                                            className="p-2 text-zinc-500 hover:text-red-500 transition-colors"
                                             aria-label={t('delete_chat_label')}
                                         >
                                             <TrashIcon className="w-4 h-4" />
@@ -187,10 +187,10 @@ const HistoryModal: React.FC<HistoryModalProps> = ({ assistant, history, activeC
                     ))}
                 </div>
 
-                <footer className="p-2 border-t border-black/10 dark:border-white/10">
+                <footer className="p-6 border-t border-white/5">
                     <button
                         onClick={onNewChat}
-                        className="w-full flex items-center justify-center space-x-2 text-sm font-semibold p-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-900/5 dark:hover:bg-white/5 transition-colors"
+                        className="w-full flex items-center justify-center space-x-3 text-sm font-bold p-4 rounded-2xl bg-white text-black hover:bg-zinc-200 transition-all active:scale-[0.98]"
                     >
                         <PlusIcon className="w-5 h-5"/>
                         <span>{t('new_chat')}</span>

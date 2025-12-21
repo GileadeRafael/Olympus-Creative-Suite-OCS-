@@ -1,8 +1,7 @@
-
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState } from 'react';
 import type { Assistant } from '../types';
 import LanguageSelector from './LanguageSelector';
-import { DiamondIcon, HistoryIcon, BellIcon, ChevronUpIcon, ChevronDownIcon } from './icons/CoreIcons';
+import { HistoryIcon, BellIcon, PlusIcon, XIcon, ChevronDownIcon } from './icons/CoreIcons';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface SidebarProps {
@@ -16,159 +15,114 @@ interface SidebarProps {
   hasUnreadNotifications: boolean;
   onToggleNotifications: () => void;
   activeChatId: string | 'new' | null;
+  onNewChat: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ 
-    assistants, 
-    onAssistantClick, 
-    activeAssistantId, 
     onResetToHome, 
-    unlockedAssistants, 
-    isLoading, 
     onToggleHistory,
     hasUnreadNotifications,
     onToggleNotifications,
     activeChatId,
+    onNewChat
 }) => {
   const { t } = useLanguage();
-  const navRef = useRef<HTMLElement>(null);
-  const [canScrollUp, setCanScrollUp] = useState(false);
-  const [canScrollDown, setCanScrollDown] = useState(false);
+  const [isMobileExpanded, setIsMobileExpanded] = useState(false);
 
-  // Filter assistants that should be hidden from the main sidebar list
-  const visibleAssistants = assistants.filter(a => !a.excludeFromSidebar);
+  const toggleMobile = () => setIsMobileExpanded(!isMobileExpanded);
 
-  const checkScrollability = useCallback(() => {
-    const el = navRef.current;
-    if (el) {
-        const hasOverflow = el.scrollHeight > el.clientHeight;
-        setCanScrollUp(el.scrollTop > 0);
-        // Use a small tolerance for floating point inaccuracies
-        setCanScrollDown(hasOverflow && Math.abs(el.scrollHeight - el.scrollTop - el.clientHeight) > 1);
-    } else {
-        setCanScrollUp(false);
-        setCanScrollDown(false);
-    }
-  }, []);
-
-  useEffect(() => {
-      const el = navRef.current;
-      if (!el) return;
-
-      checkScrollability();
-
-      const resizeObserver = new ResizeObserver(checkScrollability);
-      resizeObserver.observe(el);
-
-      return () => {
-          resizeObserver.unobserve(el);
-      };
-  }, [assistants, isLoading, checkScrollability]);
-
-  const scroll = (direction: 'up' | 'down') => {
-      navRef.current?.scrollBy({
-          top: direction === 'up' ? -80 : 80, // Scroll by approx. one icon height + spacing
-          behavior: 'smooth'
-      });
+  // Helper to handle clicks on mobile to auto-collapse after action
+  const handleMobileAction = (action: () => void) => {
+    action();
+    setIsMobileExpanded(false);
   };
 
   return (
-    <aside className="bg-gray-100 dark:bg-ocs-dark-sidebar w-20 flex flex-col items-center py-6">
-      <div className="flex flex-col items-center space-y-4 mb-6">
-        <button onClick={onResetToHome} className="transition-transform duration-200 hover:scale-110 focus:outline-none" aria-label="Go to homepage">
-          <img src="https://i.imgur.com/3y8nUBS.png" alt="Zion Peak Logo" className="h-10 w-auto block dark:hidden" />
-          <img src="https://i.imgur.com/7P8v6DA.png" alt="Zion Peak Logo" className="h-10 w-auto hidden dark:block" />
-        </button>
-        <div className="relative">
-             <button
-                onClick={onToggleNotifications}
-                className="w-12 h-12 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-ocs-dark-hover transition-colors duration-200 ease-in-out focus:outline-none"
-                aria-label="View notifications"
-            >
-                <BellIcon className="w-6 h-6" />
-            </button>
-            {hasUnreadNotifications && (
-                <span className="absolute top-2 right-2 block h-3 w-3 rounded-full bg-red-500 border-2 border-gray-100 dark:border-ocs-dark-sidebar pointer-events-none" />
-            )}
-        </div>
-      </div>
-      
-      <div className="flex-1 flex flex-col items-center justify-center w-full min-h-0">
-        <button
-          onClick={() => scroll('up')}
-          aria-label="Scroll assistants up"
-          className={`h-8 flex-shrink-0 flex items-center justify-center text-gray-400 dark:text-gray-500 transition-all duration-300 ${canScrollUp ? 'opacity-100 hover:text-gray-600 dark:hover:text-gray-300' : 'opacity-0 pointer-events-none'}`}
+    <aside className="fixed left-6 top-1/2 -translate-y-1/2 z-[60] flex items-center pointer-events-none">
+      <div 
+        className={`pointer-events-auto bg-black border border-white/10 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col items-center transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden
+          ${isMobileExpanded ? 'py-6 space-y-6 h-auto max-h-[80vh]' : 'py-3 space-y-0 h-16 md:h-auto md:py-6 md:space-y-6'}
+          w-16`}
+      >
+        
+        {/* Top: Home/Logo Button - Always Visible */}
+        <button 
+          onClick={() => handleMobileAction(onResetToHome)} 
+          className="group relative flex-shrink-0 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full hover:bg-white/10 transition-all duration-200 focus:outline-none" 
+          aria-label="Back to selection"
         >
-          <ChevronUpIcon className="w-5 h-5" />
+          <img 
+            src="https://i.imgur.com/7P8v6DA.png" 
+            alt="Zion Peak Logo" 
+            className="w-6 h-6 md:w-7 md:h-7 object-contain filter brightness-0 invert" 
+          />
+          <span className="hidden md:block absolute left-full ml-4 px-2 py-1 bg-black text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none uppercase tracking-widest border border-white/10">
+            Home
+          </span>
         </button>
 
-        <div className="relative w-full h-80 overflow-visible">
-          <div className={`absolute top-0 left-0 right-0 h-6 bg-gradient-to-b from-gray-100 dark:from-ocs-dark-sidebar to-transparent pointer-events-none z-10 transition-opacity ${canScrollUp ? 'opacity-100' : 'opacity-0'}`} />
-          
-          <nav 
-            ref={navRef}
-            onScroll={checkScrollability}
-            className="h-full overflow-y-auto overflow-x-visible space-y-3 no-scrollbar py-2 flex flex-col items-center"
-          >
-            {visibleAssistants.map((assistant) => {
-              const isLocked = !isLoading && !unlockedAssistants.has(assistant.id);
-              const lockedText = isLocked ? ` ${t('locked_tooltip')}` : '';
-              
-              return (
-                <div key={assistant.id} className="group relative">
-                  <button
-                    onClick={() => onAssistantClick(assistant)}
-                    className={`w-16 h-16 rounded-full flex items-center justify-center p-0.5 transition-all duration-300 ease-in-out transform hover:scale-110 focus:outline-none relative z-10 ${
-                      activeAssistantId === assistant.id ? `border-2 ${assistant.ringColor}` : 'border-2 border-transparent'
-                    }`}
-                    aria-label={`Select ${assistant.name}${lockedText}`}
-                  >
-                    <img 
-                      src={assistant.iconUrl} 
-                      alt={assistant.name} 
-                      className={`w-full h-full object-cover rounded-full transition-all duration-300 ${isLocked ? 'grayscale opacity-60' : ''}`}
-                    />
-                    {isLocked && (
-                      <div className="absolute -top-1.5 -right-1.5 bg-ocs-accent text-white rounded-full p-1.5 shadow-lg border-2 border-gray-100 dark:border-ocs-dark-sidebar">
-                          <DiamondIcon className="w-4 h-4" />
-                      </div>
-                    )}
-                  </button>
+        {/* Desktop Content & Mobile Expanded Content */}
+        <div className={`flex flex-col items-center space-y-6 transition-all duration-500 ${isMobileExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 md:opacity-100 md:translate-y-0 md:flex h-0 md:h-auto pointer-events-none md:pointer-events-auto'}`}>
+            
+            <div className="w-8 h-px bg-white/10 flex-shrink-0" />
 
-                  {/* Standard Tooltip */}
-                  <span className="absolute left-full ml-4 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-gray-900 text-white text-sm font-semibold rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-20">
-                    {assistant.name}{lockedText}
-                  </span>
-                </div>
-              );
-            })}
-          </nav>
-          
-          <div className={`absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-gray-100 dark:from-ocs-dark-sidebar to-transparent pointer-events-none z-10 transition-opacity ${canScrollDown ? 'opacity-100' : 'opacity-0'}`} />
-        </div>
-
-        <button
-          onClick={() => scroll('down')}
-          aria-label="Scroll assistants down"
-          className={`h-8 flex-shrink-0 flex items-center justify-center text-gray-400 dark:text-gray-500 transition-all duration-300 ${canScrollDown ? 'opacity-100 hover:text-gray-600 dark:hover:text-gray-300' : 'opacity-0 pointer-events-none'}`}
-        >
-          <ChevronDownIcon className="w-5 h-5" />
-        </button>
-      </div>
-
-      <div className="flex flex-col items-center space-y-2">
-        {activeAssistantId && (
+            {/* New Chat Button */}
             <button
-                onClick={onToggleHistory}
-                className="md:hidden w-12 h-12 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-ocs-dark-hover transition-colors duration-200 ease-in-out focus:outline-none"
-                aria-label={t('toggle_chat_history')}
+            onClick={() => handleMobileAction(onNewChat)}
+            className="group relative flex items-center justify-center w-12 h-12 rounded-full hover:bg-white/10 text-white transition-all duration-200 focus:outline-none"
+            aria-label="New Chat"
             >
-                <HistoryIcon className="w-6 h-6" />
+            <PlusIcon className="w-6 h-6" />
+            <span className="absolute left-full ml-4 px-2 py-1 bg-black text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none uppercase tracking-widest border border-white/10">
+                {t('new_chat')}
+            </span>
             </button>
-        )}
-        <div className="mb-2">
-          <LanguageSelector activeChatId={activeChatId} />
+
+            {/* History Toggle (Only visible on mobile as per request) */}
+            <button
+            onClick={() => handleMobileAction(onToggleHistory)}
+            className="md:hidden group relative flex items-center justify-center w-12 h-12 rounded-full hover:bg-white/10 text-white transition-all duration-200 focus:outline-none"
+            aria-label="View History"
+            >
+            <HistoryIcon className="w-6 h-6" />
+            </button>
+
+            {/* Notifications */}
+            <button
+            onClick={() => handleMobileAction(onToggleNotifications)}
+            className="group relative flex items-center justify-center w-12 h-12 rounded-full hover:bg-white/10 text-white transition-all duration-200 focus:outline-none"
+            aria-label="Notifications"
+            >
+            <BellIcon className="w-6 h-6" />
+            {hasUnreadNotifications && (
+                <span className="absolute top-3 right-3 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-black" />
+            )}
+            <span className="absolute left-full ml-4 px-2 py-1 bg-black text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none uppercase tracking-widest border border-white/10">
+                Alerts
+            </span>
+            </button>
+
+            <div className="w-8 h-px bg-white/10 flex-shrink-0" />
+
+            {/* Language Selector */}
+            <div className="flex flex-col items-center">
+            <LanguageSelector activeChatId={activeChatId} />
+            </div>
         </div>
+
+        {/* Mobile Toggle Button - Visible only when collapsed on mobile */}
+        <button 
+            onClick={toggleMobile}
+            className="md:hidden flex items-center justify-center w-12 h-10 text-zinc-500 hover:text-white transition-colors"
+            aria-label={isMobileExpanded ? "Collapse Menu" : "Expand Menu"}
+        >
+            {isMobileExpanded ? (
+                <XIcon className="w-5 h-5" />
+            ) : (
+                <ChevronDownIcon className="w-5 h-5 animate-bounce" />
+            )}
+        </button>
+
       </div>
     </aside>
   );

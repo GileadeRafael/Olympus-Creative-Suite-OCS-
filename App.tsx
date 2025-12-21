@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Assistant, Message, ChatHistoryItem, Notification } from './types';
 import { ASSISTANTS } from './constants';
@@ -22,7 +21,7 @@ import { ToastProvider } from './contexts/ToastContext';
 import ToastContainer from './components/ToastContainer';
 import LogoutAnimation from './components/LogoutAnimation';
 import { ChevronDoubleLeftIcon } from './components/icons/CoreIcons';
-import WelcomeScreen from './components/WelcomeScreen'; // Explicit import
+import WelcomeScreen from './components/WelcomeScreen';
 
 export interface PersonalizedWelcomeItem {
     type: 'last_chat' | 'recent_badge' | 'suggestion';
@@ -550,6 +549,7 @@ const AppContent: React.FC = () => {
                 hasUnreadNotifications={hasUnreadNotifications}
                 onToggleNotifications={() => setIsNotificationsModalOpen(p => !p)}
                 activeChatId={activeChatId}
+                onNewChat={handleNewChat}
             />
         )}
         <main className="flex-1 flex flex-col h-full relative overflow-x-hidden">
