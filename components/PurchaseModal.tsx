@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import type { Assistant } from '../types';
 import { XIcon } from './icons/CoreIcons';

@@ -1,5 +1,3 @@
-
-
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { Assistant, Message } from '../types';
 import { ASSISTANTS } from '../constants';
@@ -321,7 +319,7 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
 
 
   if (!assistant) {
-    return <WelcomeScreen user={user} personalizedData={personalizedWelcomeData} onAssistantClick={onAssistantClick} />;
+    return <WelcomeScreen user={user} personalizedData={personalizedWelcomeData} onAssistantClick={onAssistantClick} assistants={ASSISTANTS} unlockedAssistants={new Set()} onLogout={()=>{}} onOpenBadges={()=>{}} />;
   }
   
   const isSendDisabled = isLoading || (!input.trim() && selectedImages.length === 0);
@@ -333,6 +331,12 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
+        style={{
+            backgroundImage: "url('https://i.imgur.com/jgJOxlU.jpeg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+        }}
     >
       <div 
         ref={chatContainerRef} 
@@ -365,12 +369,14 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
                         </button>
                     )}
                 </div>
-                <p className="text-zinc-600 dark:text-zinc-400 max-w-lg">
-                  {t(assistant.descriptionKey)}
-                </p>
+                <div className="bg-black/40 backdrop-blur-md p-4 rounded-2xl border border-white/10 max-w-lg mx-auto">
+                    <p className="text-zinc-200 dark:text-zinc-200">
+                      {t(assistant.descriptionKey)}
+                    </p>
+                </div>
                 
                 <div className="mt-10 w-full max-w-lg">
-                    <h3 className="flex items-center justify-center text-sm font-semibold text-gray-500 dark:text-ocs-text-muted mb-4">
+                    <h3 className="flex items-center justify-center text-sm font-semibold text-gray-200 dark:text-ocs-text-muted mb-4 drop-shadow-md">
                         <SparklesIcon className="w-5 h-5 mr-2 text-ocs-accent" />
                         {t('example_prompts_title')}
                     </h3>
@@ -379,7 +385,7 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
                             <button
                                 key={promptKey}
                                 onClick={() => handleSend(t(promptKey))}
-                                className="text-left p-3 bg-gray-100/80 dark:bg-ocs-dark-input/80 backdrop-blur-md rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-ocs-dark-hover transition-colors duration-200"
+                                className="text-left p-3 bg-black/60 dark:bg-black/60 backdrop-blur-md rounded-lg text-sm text-gray-100 dark:text-gray-100 border border-white/10 hover:bg-black/80 transition-colors duration-200"
                             >
                               {t(promptKey)}
                             </button>
@@ -394,10 +400,10 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
                   <div key={msg.id} id={`message-${msg.id}`} className={`my-3 sm:my-4 flex group ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className="relative max-w-[80%] md:max-w-2xl">
                       <div
-                        className={`p-3 sm:p-4 rounded-2xl prose-p:my-2 prose-p:leading-relaxed prose-headings:my-4 prose-pre:bg-black prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-code:text-white transition-colors break-words ${
+                        className={`p-3 sm:p-4 rounded-2xl prose-p:my-2 prose-p:leading-relaxed prose-headings:my-4 prose-pre:bg-black prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-code:text-white transition-colors break-words backdrop-blur-md shadow-lg border border-white/5 ${
                           msg.role === 'user' 
-                            ? 'bg-gray-200 dark:bg-ocs-dark-hover prose dark:prose-invert'
-                            : 'bg-gray-50 dark:bg-ocs-dark-input text-gray-800 dark:text-gray-200 prose dark:prose-invert'
+                            ? 'bg-zinc-800/80 dark:bg-zinc-800/80 prose dark:prose-invert text-white'
+                            : 'bg-black/70 dark:bg-black/70 text-gray-100 dark:text-gray-100 prose dark:prose-invert border-white/10'
                         }`}
                       >
                         {msg.content ? <div dangerouslySetInnerHTML={renderMessageContent(msg.content)} /> : null}
@@ -432,7 +438,7 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
               {isLoading && messages.length > 0 && messages[messages.length-1]?.role === 'user' && (
                 <div className="my-4 flex justify-start">
                    <div className="relative group">
-                    <div className="p-4 rounded-2xl max-w-2xl bg-gray-50 dark:bg-ocs-dark-input flex items-center">
+                    <div className="p-4 rounded-2xl max-w-2xl bg-black/70 dark:bg-black/70 backdrop-blur-md flex items-center border border-white/10 shadow-lg">
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse mr-2"></div>
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse mr-2 delay-75"></div>
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-150"></div>
@@ -470,7 +476,7 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
       
       <div 
         ref={inputContainerRef}
-        className="absolute bottom-0 left-0 right-0 w-full pt-4 bg-gradient-to-t from-white dark:from-ocs-dark-chat to-transparent"
+        className="absolute bottom-0 left-0 right-0 w-full pt-4 bg-gradient-to-t from-black/60 to-transparent"
       >
         <div className="max-w-4xl mx-auto px-4 pb-4">
           {selectedImages.length > 0 && (
@@ -487,14 +493,14 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
               </div>
             </div>
           )}
-          <div className="bg-gray-100/80 dark:bg-ocs-dark-input/80 backdrop-blur-lg rounded-2xl p-3 flex flex-col w-full shadow-lg border border-gray-200/50 dark:border-ocs-dark-hover/50">
+          <div className="bg-black/60 dark:bg-black/60 backdrop-blur-lg rounded-2xl p-3 flex flex-col w-full shadow-2xl border border-white/10">
             <textarea
                 ref={textareaRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={t('message_placeholder', { assistantName: assistant.name })}
-                className="flex-1 bg-transparent text-gray-800 dark:text-gray-200 dark:placeholder-ocs-text-muted/70 focus:outline-none resize-none max-h-40 overflow-y-auto custom-scrollbar w-full px-1 pt-1"
+                className="flex-1 bg-transparent text-white dark:text-white dark:placeholder-zinc-500 focus:outline-none resize-none max-h-40 overflow-y-auto custom-scrollbar w-full px-1 pt-1"
                 rows={1}
             />
             <div className="mt-3 flex items-center justify-between">
@@ -502,7 +508,7 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
                     <input type="file" ref={fileInputRef} onChange={handleFileChange} multiple accept="image/jpeg, image/png, image/webp" className="hidden" />
                     <button 
                         onClick={() => fileInputRef.current?.click()} 
-                        className="p-2 text-gray-600 dark:text-gray-300 bg-gray-200/70 dark:bg-ocs-dark-hover/70 rounded-lg transition-colors hover:bg-gray-300 dark:hover:bg-zinc-700"
+                        className="p-2 text-white bg-white/10 dark:bg-white/10 rounded-lg transition-colors hover:bg-white/20"
                         aria-label="Add attachment"
                     >
                         <PlusIcon className="w-5 h-5" />
@@ -511,14 +517,14 @@ const ChatView: React.FC<ChatViewProps> = ({ assistant, chatSession, messages, s
                 <button
                     onClick={() => handleSend()}
                     disabled={isSendDisabled}
-                    className="flex items-center space-x-2.5 text-white bg-gray-900 dark:bg-white dark:text-gray-900 font-semibold rounded-lg px-3 sm:px-4 py-2 transition-all duration-200 transform
-                    hover:bg-gray-700 dark:hover:bg-gray-200
-                    disabled:bg-gray-300 dark:disabled:bg-zinc-800 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed disabled:scale-100"
+                    className="flex items-center space-x-2.5 text-black bg-white dark:bg-white font-semibold rounded-lg px-3 sm:px-4 py-2 transition-all duration-200 transform
+                    hover:bg-gray-200
+                    disabled:bg-zinc-800 dark:disabled:bg-zinc-800 disabled:text-zinc-600 dark:disabled:text-zinc-600 disabled:cursor-not-allowed disabled:scale-100"
                     aria-label="Send message now"
                 >
                     <span className="text-sm">Send<span className="hidden sm:inline"> now</span></span>
                     <span className="h-4 w-px bg-gray-500/50 dark:bg-gray-500/50"></span>
-                    <ChevronDownIcon className="w-4 h-4 text-gray-400 dark:text-gray-600" />
+                    <ChevronDownIcon className="w-4 h-4 text-gray-500 dark:text-gray-500" />
                 </button>
             </div>
           </div>

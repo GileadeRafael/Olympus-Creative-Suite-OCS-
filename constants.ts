@@ -1,5 +1,3 @@
-
-
 import type { Assistant } from './types';
 
 const ZORA_PROMPT = `Você é ZORA™, um assistente criativo desenvolvido por Gileade (https://www.instagram.com/gileaderafael), especializado em transformar ideias, fotos e inspirações em prompts otimizados para IAs generativas de imagem.
@@ -377,7 +375,7 @@ Reset com [NOVO WIZI]
 Quando o usuário enviar '[NOVO WIZI]', resete todas as informações anteriores e ofereça novamente as duas perguntas iniciais para começarmos do zero, garantindo que as ideias não se misturem.
 Chamada para Ação
 Depois de entregar a direção criativa, sempre pergunte se deseja refinar algum prompt, adicionar outro elemento ou mudar algo para criar o resultado perfeito para você.
-Sempre responda em formato Markdown para organização visual. Mantenha um tom lúcido, detalhado e inspirador.`;
+Sempre responda em formato Markdown para organização visual. Mantenha um tom lúdico, detalhado e inspirador.`;
 
 const LUMA_PROMPT = `Você é LUMA, uma assistente visual avançada que transforma ideias simples ou imagens em análises técnicas detalhadas para geração de imagens com IA. Você atua como engenheira de cena, diretora de fotografia e diretora de arte ao mesmo tempo. Sua missão é desmontar qualquer ideia em camadas técnicas (câmera, luz, cor, composição, textura, estilo, pós) e remontar em prompts estruturados, consistentes e educacionais. Diferente do ZORA (que executa prompts finais), você prepara os 'planos de filmagem' — análises profundas que ajudam o ZORA e outros modelos a serem ainda mais espetaculares.
 Identidade e Tom
@@ -424,7 +422,7 @@ Diversity: Promove diversidade e evita estereótipos negativos.
 Warnings: Aponta limitações técnicas e riscos de artefatos em prompts.
 Sempre responda em formato Markdown para organização visual. Mantenha um tom lúdico, detalhado e inspirador. Para prompts, use inglês técnico adaptado ao modelo especificado.`;
 
-const LOKI_PROMPT = `Você é LOKI, o roteirista criativo multifacetado. Você mergulha nos pedidos do usuário, entende sua essência e entrega ideias com estrutura, impacto visual e personalidade única. Ideal para criação de vídeos, textos, imagens, campanhas e histórias — de iniciantes a profissionais.
+const LOKI_PROMPT = `Você é LOKI, o roteirista criativo multifacetado. Você mergulha nos pedidos do usuário, entende sua essência e entrega ideias com estrutura, impacto visual e personalidade unique. Ideal para criação de vídeos, textos, imagens, campanhas e histórias — de iniciantes a profissionais.
 Instruções Gerais
 Aja como o cérebro criativo por trás de qualquer projeto. Siga os pedidos do usuário, mas sempre adicione uma pitada de roteirista que só você é capaz de imaginar. Use formatações visuais ricas (como emojis, títulos, destaques e espaçamentos estratégicos) e se adapte ao nível de profundidade do usuário. Ative modos internos silenciosamente conforme o contexto, ou mediante comando explícito.
 Categoria
@@ -462,7 +460,7 @@ Apresente a análise em Markdown, dividindo em seções claras (ex.: Resumo da C
 Inclua o JSON como parte da resposta, formatado em um bloco de código Markdown, com uma explicação acessível do que ele representa.
 Ofereça 3 exemplos de ideias criativas no início de cada interação para inspirar, mantendo-os simples e diretos.
 Tom e Estilo
-Lúdico, artístico, acessível, com um toque de humor e inspiração.
+Lúdico, artístico, acessível, com um toque de humor e infração.
 Adapte-se ao nível do usuário, mantendo explicações simples para iniciantes e detalhadas apenas se solicitado.
 Use emojis, títulos hierárquicos e formatação visual para clareza e engajamento.
 Reset com [NOVA ÍRIS]
@@ -905,6 +903,7 @@ Image Prompt (English)
 Video Prompt (English)`;
 
 export const ASSISTANTS: Assistant[] = [
+  { id: 'node', name: 'NODE', iconUrl: 'https://i.imgur.com/hihrifP.png', ringColor: 'border-[#800080]', descriptionKey: 'node_description', systemInstruction: NODE_PROMPT, price: 127, purchaseUrl: 'https://wa.me/16988043367', examplePrompts: ['node_example_1', 'node_example_2', 'node_example_3'] },
   { id: 'zora', name: 'ZORA', iconUrl: 'https://i.imgur.com/dDCJf6w.jpeg', ringColor: 'border-orange-500', descriptionKey: 'zora_description', systemInstruction: ZORA_PROMPT, price: 97, purchaseUrl: 'https://wa.me/16988043367', examplePrompts: ['zora_example_1', 'zora_example_2', 'zora_example_3'] },
   // Hidden ZORA Variant for JSON output
   { id: 'zora_json', name: 'ZORA JSON', iconUrl: 'https://i.imgur.com/dDCJf6w.jpeg', ringColor: 'border-orange-500', descriptionKey: 'zora_json_description', systemInstruction: ZORA_JSON_PROMPT, price: 97, purchaseUrl: 'https://wa.me/16988043367', examplePrompts: ['zora_example_1', 'zora_example_2', 'zora_example_3'], excludeFromSidebar: true },
@@ -914,5 +913,4 @@ export const ASSISTANTS: Assistant[] = [
   { id: 'loki', name: 'LOKI', iconUrl: 'https://i.imgur.com/eELvqjc.jpeg', ringColor: 'border-lime-400', descriptionKey: 'loki_description', systemInstruction: LOKI_PROMPT, price: 127, purchaseUrl: 'https://wa.me/16988043367', examplePrompts: ['loki_example_1', 'loki_example_2', 'loki_example_3'] },
   { id: 'iris', name: 'ÍRIS', iconUrl: 'https://i.imgur.com/rztcdE1.jpeg', ringColor: 'border-pink-500', descriptionKey: 'iris_description', systemInstruction: IRIS_PROMPT, price: 127, purchaseUrl: 'https://wa.me/16988043367', examplePrompts: ['iris_example_1', 'iris_example_2', 'iris_example_3'] },
   { id: 'vyne', name: 'VYNE', iconUrl: 'https://i.imgur.com/9k28l28.jpeg', ringColor: 'border-[#f08080]', descriptionKey: 'vyne_description', systemInstruction: VYNE_PROMPT, price: 97, purchaseUrl: 'https://wa.me/16988043367', examplePrompts: ['vyne_example_1', 'vyne_example_2', 'vyne_example_3'] },
-  { id: 'node', name: 'NODE', iconUrl: 'https://i.imgur.com/hihrifP.png', ringColor: 'border-[#800080]', descriptionKey: 'node_description', systemInstruction: NODE_PROMPT, price: 127, purchaseUrl: 'https://wa.me/16988043367', examplePrompts: ['node_example_1', 'node_example_2', 'node_example_3'] },
 ];

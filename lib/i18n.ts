@@ -1,5 +1,3 @@
-
-
 export type LanguageCode = 'en' | 'pt' | 'es' | 'zh' | 'fr';
 
 export const translations: Record<LanguageCode, Record<string, string>> = {
@@ -275,7 +273,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'zora_example_2': "Tengo una idea: 'un astronauta solitario descubriendo un bosque brillante.' Ayúdame a visualizarlo.",
     'zora_example_3': 'Sé mi brújula creativa. Necesito inspiración para la portada de un libro de fantasía.',
     'wizi_example_1': 'Ayúdame a crear una imagen de un zorro cibernético en una ciudad de neón.',
-    'wizi_example_2': "Tengo el sujeto: 'un golem antiguo'. ¿Qué tal el entorno y el estilo?",
+    'wizi_example_2': "Tengo el sujeto: 'un guolem antiguo'. ¿Qué tal el entorno y el estilo?",
     'wizi_example_3': 'Construyamos un prompt juntos. Comienza con un estilo de "retrato surrealista".',
     'luma_example_1': '@decompose una foto de una calle lluviosa de noche para un look de cine negro.',
     'luma_example_2': 'Explica la cámara y la iluminación para un estilo de "fotografia de comida acogedora".',
@@ -423,7 +421,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'zora_description': 'Assistant créatif spécialisé dans la transformation d\'idées et de photos en prompts optimisés pour les IA génératives d\'images.',
     'zora_json_description': 'ZORA™ JSON Edition: Spécialisé dans la génération de prompts JSON structurés, parfait pour les pipelines d\'intégration.',
     'wizi_description': 'Un assistant lucide et détaillé qui vous aide à construire des prompts visuels complexes pour la génération d\'images, élément par élément.',
-    'luma_description': 'Une ingénieure visuelle qui décompose les idées en couches techniques (caméra, lumière, couleur) pour créer des prompts structurés et éducatifs.',
+    'luma_description': 'Une ingénieure visuelle qui décompose les idées en couches techniques (caméra, lumière, couleur) pour créer des prompts structurados et éducatifs.',
     'loki_description': 'Un scénariste créatif aux multiples facettes qui fournit des idées, des formats et des histoires pour des vidéos, des textes et des campagnes avec une touche unique.',
     'iris_description': 'Une artisane numérique qui transforme les idées en prompts détaillés et ludiques au format JSON pour les IA génératives de vidéos.',
     'vyne_description': 'VYNE est le parolier ultime pour l\'IA musicale Suno. Il crée des paroles sur mesure, comprenant le genre, le rythme, l\'intention et les références d\'artistes.',

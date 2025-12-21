@@ -1,6 +1,4 @@
-
-
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { MailIcon, EyeIcon, EyeSlashIcon, ChevronDoubleRightIcon } from './icons/CoreIcons';
 import { ASSISTANTS } from '../constants';
@@ -16,9 +14,6 @@ const AuthPage: React.FC = () => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
 
-  // Background Ref for performance
-  const backgroundRef = useRef<HTMLDivElement>(null);
-
   // Slideshow State
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isSlideVisible, setIsSlideVisible] = useState(true);
@@ -29,38 +24,6 @@ const AuthPage: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [toast]);
-
-  // Mouse Interaction Effect
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-        if (!backgroundRef.current) return;
-
-        const x = e.clientX;
-        const y = e.clientY;
-        const width = window.innerWidth;
-
-        // Calculate color ratio (0 to 1) based on X position
-        const ratio = x / width;
-
-        // Interpolate between Purple (138, 93, 255) and Lime (204, 255, 0)
-        // You can adjust these RGB values to tweak the colors
-        const startColor = { r: 138, g: 93, b: 255 }; // Purple
-        const endColor = { r: 204, g: 255, b: 0 };    // Lime
-
-        const r = Math.round(startColor.r + (endColor.r - startColor.r) * ratio);
-        const g = Math.round(startColor.g + (endColor.g - startColor.g) * ratio);
-        const b = Math.round(startColor.b + (endColor.b - startColor.b) * ratio);
-
-        backgroundRef.current.style.background = `radial-gradient(
-            800px circle at ${x}px ${y}px, 
-            rgba(${r}, ${g}, ${b}, 0.25), 
-            transparent 60%
-        )`;
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
 
   // Dynamic Island Slideshow Logic
   const slides = [
@@ -162,21 +125,15 @@ const AuthPage: React.FC = () => {
   const primaryButtonClass = "w-full bg-quantum-lime hover:bg-lime-400 text-black font-bold py-4 rounded-full transition-all duration-300 transform hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(204,255,0,0.4)] disabled:opacity-50 disabled:hover:scale-100 disabled:shadow-none mt-4 text-sm uppercase tracking-wider";
   
   return (
-    <div className="min-h-screen w-full relative flex items-center justify-center bg-[#030303] overflow-hidden font-sans text-white selection:bg-lime-500/30">
-       
-       {/* Background Grid & Effects */}
-       <div className="absolute inset-0 z-0 bg-quantum-grid bg-quantum-plus pointer-events-none opacity-50"></div>
-       
-       {/* Dynamic Interactive Gradient Background */}
-       <div 
-         ref={backgroundRef}
-         className="absolute inset-0 z-0 pointer-events-none transition-opacity duration-300"
-         style={{
-             // Initial state before JavaScript kicks in
-             background: 'radial-gradient(800px circle at 50% 50%, rgba(138, 93, 255, 0.15), transparent 60%)'
-         }}
-       />
-
+    <div 
+        className="min-h-screen w-full relative flex items-center justify-center bg-[#030303] overflow-hidden font-sans text-white selection:bg-lime-500/30"
+        style={{
+            backgroundImage: "url('https://i.imgur.com/jgJOxlU.jpeg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+        }}
+    >
        {/* Global Toast */}
        {toast && (
         <div className={`fixed top-8 left-1/2 -translate-x-1/2 z-[80] px-6 py-3 rounded-full text-white font-bold shadow-[0_0_20px_rgba(0,0,0,0.5)] ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'} backdrop-blur-md border border-white/10`}>
@@ -191,7 +148,7 @@ const AuthPage: React.FC = () => {
             onClick={handleCloseConfirmationModal}
         >
             <div 
-                className="w-full max-w-sm bg-[#0a0a0a] border border-white/10 rounded-3xl p-8 flex flex-col items-center text-center shadow-2xl relative overflow-hidden"
+                className="w-full max-sm bg-[#0a0a0a] border border-white/10 rounded-3xl p-8 flex flex-col items-center text-center shadow-2xl relative overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="absolute inset-0 bg-gradient-to-b from-purple-500/10 to-transparent pointer-events-none"></div>
@@ -387,7 +344,7 @@ const AuthPage: React.FC = () => {
             )}
         </div>
         
-        {/* Footer info - Removed 'Powered by Gemini 2.5' */}
+        {/* Footer info */}
         <div className="mt-8 text-center">
             <p className="text-zinc-600 text-xs">
                 &copy; {new Date().getFullYear()} Zion Peak Suite.
