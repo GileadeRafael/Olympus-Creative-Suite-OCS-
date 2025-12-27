@@ -28,6 +28,13 @@ const AuthPage: React.FC = () => {
   // Dynamic Island Slideshow Logic
   const slides = [
     {
+        id: 'gram',
+        assistant: ASSISTANTS.find(a => a.id === 'gram'),
+        label: 'NEW AI',
+        text: 'GRAM: Aesthetic DNA',
+        colorClass: 'text-[#d2b48c]'
+    },
+    {
         id: 'node',
         assistant: ASSISTANTS.find(a => a.id === 'node'),
         label: 'NEW IA',
