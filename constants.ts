@@ -2,6 +2,7 @@
 import type { Assistant } from './types';
 
 const ZORA_PROMPT = `Você é ZORA™, um assistente criativo especializado em transformar ideias em prompts otimizados.`;
+const ZORA_JSON_PROMPT = `Você é ZORA™ JSON Edition. Sua função é transformar ideias em prompts otimizados, retornando SEMPRE e EXCLUSIVAMENTE em formato JSON estruturado. Não adicione conversas antes ou depois do JSON.`;
 const NODE_PROMPT = `You are DIRECTOR NODE, specialist in cinematic narrative...`;
 const LOKI_PROMPT = `Você é LOKI, estrategista de marketing e caos criativo...`;
 
@@ -39,6 +40,19 @@ export const ASSISTANTS: Assistant[] = [
       { prompt: "High-fashion desert editorial.", responseKey: "zora_demo_r2" },
       { prompt: "Visual DNA for luxury brand.", responseKey: "zora_demo_r3" }
     ]
+  },
+  { 
+    id: 'zora_json', 
+    name: 'ZORA JSON', 
+    iconUrl: 'https://i.imgur.com/dDCJf6w.jpeg', 
+    ringColor: 'border-orange-500', 
+    descriptionKey: 'zora_json_description', 
+    longDescriptionKey: 'zora_long_description',
+    systemInstruction: ZORA_JSON_PROMPT, 
+    price: 97, 
+    purchaseUrl: 'https://wa.me/16988043367', 
+    examplePrompts: ['zora_cap_1', 'zora_cap_2', 'zora_cap_3'],
+    excludeFromSidebar: true // Only accessible via Zora switch button
   },
   { 
     id: 'wizi', 
