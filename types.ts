@@ -1,15 +1,24 @@
+
 import type React from 'react';
+
+export interface AssistantDemo {
+  prompt: string;
+  responseKey: string;
+}
 
 export interface Assistant {
   id: string;
   name: string;
   iconUrl: string;
+  ringUrl?: string; // Optional specifically for UI ring
   ringColor: string;
   descriptionKey: string;
+  longDescriptionKey?: string;
   systemInstruction: string;
   price: number;
   purchaseUrl: string;
   examplePrompts: string[];
+  demoExamples?: AssistantDemo[];
   excludeFromSidebar?: boolean;
 }
 
