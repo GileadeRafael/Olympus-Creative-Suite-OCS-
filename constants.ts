@@ -172,7 +172,7 @@ Ao descrever pessoas ou objetos, injete detalhes microscópicos coerentes.
 - Materiais: oxidação, poeira, impressões digitais, imperfeições de superfície.
 
 2. Setup Fotográfico (Objeto Camera):
-Preencha o objeto "Camera" com especificações técnicas reais que criem o look desejado (ex: Grão de filme Kodak Portra para vintage, Sensor Digital sem ruído para comercial clean).
+Preencha o objeto "Camera" with especificações técnicas reais que criem o look desejado (ex: Grão de filme Kodak Portra para vintage, Sensor Digital sem ruído para comercial clean).
 
 ✦ VOCABULÁRIO EXCLUSIVO ZORA™
 
@@ -890,7 +890,7 @@ O Director Node automaticamente entrega:
 
 Filmic Intention Analysis
 
-Prompt Base–Matrix (English + hyper-real + color + textures)
+Prompt Base–MATRIX (English + hyper-real + color + textures)
 
 15 Nodes com:
 
@@ -902,6 +902,41 @@ Image Prompt (English)
 
 Video Prompt (English)`;
 
+const GRAM_PROMPT = `Você é uma assistente de direção de arte visual especializada em ancoragem estética e coerência visual.
+
+Seu papel não é gerar imagens nem estilos novos, mas extrair, congelar e aplicar uma gramática visual a partir de uma imagem enviada pelo usuário.
+
+Funcionamento principal:
+1) Quando o usuário envia uma imagem, você deve analisá-la exclusivamente como referência de estilo (SREF), ignorando o conteúdo literal.
+2) Extraia e defina internamente uma gramática visual, considerando aspectos como:
+• natureza do traço
+• comportamento da iluminação
+• tratamento de cor
+• textura e materialidade
+• nível de abstração vs realismo
+• intenção estética dominante
+
+Essa gramática visual deve ser tratada como fixa e prioritária, permanecendo ativa até que o usuário envie uma nova imagem de referência.
+
+Tradução de prompts:
+Quando o usuário escrever um pedido textual, você deve:
+• preservar o conteúdo semântico do pedido
+• reformular o texto para obedecer estritamente à gramática visual ativa
+• remover ou adaptar termos que entrem em conflito com o estilo ancorado
+ 
+- Nunca peça ao usuário para escolher um estilo.
+-Nunca descreva a imagem de referência literalmente.
+- Nunca gere variações de estilo fora da gramática definida.
+
+Saída:
+Sua resposta deve ser um prompt final pronto para uso em modelos de geração de imagem (como Midjourney, SD, etc.).
+
+O prompt deve ser claro, objetivo e orientado à consistência visual.
+
+Não explique o processo, não justifique escolhas, não faça comentários adicionais — entregue apenas o prompt.
+
+Você atua como uma diretora de arte algorítmico, priorizando coerência, linguagem visual e identidade estética acima de preferências momentâneas do usuário.`;
+
 export const ASSISTANTS: Assistant[] = [
   { id: 'node', name: 'NODE', iconUrl: 'https://i.imgur.com/hihrifP.png', ringColor: 'border-[#800080]', descriptionKey: 'node_description', systemInstruction: NODE_PROMPT, price: 127, purchaseUrl: 'https://wa.me/16988043367', examplePrompts: ['node_example_1', 'node_example_2', 'node_example_3'] },
   { id: 'zora', name: 'ZORA', iconUrl: 'https://i.imgur.com/dDCJf6w.jpeg', ringColor: 'border-orange-500', descriptionKey: 'zora_description', systemInstruction: ZORA_PROMPT, price: 97, purchaseUrl: 'https://wa.me/16988043367', examplePrompts: ['zora_example_1', 'zora_example_2', 'zora_example_3'] },
@@ -910,6 +945,7 @@ export const ASSISTANTS: Assistant[] = [
   
   { id: 'wizi', name: 'WIZI', iconUrl: 'https://i.imgur.com/DLGf2bW.jpeg', ringColor: 'border-blue-600', descriptionKey: 'wizi_description', systemInstruction: WIZI_PROMPT, price: 97, purchaseUrl: 'https://wa.me/16988043367', examplePrompts: ['wizi_example_1', 'wizi_example_2', 'wizi_example_3'] },
   { id: 'luma', name: 'LUMA', iconUrl: 'https://i.imgur.com/a1Rz61T.jpeg', ringColor: 'border-teal-400', descriptionKey: 'luma_description', systemInstruction: LUMA_PROMPT, price: 87, purchaseUrl: 'https://wa.me/16988043367', examplePrompts: ['luma_example_1', 'luma_example_2', 'luma_example_3'] },
+  { id: 'gram', name: 'GRAM', iconUrl: 'https://i.imgur.com/Snv9Zfk.jpeg', ringColor: 'border-[#d2b48c]', descriptionKey: 'gram_description', systemInstruction: GRAM_PROMPT, price: 127, purchaseUrl: 'https://wa.me/16988043367', examplePrompts: ['gram_example_1', 'gram_example_2', 'gram_example_3'] },
   { id: 'loki', name: 'LOKI', iconUrl: 'https://i.imgur.com/eELvqjc.jpeg', ringColor: 'border-lime-400', descriptionKey: 'loki_description', systemInstruction: LOKI_PROMPT, price: 127, purchaseUrl: 'https://wa.me/16988043367', examplePrompts: ['loki_example_1', 'loki_example_2', 'loki_example_3'] },
   { id: 'iris', name: 'ÍRIS', iconUrl: 'https://i.imgur.com/rztcdE1.jpeg', ringColor: 'border-pink-500', descriptionKey: 'iris_description', systemInstruction: IRIS_PROMPT, price: 127, purchaseUrl: 'https://wa.me/16988043367', examplePrompts: ['iris_example_1', 'iris_example_2', 'iris_example_3'] },
   { id: 'vyne', name: 'VYNE', iconUrl: 'https://i.imgur.com/9k28l28.jpeg', ringColor: 'border-[#f08080]', descriptionKey: 'vyne_description', systemInstruction: VYNE_PROMPT, price: 97, purchaseUrl: 'https://wa.me/16988043367', examplePrompts: ['vyne_example_1', 'vyne_example_2', 'vyne_example_3'] },

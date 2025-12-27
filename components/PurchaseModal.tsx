@@ -78,6 +78,8 @@ const getButtonColors = (ringColor: string): string => {
             return 'bg-blue-600 text-white hover:bg-blue-500 shadow-blue-600/30';
         case 'border-teal-400':
             return 'bg-teal-400 text-white hover:bg-teal-300 shadow-teal-400/30';
+        case 'border-[#d2b48c]':
+            return 'bg-[#c19a6b] text-white hover:bg-[#a67c52] shadow-[#d2b48c]/30'; // Darker beige/tan for GRAM
         case 'border-lime-400':
             return 'bg-lime-400 text-black hover:bg-lime-300 shadow-lime-400/30';
         case 'border-pink-500':
